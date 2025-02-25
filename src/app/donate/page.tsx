@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import {
   Card,
@@ -14,9 +16,72 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, CreditCard, Banknote } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Heart,
+  Gift,
+  BookOpen,
+  Users,
+  CreditCard,
+  Banknote,
+} from "lucide-react";
 
-export default function Donate() {
+const supportOptions = [
+  {
+    title: "Monthly Donation",
+    description:
+      "Support our ongoing programs and maintenance with a monthly contribution.",
+    icon: Heart,
+    options: ["$10/month", "$25/month", "$50/month", "$100/month"],
+    benefits: [
+      "Support daily operations",
+      "Help maintain facilities",
+      "Fund teaching programs",
+      "Monthly merit dedication",
+    ],
+  },
+  {
+    title: "One-time Donation",
+    description:
+      "Make a one-time contribution to support our mission and activities.",
+    icon: Gift,
+    options: ["$50", "$100", "$250", "$500"],
+    benefits: [
+      "Support special projects",
+      "Fund retreat scholarships",
+      "Help with maintenance",
+      "Merit dedication",
+    ],
+  },
+  {
+    title: "Sponsor a Program",
+    description: "Help make Buddhist teachings accessible to more people.",
+    icon: BookOpen,
+    options: ["$500", "$1000", "$2500", "$5000"],
+    benefits: [
+      "Fund teaching programs",
+      "Support student scholarships",
+      "Enable live streaming",
+      "Special dedication ceremony",
+    ],
+  },
+];
+
+const paymentMethods = [
+  {
+    id: "bank",
+    name: "Bank Transfer",
+    accountInfo: "Bank: ABC Bank\nAccount: 1234567890\nIFSC: ABCD0001234",
+  },
+  { id: "esewa", name: "eSewa", accountInfo: "eSewa ID: 9876543210" },
+  { id: "khalti", name: "Khalti", accountInfo: "Khalti ID: 1234567890" },
+];
+
+export default function DonatePage() {
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
+    paymentMethods[0].id
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Breadcrumbs />
@@ -37,6 +102,7 @@ export default function Donate() {
         Your generous donation helps us continue spreading Buddhist teachings
         and practices.
       </motion.p>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -116,10 +182,10 @@ export default function Donate() {
           <Card className="bg-saffron-50 border-saffron-200">
             <CardHeader>
               <CardTitle className="text-2xl text-crimson-700">
-                Payment Information
+                Donor Information
               </CardTitle>
               <CardDescription className="text-maroon-600">
-                Enter your payment details securely
+                Enter your details
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -128,7 +194,11 @@ export default function Donate() {
                   <Label htmlFor="name" className="text-maroon-700">
                     Full Name
                   </Label>
-                  <Input id="name" placeholder="John Doe" className="mt-1" />
+                  <Input
+                    id="name"
+                    placeholder="Your Fullname"
+                    className="mt-1"
+                  />
                 </div>
                 <div className="mb-4">
                   <Label htmlFor="email" className="text-maroon-700">
@@ -137,33 +207,36 @@ export default function Donate() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="john@example.com"
+                    placeholder="example@gmail.com"
                     className="mt-1"
                   />
                 </div>
                 <div className="mb-4">
-                  <Label htmlFor="card" className="text-maroon-700">
-                    Card Number
-                  </Label>
-                  <Input
-                    id="card"
-                    placeholder="1234 5678 9012 3456"
-                    className="mt-1"
-                  />
+                  <Label className="text-maroon-700">Payment Method</Label>
+                  <RadioGroup
+                    value={selectedPaymentMethod}
+                    onValueChange={setSelectedPaymentMethod}
+                    className="mt-2"
+                  >
+                    {paymentMethods.map((method) => (
+                      <div
+                        key={method.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <RadioGroupItem value={method.id} id={method.id} />
+                        <Label htmlFor={method.id}>{method.name}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <Label htmlFor="expiry" className="text-maroon-700">
-                      Expiry Date
-                    </Label>
-                    <Input id="expiry" placeholder="MM/YY" className="mt-1" />
-                  </div>
-                  <div>
-                    <Label htmlFor="cvc" className="text-maroon-700">
-                      CVC
-                    </Label>
-                    <Input id="cvc" placeholder="123" className="mt-1" />
-                  </div>
+                <div className="mb-4 p-4 bg-saffron-100 rounded-md">
+                  <h4 className="font-semibold mb-2">Account Information</h4>
+                  <pre className="whitespace-pre-wrap text-sm">
+                    {
+                      paymentMethods.find((m) => m.id === selectedPaymentMethod)
+                        ?.accountInfo
+                    }
+                  </pre>
                 </div>
                 <Button className="w-full bg-crimson-600 hover:bg-crimson-700 text-white">
                   <Heart className="mr-2 h-4 w-4" /> Donate Now
@@ -173,6 +246,9 @@ export default function Donate() {
           </Card>
         </motion.div>
       </div>
+
+      <SupportSection />
+
       <motion.div
         className="mt-8"
         initial={{ opacity: 0, y: 20 }}
@@ -190,10 +266,10 @@ export default function Donate() {
               <CreditCard className="h-8 w-8 text-crimson-600 mr-4" />
               <div>
                 <h3 className="text-lg font-semibold text-maroon-800">
-                  Bank Transfer
+                  Physical Donation
                 </h3>
                 <p className="text-maroon-600">
-                  Contact us for our bank details
+                  Make a physical donation to our office
                 </p>
               </div>
             </div>
@@ -210,5 +286,89 @@ export default function Donate() {
         </Card>
       </motion.div>
     </div>
+  );
+}
+
+function SupportSection() {
+  const ref = useInView({ threshold: 0.5 });
+
+  return (
+    <section className="py-20 bg-muted/30">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Badge variant="secondary" className="mb-4">
+              Support Our Mission
+            </Badge>
+            <h2 className="text-3xl font-bold mb-4">
+              Help Us Spread Buddhist Teachings
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Your generous support helps us maintain our facilities, support
+              our teachers, and make Buddhist teachings accessible to all.
+            </p>
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {supportOptions.map((option, index) => {
+            const Icon = option.icon;
+            return (
+              <motion.div
+                key={option.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+              >
+                <Card className="h-full">
+                  <CardHeader>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="p-3 rounded-full bg-primary/10">
+                        <Icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <CardTitle>{option.title}</CardTitle>
+                    </div>
+                    <p className="text-muted-foreground">
+                      {option.description}
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-2 mb-6">
+                      {option.options.map((amount) => (
+                        <Button
+                          key={amount}
+                          variant="outline"
+                          className="w-full"
+                        >
+                          {amount}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="space-y-2 mb-6">
+                      {option.benefits.map((benefit, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-primary" />
+                          <span className="text-sm">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <Button className="w-full">Support Now</Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+    </section>
   );
 }

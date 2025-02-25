@@ -1,12 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Bell, Calendar, Clock } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Bell, Calendar, Clock } from "lucide-react";
+
+interface Reminder {
+  id: number;
+  type: string;
+  time: string;
+  days: string[];
+  active: boolean;
+}
 
 export function PracticeReminder() {
-  const [reminders, setReminders] = useState([
+  const [reminders, setReminders] = useState<Reminder[]>([
     {
       id: 1,
       type: "Meditation",
@@ -21,20 +29,26 @@ export function PracticeReminder() {
       days: ["Daily"],
       active: true,
     },
-  ])
+  ]);
 
   const handleToggle = (id: number) => {
     setReminders(
-      reminders.map((reminder) => (reminder.id === id ? { ...reminder, active: !reminder.active } : reminder)),
-    )
-  }
+      reminders.map((reminder) =>
+        reminder.id === id
+          ? { ...reminder, active: !reminder.active }
+          : reminder
+      )
+    );
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">Practice Reminders</h3>
-          <p className="text-sm text-primary/60">Set up notifications for your daily practice</p>
+          <p className="text-sm text-primary/60">
+            Set up notifications for your daily practice
+          </p>
         </div>
         <Button variant="outline">
           <Bell className="h-4 w-4 mr-2" />
@@ -44,7 +58,10 @@ export function PracticeReminder() {
 
       <div className="space-y-4">
         {reminders.map((reminder) => (
-          <div key={reminder.id} className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
+          <div
+            key={reminder.id}
+            className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
+          >
             <div className="space-y-1">
               <h4 className="font-medium">{reminder.type}</h4>
               <div className="flex items-center gap-2 text-sm text-primary/60">
@@ -54,11 +71,13 @@ export function PracticeReminder() {
                 {reminder.days.join(", ")}
               </div>
             </div>
-            <Switch checked={reminder.active} onCheckedChange={() => handleToggle(reminder.id)} />
+            <Switch
+              checked={reminder.active}
+              onCheckedChange={() => handleToggle(reminder.id)}
+            />
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
-

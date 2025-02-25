@@ -4,6 +4,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import Head from "next/head";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
   title: "Ngyungne Practice - Buddhist Teachings & Events",
   description:
     "Join us for Buddhist teachings, events, and practices. Learn about Ngyungne meditation and spiritual development.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -23,9 +27,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={poppins.className}>
+      <body className={`${poppins.className} flex flex-col min-h-screen`}>
         <Header />
-        <main>{children}</main>
+        <main className="flex-grow">{children}</main>
         <Footer />
       </body>
     </html>

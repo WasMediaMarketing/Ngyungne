@@ -1,29 +1,33 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
+import { useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 interface BuddhistEvent {
-  date: Date
-  title: string
-  type: "teaching" | "practice" | "festival" | "moon"
-  description: string
+  date: Date;
+  title: string;
+  type: "teaching" | "practice" | "festival" | "moon";
+  description: string;
 }
 
 export default function BuddhistCalendarPage() {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
-  const [view, setView] = useState<"month" | "year">("month")
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
+  const [view, setView] = useState<"month" | "year">("month");
 
   const buddhistEvents: BuddhistEvent[] = [
     {
       date: new Date(2024, 1, 15),
       title: "Losar - Tibetan New Year",
       type: "festival",
-      description: "Celebration of Tibetan New Year with special prayers and offerings.",
+      description:
+        "Celebration of Tibetan New Year with special prayers and offerings.",
     },
     {
       date: new Date(2024, 2, 1),
@@ -32,15 +36,22 @@ export default function BuddhistCalendarPage() {
       description: "Special practice session during the full moon.",
     },
     // Add more events
-  ]
+  ];
 
   const getEventForDate = (date: Date) => {
-    return buddhistEvents.find((event) => event.date.toDateString() === date.toDateString())
-  }
+    return buddhistEvents.find(
+      (event) => event.date.toDateString() === date.toDateString()
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid md:grid-cols-3 gap-8">
+      <Breadcrumbs />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid md:grid-cols-3 gap-8"
+      >
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>Buddhist Calendar</CardTitle>
@@ -48,10 +59,16 @@ export default function BuddhistCalendarPage() {
           <CardContent>
             <div className="space-y-4">
               <div className="flex gap-2">
-                <Button variant={view === "month" ? "default" : "outline"} onClick={() => setView("month")}>
+                <Button
+                  variant={view === "month" ? "default" : "outline"}
+                  onClick={() => setView("month")}
+                >
                   Month
                 </Button>
-                <Button variant={view === "year" ? "default" : "outline"} onClick={() => setView("year")}>
+                <Button
+                  variant={view === "year" ? "default" : "outline"}
+                  onClick={() => setView("year")}
+                >
                   Year
                 </Button>
               </div>
@@ -62,7 +79,11 @@ export default function BuddhistCalendarPage() {
                 onSelect={setSelectedDate}
                 className="rounded-md border"
                 modifiers={{
-                  event: (date) => buddhistEvents.some((event) => event.date.toDateString() === date.toDateString()),
+                  event: (date) =>
+                    buddhistEvents.some(
+                      (event) =>
+                        event.date.toDateString() === date.toDateString()
+                    ),
                 }}
                 modifiersStyles={{
                   event: {
@@ -91,8 +112,12 @@ export default function BuddhistCalendarPage() {
           <CardContent>
             {selectedDate && getEventForDate(selectedDate) ? (
               <div className="space-y-4">
-                <h3 className="font-bold text-lg">{getEventForDate(selectedDate)?.title}</h3>
-                <p className="text-primary/60">{getEventForDate(selectedDate)?.description}</p>
+                <h3 className="font-bold text-lg">
+                  {getEventForDate(selectedDate)?.title}
+                </h3>
+                <p className="text-primary/60">
+                  {getEventForDate(selectedDate)?.description}
+                </p>
                 <Button className="w-full">Add to Calendar</Button>
               </div>
             ) : (
@@ -102,6 +127,5 @@ export default function BuddhistCalendarPage() {
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }
-

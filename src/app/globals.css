@@ -51,7 +51,7 @@
 
 /* Tibetan decorative patterns */
 .tibetan-border {
-  background-image: url("/tibetan-border.svg");
+  background-image: url("/tibetian-border.jpg");
   background-repeat: repeat-x;
 }
 
@@ -71,8 +71,17 @@
 
 /* Mandala background pattern */
 .mandala-bg {
-  background-image: url("/mandala-pattern.svg");
+  background-image: url("/mandala.jpg");
   background-repeat: repeat;
   background-size: 200px;
   opacity: 0.1;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

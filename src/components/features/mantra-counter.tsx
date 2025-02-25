@@ -1,33 +1,38 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function MantraCounter() {
-  const [count, setCount] = useState(0)
-  const [goal, setGoal] = useState(108)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [bellSound, setBellSound] = useState<HTMLAudioElement | null>(null)
+  const [count, setCount] = useState(0);
+  const [goal, setGoal] = useState(108);
+  const [bellSound, setBellSound] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    setBellSound(new Audio("/bell-sound.mp3"))
-  }, [])
+    setBellSound(new Audio("/bell.mp3"));
+  }, []);
 
   const handleCount = () => {
     setCount((prev) => {
-      const newCount = prev + 1
+      const newCount = prev + 1;
       if (newCount === goal) {
-        bellSound?.play()
+        bellSound?.play();
       }
-      return newCount
-    })
-  }
+      return newCount;
+    });
+  };
 
   const resetCount = () => {
-    setCount(0)
-  }
+    setCount(0);
+  };
 
   return (
     <Dialog>
@@ -43,7 +48,9 @@ export function MantraCounter() {
         <div className="space-y-4">
           <div className="text-center">
             <div className="text-6xl font-bold text-primary mb-4">{count}</div>
-            <div className="text-sm text-primary/60">Goal: {goal} recitations</div>
+            <div className="text-sm text-primary/60">
+              Goal: {goal} recitations
+            </div>
             <div className="h-2 bg-secondary/20 rounded-full mt-2">
               <div
                 className="h-full bg-secondary rounded-full transition-all duration-300"
@@ -52,7 +59,10 @@ export function MantraCounter() {
             </div>
           </div>
           <div className="flex gap-4">
-            <Button onClick={handleCount} className="flex-1 bg-primary hover:bg-primary/90">
+            <Button
+              onClick={handleCount}
+              className="flex-1 bg-primary hover:bg-primary/90"
+            >
               Count
             </Button>
             <Button onClick={resetCount} variant="outline" className="flex-1">
@@ -61,11 +71,15 @@ export function MantraCounter() {
           </div>
           <div className="space-y-2">
             <label className="text-sm text-primary/60">Set Goal</label>
-            <Input type="number" value={goal} onChange={(e) => setGoal(Number.parseInt(e.target.value) || 0)} min="1" />
+            <Input
+              type="number"
+              value={goal}
+              onChange={(e) => setGoal(Number(e.target.value) || 0)}
+              min={1}
+            />
           </div>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

@@ -23,6 +23,12 @@ export const siteConfig = {
         description: "Study Buddhist texts and commentaries",
         icon: "ScrollText",
       },
+      {
+        title: "Courses",
+        href: "/teachings/courses",
+        description: "Structured learning programs",
+        icon: "GraduationCap",
+      },
     ] as NavSection[],
     programs: [
       {
@@ -43,12 +49,6 @@ export const siteConfig = {
         description: "Join our meditation retreats",
         icon: "Users",
       },
-      {
-        title: "Courses",
-        href: "/programs/courses",
-        description: "Structured learning programs",
-        icon: "GraduationCap",
-      },
     ] as NavSection[],
     resources: [
       {
@@ -61,6 +61,12 @@ export const siteConfig = {
         title: "Buddhist Calender",
         href: "/resources/buddhist-calendar",
         description: "Study Buddhist texts and commentaries",
+        icon: "ScrollText",
+      },
+      {
+        title: "Practices",
+        href: "/resources/practices",
+        description: "Practice meditation and spiritual development",
         icon: "ScrollText",
       },
       {

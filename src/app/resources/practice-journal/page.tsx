@@ -1,21 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar, Clock, Star } from "lucide-react"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar, Clock, Star } from "lucide-react";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 interface JournalEntry {
-  id: string
-  date: string
-  type: string
-  duration: number
-  notes: string
-  mood: number
+  id: string;
+  date: string;
+  type: string;
+  duration: number;
+  notes: string;
+  mood: number;
 }
 
 export default function PracticeJournalPage() {
@@ -29,7 +30,7 @@ export default function PracticeJournalPage() {
       mood: 4,
     },
     // Add more entries
-  ])
+  ]);
 
   const [newEntry, setNewEntry] = useState<Partial<JournalEntry>>({
     date: new Date().toISOString().split("T")[0],
@@ -37,10 +38,10 @@ export default function PracticeJournalPage() {
     duration: 30,
     notes: "",
     mood: 3,
-  })
+  });
 
   const addEntry = () => {
-    if (!newEntry.notes) return
+    if (!newEntry.notes) return;
 
     setEntries([
       {
@@ -48,21 +49,30 @@ export default function PracticeJournalPage() {
         id: Date.now().toString(),
       } as JournalEntry,
       ...entries,
-    ])
+    ]);
 
     setNewEntry({
       ...newEntry,
       notes: "",
       date: new Date().toISOString().split("T")[0],
-    })
-  }
+    });
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+      <Breadcrumbs />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-8"
+      >
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary mb-2">Practice Journal</h1>
-          <p className="text-primary/60">Track your spiritual practice and insights</p>
+          <h1 className="text-3xl font-bold text-primary mb-2">
+            Practice Journal
+          </h1>
+          <p className="text-primary/60">
+            Track your spiritual practice and insights
+          </p>
         </div>
 
         <Card>
@@ -107,7 +117,9 @@ export default function PracticeJournalPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Duration (minutes)</label>
+                  <label className="text-sm font-medium">
+                    Duration (minutes)
+                  </label>
                   <Input
                     type="number"
                     value={newEntry.duration}
@@ -120,7 +132,9 @@ export default function PracticeJournalPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Practice Quality</label>
+                  <label className="text-sm font-medium">
+                    Practice Quality
+                  </label>
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((rating) => (
                       <button
@@ -132,7 +146,9 @@ export default function PracticeJournalPage() {
                           })
                         }
                         className={`p-2 rounded-full ${
-                          newEntry.mood === rating ? "bg-primary text-white" : "bg-gray-100"
+                          newEntry.mood === rating
+                            ? "bg-primary text-white"
+                            : "bg-gray-100"
                         }`}
                       >
                         <Star className="h-5 w-5" />
@@ -190,7 +206,10 @@ export default function PracticeJournalPage() {
                         </div>
                         <div className="flex gap-1">
                           {Array.from({ length: entry.mood }).map((_, i) => (
-                            <Star key={i} className="h-4 w-4 text-secondary fill-current" />
+                            <Star
+                              key={i}
+                              className="h-4 w-4 text-secondary fill-current"
+                            />
                           ))}
                         </div>
                       </div>
@@ -200,14 +219,17 @@ export default function PracticeJournalPage() {
                 ))}
               </TabsContent>
 
-              <TabsContent value="calendar">{/* Add calendar view */}</TabsContent>
+              <TabsContent value="calendar">
+                {/* Add calendar view */}
+              </TabsContent>
 
-              <TabsContent value="stats">{/* Add statistics and charts */}</TabsContent>
+              <TabsContent value="stats">
+                {/* Add statistics and charts */}
+              </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }
-
