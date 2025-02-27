@@ -1,15 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Heart, Share2 } from "lucide-react"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Heart, Share2 } from "lucide-react";
+
+interface Dedication {
+  id: number;
+  author: string;
+  message: string;
+  likes: number;
+  timestamp: string;
+}
 
 export function MeritDedication() {
-  const [dedications, setDedications] = useState([
+  const [dedications, setDedications] = useState<Dedication[]>([
     {
       id: 1,
       author: "Tenzin",
@@ -18,13 +26,13 @@ export function MeritDedication() {
       timestamp: new Date().toISOString(),
     },
     // Add more dedications
-  ])
+  ]);
 
-  const [newDedication, setNewDedication] = useState("")
+  const [newDedication, setNewDedication] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newDedication.trim()) return
+    e.preventDefault();
+    if (!newDedication.trim()) return;
 
     setDedications([
       {
@@ -35,15 +43,19 @@ export function MeritDedication() {
         timestamp: new Date().toISOString(),
       },
       ...dedications,
-    ])
-    setNewDedication("")
-  }
+    ]);
+    setNewDedication("");
+  };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-primary mb-2">Merit Dedication Wall</h3>
-        <p className="text-primary/60">Share your practice merit and dedications with the community</p>
+        <h3 className="text-2xl font-bold text-primary mb-2">
+          Merit Dedication Wall
+        </h3>
+        <p className="text-primary/60">
+          Share your practice merit and dedications with the community
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -87,6 +99,5 @@ export function MeritDedication() {
         </AnimatePresence>
       </div>
     </div>
-  )
+  );
 }
-

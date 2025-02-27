@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { useInView } from "framer-motion"
-import { useRef } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Calendar, Clock, MapPin } from "lucide-react"
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Navigation, Pagination } from "swiper/modules"
-import "swiper/css"
-import "swiper/css/navigation"
-import "swiper/css/pagination"
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, MapPin } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const events = [
   {
@@ -19,7 +19,7 @@ const events = [
     time: "6:00 AM - 7:30 AM",
     location: "Main Temple Hall",
     teacher: "Ven. Khen Ripoche",
-    image: "/placeholder.svg",
+    image: "https://www.dharmaideal.org/api/image/1734338085080.jpeg",
   },
   {
     title: "Buddhist Philosophy Class",
@@ -27,7 +27,7 @@ const events = [
     time: "7:00 PM - 8:30 PM",
     location: "Teaching Hall",
     teacher: "H.E. Choknyi Rinpoche",
-    image: "/placeholder.svg",
+    image: "https://www.dharmaideal.org/api/image/1734338085080.jpeg",
   },
   {
     title: "Weekend Retreat",
@@ -35,13 +35,13 @@ const events = [
     time: "Full Day",
     location: "Retreat Center",
     teacher: "Ven. Dolpo Tulku Rinpoche",
-    image: "/placeholder.svg",
+    image: "https://www.dharmaideal.org/api/image/1734338085080.jpeg",
   },
-]
+];
 
 export function EventsSection() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
 
   return (
     <section id="events" className="py-20">
@@ -49,7 +49,8 @@ export function EventsSection() {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Upcoming Events</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Join us for teachings, meditation sessions, and retreats with our esteemed teachers.
+            Join us for teachings, meditation sessions, and retreats with our
+            esteemed teachers.
           </p>
         </div>
 
@@ -108,6 +109,5 @@ export function EventsSection() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
-

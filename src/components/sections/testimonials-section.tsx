@@ -1,57 +1,70 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { useRef } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Quote } from "lucide-react"
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Navigation, Pagination, Autoplay } from "swiper/modules"
-import "swiper/css"
-import "swiper/css/navigation"
-import "swiper/css/pagination"
+import { motion } from "framer-motion";
+import { useRef } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Quote } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const testimonials = [
   {
-    quote: "The teachings have transformed my understanding of Buddhism and daily practice.",
+    quote:
+      "The teachings have transformed my understanding of Buddhism and daily practice.",
     author: "Sarah Chen",
     title: "Student",
-    image: "/placeholder.svg",
+    image:
+      "https://sonamgear.com/uploads/product_images/bda50ca15f25e3045208f54062357663.jpg",
   },
   {
-    quote: "The meditation retreat was a life-changing experience. I learned so much about mindfulness.",
+    quote:
+      "The meditation retreat was a life-changing experience. I learned so much about mindfulness.",
     author: "David Miller",
     title: "Practitioner",
-    image: "/placeholder.svg",
+    image:
+      "https://sonamgear.com/uploads/product_images/de54e474acc117695a015ff28a2d5830.jpg",
   },
   {
-    quote: "The community here is wonderful. Everyone is so supportive and welcoming.",
+    quote:
+      "The community here is wonderful. Everyone is so supportive and welcoming.",
     author: "Maria Garcia",
     title: "Community Member",
-    image: "/placeholder.svg",
+    image:
+      "https://sonamgear.com/uploads/product_images/bda50ca15f25e3045208f54062357663.jpg",
   },
   {
-    quote: "The Tibetan language course opened up a new world of Buddhist texts for me.",
+    quote:
+      "The Tibetan language course opened up a new world of Buddhist texts for me.",
     author: "John Smith",
     title: "Language Student",
-    image: "/placeholder.svg",
+    image:
+      "https://sonamgear.com/uploads/product_images/de54e474acc117695a015ff28a2d5830.jpg",
   },
-]
+];
 
 export function TestimonialsSection() {
-  const swiperRef = useRef(null)
+  const swiperRef = useRef(null);
 
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Badge variant="secondary" className="mb-4">
               Testimonials
             </Badge>
             <h2 className="text-3xl font-bold mb-4">What Our Students Say</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Hear from our community members about their experiences with our teachings and programs.
+              Hear from our community members about their experiences with our
+              teachings and programs.
             </p>
           </motion.div>
         </div>
@@ -83,7 +96,9 @@ export function TestimonialsSection() {
                     />
                     <div>
                       <h4 className="font-medium">{testimonial.author}</h4>
-                      <p className="text-sm text-muted-foreground">{testimonial.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {testimonial.title}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -93,6 +108,5 @@ export function TestimonialsSection() {
         </Swiper>
       </div>
     </section>
-  )
+  );
 }
-

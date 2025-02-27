@@ -156,16 +156,13 @@ function MobileNav({ pathname }: { pathname: string }) {
         })}
       </div>
 
-      <Link
-        href="/contact"
-        className={`text-lg font-medium ${
-          pathname === "/contact" ? "text-primary" : "text-primary/60"
-        }`}
-      >
-        Contact
-      </Link>
-
       <div className="flex flex-col gap-2 pt-4">
+        <Button className="w-full">
+          <Link href="/contact">Contact Us</Link>
+        </Button>
+      </div>
+
+      <div className="flex flex-col gap-2">
         <Button className="w-full">
           <Link href="/donate">Donate Now</Link>
         </Button>

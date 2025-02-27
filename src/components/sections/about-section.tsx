@@ -5,6 +5,7 @@ import { useInView } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function AboutSection() {
   const ref = useRef(null);
@@ -66,7 +67,7 @@ export function AboutSection() {
               </div>
             </div>
             <Button size="lg" className="bg-primary hover:bg-primary/90">
-              Learn More About Ngyungne
+              <Link href="/about">Learn More About Ngyungne</Link>
             </Button>
           </div>
         </motion.div>
