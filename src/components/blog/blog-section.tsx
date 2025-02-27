@@ -153,7 +153,7 @@ export function BlogSection() {
                 className="h-full"
               >
                 <BlogPostCard
-                  post={post as BlogPost}
+                  post={post}
                   isHovered={hoveredCard === post.slug}
                   onHoverStart={() => setHoveredCard(post.slug)}
                   onHoverEnd={() => setHoveredCard(null)}

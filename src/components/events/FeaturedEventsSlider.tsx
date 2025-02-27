@@ -62,79 +62,81 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
           >
             {events.map((event) => (
               <SwiperSlide key={event.id}>
-                <Card className="overflow-hidden h-full border-none shadow-md hover:shadow-xl transition-shadow duration-300">
-                  <div className="aspect-video relative">
-                    <img
-                      src={event.image || "/placeholder.svg"}
-                      alt={event.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <Badge className="absolute top-4 right-4 bg-crimson-600 text-white">
-                      {event.type}
-                    </Badge>
-                    <div className="absolute bottom-4 left-4 text-white">
-                      <div className="flex items-center gap-2 text-sm">
-                        <CalendarDays className="h-4 w-4" />
-                        <span>
-                          {event.date.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
+                <Link href={`/programs/events/${event.id}`}>
+                  <Card className="overflow-hidden h-full border-none shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div className="aspect-video relative">
+                      <img
+                        src={event.image || "/placeholder.svg"}
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
+                      <Badge className="absolute top-4 right-4 bg-crimson-600 text-white">
+                        {event.type}
+                      </Badge>
+                      <div className="absolute bottom-4 left-4 text-white">
+                        <div className="flex items-center gap-2 text-sm">
+                          <CalendarDays className="h-4 w-4" />
+                          <span>
+                            {event.date.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xl text-crimson-700 line-clamp-1">
+                        {event.title}
+                      </CardTitle>
+                      <div className="flex items-center mt-1">
+                        <Avatar className="h-6 w-6 mr-2">
+                          <AvatarImage src="/avatar.png" />
+                          <AvatarFallback className="bg-crimson-100 text-crimson-700 text-xs">
+                            {event.teacher
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm text-gray-600">
+                          {event.teacher}
                         </span>
                       </div>
-                    </div>
-                  </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl text-crimson-700 line-clamp-1">
-                      {event.title}
-                    </CardTitle>
-                    <div className="flex items-center mt-1">
-                      <Avatar className="h-6 w-6 mr-2">
-                        <AvatarImage src="/avatar.png" />
-                        <AvatarFallback className="bg-crimson-100 text-crimson-700 text-xs">
-                          {event.teacher
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm text-gray-600">
-                        {event.teacher}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                      <Clock className="h-4 w-4 text-gray-400" />
-                      <span>{event.time}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 text-gray-400" />
-                      <span>{event.location}</span>
-                    </div>
-                    <div className="mt-3 flex items-center text-sm text-gray-600">
-                      <div className="flex -space-x-2 mr-2">
-                        {[...Array(3)].map((_, i) => (
-                          <Avatar
-                            key={i}
-                            className="h-6 w-6 border-2 border-white"
-                          >
-                            <AvatarFallback className="bg-gray-200 text-gray-600 text-xs">
-                              {String.fromCharCode(65 + i)}
-                            </AvatarFallback>
-                          </Avatar>
-                        ))}
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        <span>{event.time}</span>
                       </div>
-                      <span>{event.attending} attending</span>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button className="w-full bg-crimson-600 hover:bg-crimson-700">
-                      Register Now
-                    </Button>
-                  </CardFooter>
-                </Card>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="h-4 w-4 text-gray-400" />
+                        <span>{event.location}</span>
+                      </div>
+                      <div className="mt-3 flex items-center text-sm text-gray-600">
+                        <div className="flex -space-x-2 mr-2">
+                          {[...Array(3)].map((_, i) => (
+                            <Avatar
+                              key={i}
+                              className="h-6 w-6 border-2 border-white"
+                            >
+                              <AvatarFallback className="bg-gray-200 text-gray-600 text-xs">
+                                {String.fromCharCode(65 + i)}
+                              </AvatarFallback>
+                            </Avatar>
+                          ))}
+                        </div>
+                        <span>{event.attending} attending</span>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button className="w-full bg-crimson-600 hover:bg-crimson-700">
+                        Register Now
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </Link>
               </SwiperSlide>
             ))}
           </Swiper>

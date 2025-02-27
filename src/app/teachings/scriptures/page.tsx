@@ -30,10 +30,11 @@ import {
   MessageCircleQuestion,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 const scriptures = [
   {
-    id: "dhammapada",
+    id: "1",
     title: "The Dhammapada",
     tradition: "Theravada",
     period: "3rd century BCE",
@@ -78,7 +79,7 @@ const scriptures = [
       "Compiled after the Buddha's death as part of the effort to preserve his teachings, the Dhammapada represents some of the earliest recorded Buddhist teachings. Similar collections exist in Sanskrit and other languages, though the Pali version is the most well-known.",
   },
   {
-    id: "heart-sutra",
+    id: "2",
     title: "The Heart Sutra",
     tradition: "Mahayana",
     period: "1st century CE",
@@ -123,7 +124,7 @@ const scriptures = [
       "The Heart Sutra emerged during the development of Mahayana Buddhism, when new sutras were appearing that emphasized emptiness, compassion, and the bodhisattva path. It became especially prominent in China, Japan, and Korea.",
   },
   {
-    id: "diamond-sutra",
+    id: "3",
     title: "The Diamond Sutra",
     tradition: "Mahayana",
     period: "1st-2nd century CE",
@@ -168,7 +169,7 @@ const scriptures = [
       "Like the Heart Sutra, the Diamond Sutra developed during the growth of Mahayana Buddhism in India and gained prominence as Buddhism spread throughout Asia. It was translated multiple times into Chinese, becoming particularly influential in Chinese Buddhism.",
   },
   {
-    id: "lotus-sutra",
+    id: "4",
     title: "The Lotus Sutra",
     tradition: "Mahayana",
     period: "1st-2nd century CE",
@@ -499,13 +500,15 @@ export default function Scriptures() {
 
                   <CardFooter className="bg-saffron-50 border-t border-saffron-200 p-4">
                     <div className="flex justify-between items-center w-full">
-                      <Button
-                        variant="ghost"
-                        className="text-crimson-600 hover:text-crimson-800 hover:bg-saffron-100"
-                      >
-                        <BookOpenText className="mr-2 h-4 w-4" />
-                        Read Full Text
-                      </Button>
+                      <Link href={`/teachings/scriptures/${scripture.id}`}>
+                        <Button
+                          variant="ghost"
+                          className="text-crimson-600 hover:text-crimson-800 hover:bg-saffron-100"
+                        >
+                          <BookOpenText className="mr-2 h-4 w-4" />
+                          Read Full Text
+                        </Button>
+                      </Link>
                       <Button
                         variant="outline"
                         className="text-crimson-600 border-crimson-300 hover:bg-crimson-50"

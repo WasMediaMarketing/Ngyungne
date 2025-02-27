@@ -7,7 +7,7 @@ import { PracticeDashboard } from "@/components/features/practice-dashboard";
 import { PracticeReminder } from "@/components/features/practice-reminder";
 import { VirtualPrayerWheel } from "@/components/features/virtual-prayer-wheel";
 import { VirtualTemple } from "@/components/features/virtual-temple";
-import { Loader } from "@/components/sections/loader";
+import { Loader } from "@/components/common/loader";
 
 export default function PracticePage() {
   return (

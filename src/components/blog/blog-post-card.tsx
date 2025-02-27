@@ -87,7 +87,7 @@ export function BlogPostCard({
             </span>
           </div>
           <CardTitle className="text-xl text-crimson-700 hover:text-crimson-800 transition-colors line-clamp-2">
-            <Link href={`/resources/blog/${post.slug}`}>{post.title}</Link>
+            <Link href={`/resources/blog/${post.id}`}>{post.title}</Link>
           </CardTitle>
         </CardHeader>
         <CardContent className="pb-2 flex-grow">

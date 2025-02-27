@@ -1,34 +1,23 @@
 export interface BlogPost {
   id: number;
   title: string;
-  slug: string;
-  description: string;
   excerpt: string;
-  date: Date;
-  readTime: string;
+  content: string | { content: string; type: string }[];
+  date: string;
   author: {
     name: string;
     image: string;
-    bio: string;
+    title: string;
+    bio?: string;
   };
   category: string;
   tags: string[];
-  content: string | ContentItem[];
-  related: number[];
+  image: string;
+  slug: string;
+  readTime: string;
   views: number;
   likes: number;
   comments: number;
-  image: string;
-}
-
-export interface ContentItem {
-  type: string;
-  content?: string;
-  level?: number;
-  src?: string;
-  alt?: string;
-  caption?: string;
-  author?: string;
-  poster?: string;
-  items?: string[];
+  description?: string; // Make optional
+  related?: BlogPost[]; // Make optional
 }

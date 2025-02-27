@@ -61,7 +61,9 @@ export function BlogFeaturedArticle({ post }: BlogFeaturedArticleProps) {
               <p className="text-sm font-medium text-maroon-800">
                 {post.author.name}
               </p>
-              <p className="text-xs text-maroon-600">{post.author.bio}</p>
+              <p className="text-xs text-maroon-600">
+                {post.author.bio || post.author.title}
+              </p>
             </div>
             <div className="ml-auto flex flex-col text-right">
               <div className="flex items-center text-sm text-maroon-600 justify-end">
@@ -89,7 +91,7 @@ export function BlogFeaturedArticle({ post }: BlogFeaturedArticleProps) {
                 {post.views}
               </span>
             </div>
-            <Link href={`/resources/blog/${post.slug}`}>
+            <Link href={`/resources/blog/${post.id}`}>
               <Button className="bg-crimson-600 hover:bg-crimson-700 text-white">
                 Read Article
               </Button>
