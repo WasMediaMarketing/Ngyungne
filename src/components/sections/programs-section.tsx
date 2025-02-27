@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { useInView } from "framer-motion"
-import { useRef } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, Users, GraduationCap } from "lucide-react"
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, Users, GraduationCap } from "lucide-react";
 
 const programs = [
   {
@@ -17,7 +17,7 @@ const programs = [
     capacity: "30 students",
     level: "Beginner",
     teacher: "Ven. Khen Rinpoche",
-    image: "/placeholder.svg",
+    image: "https://hsj.com.np/uploads/0000/1/2024/02/11/yoga-21.jpg",
   },
   {
     title: "Meditation Retreat",
@@ -27,7 +27,7 @@ const programs = [
     capacity: "20 practitioners",
     level: "All Levels",
     teacher: "H.E. Choknyi Rinpoche",
-    image: "/placeholder.svg",
+    image: "https://hsj.com.np/uploads/0000/1/2024/02/11/yoga-21.jpg",
   },
   {
     title: "Tibetan Language",
@@ -37,26 +37,33 @@ const programs = [
     capacity: "15 students",
     level: "Beginner",
     teacher: "Ven. Dolpo Tulku Rinpoche",
-    image: "/placeholder.svg",
+    image: "https://hsj.com.np/uploads/0000/1/2024/02/11/yoga-21.jpg",
   },
-]
+];
 
 export function ProgramsSection() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
 
   return (
     <section id="programs" className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Badge variant="secondary" className="mb-4">
               Our Programs
             </Badge>
-            <h2 className="text-3xl font-bold mb-4">Learn and Practice Buddhism</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Learn and Practice Buddhism
+            </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Join our comprehensive programs designed to help you develop your understanding and practice of Buddhism
-              through structured learning and guidance.
+              Join our comprehensive programs designed to help you develop your
+              understanding and practice of Buddhism through structured learning
+              and guidance.
             </p>
           </motion.div>
         </div>
@@ -90,7 +97,9 @@ export function ProgramsSection() {
                   <CardTitle>{program.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-6">{program.description}</p>
+                  <p className="text-muted-foreground mb-6">
+                    {program.description}
+                  </p>
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-primary" />
@@ -117,6 +126,5 @@ export function ProgramsSection() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
-

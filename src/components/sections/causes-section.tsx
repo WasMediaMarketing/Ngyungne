@@ -2,116 +2,212 @@
 
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Heart, Share2, Info } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const causes = [
   {
     id: 1,
     title: "Temple Renovation",
-    description: "Help us restore and maintain our sacred temple spaces.",
+    description:
+      "Help us restore and maintain our sacred temple spaces for future generations of practitioners.",
     goal: 50000,
     raised: 35000,
-    image: "/placeholder.svg?height=200&width=400",
+    image: "https://www.dharmaideal.org/api/image/1734338085080.jpeg",
+    donors: 128,
+    daysLeft: 45,
   },
   {
     id: 2,
     title: "Monastic Education",
-    description: "Support the education of young monks and nuns.",
+    description:
+      "Support the education of young monks and nuns preserving ancient wisdom traditions.",
     goal: 30000,
     raised: 20000,
-    image: "/placeholder.svg?height=200&width=400",
+    image: "https://www.dharmaideal.org/api/image/1734338085080.jpeg",
+    donors: 87,
+    daysLeft: 60,
   },
   {
     id: 3,
     title: "Community Outreach",
-    description: "Expand our Buddhist teachings to more communities.",
+    description:
+      "Expand our Buddhist teachings to more communities and bring the dharma to those seeking wisdom.",
     goal: 25000,
     raised: 15000,
-    image: "/placeholder.svg?height=200&width=400",
+    image: "https://www.dharmaideal.org/api/image/1734338085080.jpeg",
+    donors: 64,
+    daysLeft: 30,
   },
 ];
 
 export function CausesSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const pathname = usePathname();
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+  };
 
   return (
-    <section id="causes" className="py-20 bg-saffron-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4 text-crimson-800">
+    <section
+      id="causes"
+      className="py-16 md:py-24 bg-gradient-to-b from-saffron-50 to-white"
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-12 md:mb-16"
+        >
+          <span className="inline-block px-4 py-1 rounded-full bg-saffron-100 text-crimson-700 text-sm font-medium mb-4">
+            Make A Difference
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-crimson-800">
             Support Our Causes
           </h2>
-          <p className="text-maroon-600 max-w-2xl mx-auto">
+          <p className="text-maroon-600 max-w-2xl mx-auto text-base md:text-lg">
             Your generous support helps us maintain our temples, support
-            monastic education, and spread Buddhist teachings to more
-            communities.
+            monastic education, and spread Buddhist teachings to communities in
+            need.
           </p>
-        </div>
+        </motion.div>
 
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.8 }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          variants={container}
+          initial="hidden"
+          animate={isInView ? "show" : "hidden"}
+          className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
         >
           {causes.map((cause, index) => (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.8, delay: index * 0.2 }}
+              key={cause.id}
+              variants={item}
+              onMouseEnter={() => setHoveredCard(cause.id)}
+              onMouseLeave={() => setHoveredCard(null)}
+              className="h-full"
             >
-              <Card className="bg-white border-saffron-200">
-                <CardHeader>
-                  <CardTitle className="text-crimson-700">
+              <Card className="h-full bg-white border-saffron-200 overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-crimson-300 flex flex-col">
+                <div className="aspect-video relative overflow-hidden">
+                  <motion.img
+                    src={cause.image || "/placeholder.svg"}
+                    alt={cause.title}
+                    className="w-full h-full object-cover"
+                    animate={
+                      hoveredCard === cause.id ? { scale: 1.05 } : { scale: 1 }
+                    }
+                    transition={{ duration: 0.4 }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-70"></div>
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <div className="px-3 py-1 bg-crimson-600 text-white text-xs font-medium rounded-full inline-block">
+                      {cause.daysLeft} days left
+                    </div>
+                  </div>
+                </div>
+
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xl md:text-2xl text-crimson-700 font-semibold">
                     {cause.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="aspect-video relative mb-4 rounded-lg overflow-hidden">
-                    <img
-                      src={cause.image || "/placeholder.svg"}
-                      alt={cause.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <p className="text-maroon-600 mb-4">{cause.description}</p>
-                  <div className="space-y-2">
+
+                <CardContent className="pb-4 flex-grow">
+                  <p className="text-maroon-600 mb-4 text-sm md:text-base line-clamp-3">
+                    {cause.description}
+                  </p>
+                  <div className="space-y-3 mt-auto">
                     <div className="flex justify-between text-sm text-maroon-700">
-                      <span>Raised: ${cause.raised.toLocaleString()}</span>
+                      <span className="font-medium">
+                        ${cause.raised.toLocaleString()}
+                      </span>
                       <span>Goal: ${cause.goal.toLocaleString()}</span>
                     </div>
                     <Progress
                       value={(cause.raised / cause.goal) * 100}
-                      className="h-2 bg-saffron-200"
+                      className="h-2 bg-saffron-100"
                     />
-                    <div className="flex justify-between mt-4">
-                      <Link href={`/programs/causes/${cause.id}`}>
-                        <Button
-                          variant="outline"
-                          className="border-crimson-600 text-crimson-600 hover:bg-crimson-50"
-                        >
-                          Learn More
-                        </Button>
-                      </Link>
-                      <Link href={`/programs/causes/${cause.id}`}>
-                        <Button className="bg-crimson-600 text-white hover:bg-crimson-700">
-                          Donate Now
-                        </Button>
-                      </Link>
+                    <div className="flex items-center text-xs text-maroon-500 mt-2">
+                      <Heart size={14} className="mr-1 text-crimson-500" />
+                      <span>{cause.donors} donors</span>
                     </div>
                   </div>
                 </CardContent>
+
+                <CardFooter className="pt-0 flex flex-col sm:flex-row gap-2 sm:justify-between">
+                  <Link
+                    href={`/programs/causes/${cause.id}`}
+                    className="w-full sm:w-auto"
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-crimson-600 text-crimson-600 hover:bg-crimson-50 w-full"
+                    >
+                      <Info size={16} className="mr-2" /> Learn More
+                    </Button>
+                  </Link>
+                  <Link
+                    href={`/programs/causes/${cause.id}`}
+                    className="w-full sm:w-auto"
+                  >
+                    <Button
+                      size="sm"
+                      className="bg-crimson-600 text-white hover:bg-crimson-700 w-full"
+                    >
+                      Donate Now
+                    </Button>
+                  </Link>
+                </CardFooter>
               </Card>
             </motion.div>
           ))}
         </motion.div>
+
+        {pathname !== "/programs/causes" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.7, delay: 0.6 }}
+            className="mt-12 text-center"
+          >
+            <Link href="/programs/causes">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-2 border-crimson-600 text-crimson-700 hover:bg-crimson-50 rounded-full px-8"
+              >
+                View All Causes
+              </Button>
+            </Link>
+          </motion.div>
+        )}
       </div>
     </section>
   );

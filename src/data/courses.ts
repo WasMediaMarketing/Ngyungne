@@ -7,6 +7,7 @@ export const courses = [
     duration: "8 weeks",
     lessons: 16,
     level: "Beginner",
+    featured: true,
     rating: 4.8,
     progress: 0,
     students: 1500,
@@ -52,6 +53,7 @@ export const courses = [
     rating: 4.9,
     progress: 50,
     students: 1200,
+    featured: true,
     image: "/images/meditation-mastery.jpg",
     modules: [
       {

@@ -44,7 +44,7 @@ export function VirtualTemple() {
     // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controlsRef.current = controls;
+    controlsRef.current;
 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
