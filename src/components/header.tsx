@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { MainNav } from "@/components/navigation/main-nav";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import * as LucideIcons from "lucide-react";
-import { Menu } from "lucide-react";
+import { Menu, ChevronDown, ChevronRight } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import type { LucideIcon } from "lucide-react";
 
@@ -76,84 +76,155 @@ export function Header() {
 }
 
 function MobileNav({ pathname }: { pathname: string }) {
+  const [openSections, setOpenSections] = useState<{
+    teachings: boolean;
+    programs: boolean;
+    resources: boolean;
+  }>({
+    teachings: false,
+    programs: false,
+    resources: false,
+  });
+
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
   return (
     <div className="flex flex-col space-y-4">
       <Link
         href="/"
-        className={`text-lg font-medium ${
+        className={`text-base font-medium ${
           pathname === "/" ? "text-primary" : "text-primary/60"
         }`}
       >
         Home
       </Link>
 
+      <Link
+        href="/about"
+        className={`text-base font-medium ${
+          pathname === "/about" ? "text-primary" : "text-primary/60"
+        }`}
+      >
+        About
+      </Link>
+
       <div>
-        <h4 className="mb-2 text-sm font-medium text-primary/60">Teachings</h4>
-        {siteConfig.mainNav.teachings.map((item) => {
-          const Icon = LucideIcons[
-            item.icon as keyof typeof LucideIcons
-          ] as LucideIcon;
-          return (
-            <Link
-              key={item.title}
-              href={item.href}
-              className={`block py-2 text-sm hover:text-primary transition-colors ${
-                pathname === item.href ? "text-primary" : "text-primary/60"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4" />
-                {item.title}
-              </div>
-            </Link>
-          );
-        })}
+        <button
+          onClick={() => toggleSection("teachings")}
+          className="flex w-full items-center justify-between mb-2 text-base font-medium text-primary/60 hover:text-primary transition-colors"
+        >
+          <span>Teachings</span>
+          {openSections.teachings ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </button>
+
+        {openSections.teachings && (
+          <div className="pl-2 border-l border-primary/10">
+            {siteConfig.mainNav.teachings.map((item) => {
+              const Icon = LucideIcons[
+                item.icon as keyof typeof LucideIcons
+              ] as LucideIcon;
+              return (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className={`block py-2 text-sm hover:text-primary transition-colors ${
+                    pathname === item.href ? "text-primary" : "text-primary/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {item.title}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div>
-        <h4 className="mb-2 text-sm font-medium text-primary/60">Programs</h4>
-        {siteConfig.mainNav.programs.map((item) => {
-          const Icon = LucideIcons[
-            item.icon as keyof typeof LucideIcons
-          ] as LucideIcon;
-          return (
-            <Link
-              key={item.title}
-              href={item.href}
-              className={`block py-2 text-sm hover:text-primary transition-colors ${
-                pathname === item.href ? "text-primary" : "text-primary/60"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4" />
-                {item.title}
-              </div>
-            </Link>
-          );
-        })}
+        <button
+          onClick={() => toggleSection("programs")}
+          className="flex w-full items-center justify-between mb-2 text-base font-medium text-primary/60 hover:text-primary transition-colors"
+        >
+          <span>Programs</span>
+          {openSections.programs ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </button>
+
+        {openSections.programs && (
+          <div className="pl-2 border-l border-primary/10">
+            {siteConfig.mainNav.programs.map((item) => {
+              const Icon = LucideIcons[
+                item.icon as keyof typeof LucideIcons
+              ] as LucideIcon;
+              return (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className={`block py-2 text-sm hover:text-primary transition-colors ${
+                    pathname === item.href ? "text-primary" : "text-primary/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {item.title}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div>
-        <h4 className="mb-2 text-sm font-medium text-primary/60">Resources</h4>
-        {siteConfig.mainNav.resources.map((item) => {
-          const Icon = LucideIcons[
-            item.icon as keyof typeof LucideIcons
-          ] as LucideIcon;
-          return (
-            <Link
-              key={item.title}
-              href={item.href}
-              className={`block py-2 text-sm hover:text-primary transition-colors ${
-                pathname === item.href ? "text-primary" : "text-primary/60"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4" />
-                {item.title}
-              </div>
-            </Link>
-          );
-        })}
+        <button
+          onClick={() => toggleSection("resources")}
+          className="flex w-full items-center justify-between mb-2 text-base font-medium text-primary/60 hover:text-primary transition-colors"
+        >
+          <span>Resources</span>
+          {openSections.resources ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </button>
+
+        {openSections.resources && (
+          <div className="pl-2 border-l border-primary/10">
+            {siteConfig.mainNav.resources.map((item) => {
+              const Icon = LucideIcons[
+                item.icon as keyof typeof LucideIcons
+              ] as LucideIcon;
+              return (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className={`block py-2 text-sm hover:text-primary transition-colors ${
+                    pathname === item.href ? "text-primary" : "text-primary/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {item.title}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-2 pt-4">

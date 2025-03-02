@@ -63,8 +63,6 @@ const blogPosts = [
       "Mindfulness is the practice of being fully present and engaged in the moment, aware of your thoughts and feelings without distraction or judgment. In our fast-paced world, it's easy to get caught up in the hustle and bustle of daily life, often leading to stress and anxiety. Through mindfulness practice, we can cultivate a deeper awareness of our emotions, thoughts, and sensations, allowing us to respond to life's challenges with greater clarity and compassion.\n\nThe benefits of mindfulness extend far beyond stress reduction. Research has shown that regular mindfulness practice can improve concentration, emotional regulation, and overall well-being. It can help us break free from automatic reactions and develop a more thoughtful relationship with our experiences.\n\nIn this article, we'll explore practical ways to incorporate mindfulness into your daily routine, from formal meditation sessions to mindful eating, walking, and communicating. You'll learn techniques that can be applied immediately to enhance your quality of life and develop a greater sense of inner peace.",
     image: "/placeholder.svg?height=400&width=600",
     views: 1245,
-    likes: 87,
-    comments: 23,
     relatedPosts: [2, 5],
   },
   {
@@ -85,8 +83,6 @@ const blogPosts = [
       "The Four Noble Truths are the central teachings of Buddhism, first expounded by the Buddha in his very first sermon after attaining enlightenment. These truths form the foundation of Buddhist thought and practice, offering a profound understanding of the nature of suffering and the path to liberation.\n\nThe First Noble Truth acknowledges the reality of suffering (dukkha) in all forms of existence. This isn't limited to physical pain but includes the unsatisfactory nature of impermanent phenomena and the suffering caused by attachment to a false sense of self.\n\nThe Second Noble Truth identifies the cause of suffering as craving (tanha) and ignorance (avidya). Our tendency to grasp at pleasurable experiences, avoid unpleasant ones, and remain unaware of the true nature of reality perpetuates our suffering.\n\nThe Third Noble Truth offers hope by declaring that there is an end to suffering. By eliminating the causes of suffering—craving and ignorance—we can attain Nirvana, a state of perfect peace and freedom.\n\nThe Fourth Noble Truth prescribes the path to the cessation of suffering: the Noble Eightfold Path. This comprehensive approach to ethical conduct, mental discipline, and wisdom provides a practical framework for living a meaningful life and progressing toward liberation.",
     image: "/placeholder.svg?height=400&width=600",
     views: 982,
-    likes: 92,
-    comments: 31,
     relatedPosts: [3, 4],
   },
   {
@@ -107,8 +103,6 @@ const blogPosts = [
       "The Noble Eightfold Path represents Buddha's practical guidance for living ethically and mindfully. It encompasses three essential aspects of Buddhist practice: ethical conduct (sila), mental discipline (samadhi), and wisdom (panna). Through cultivation of these eight factors, practitioners progress toward liberation from suffering and the cultivation of compassion.",
     image: "/placeholder.svg?height=400&width=600",
     views: 845,
-    likes: 76,
-    comments: 19,
     relatedPosts: [2, 6],
   },
   {
@@ -129,8 +123,6 @@ const blogPosts = [
       "Buddhist meditation encompasses a variety of techniques designed to develop mindfulness, concentration, and insight. From focusing on the breath to cultivating loving-kindness, these practices offer transformative tools for working with the mind and heart.",
     image: "/placeholder.svg?height=400&width=600",
     views: 1562,
-    likes: 134,
-    comments: 42,
     relatedPosts: [1, 3],
   },
   {
@@ -151,8 +143,6 @@ const blogPosts = [
       "Loving-kindness meditation (metta) is a heartfelt practice that cultivates universal love and compassion. Beginning with oneself and extending outward, this meditation breaks down barriers between self and others, fostering deep connection and goodwill.",
     image: "/placeholder.svg?height=400&width=600",
     views: 923,
-    likes: 102,
-    comments: 28,
     relatedPosts: [1, 4],
   },
   {
@@ -173,8 +163,6 @@ const blogPosts = [
       "The teaching of anatta (non-self) challenges our fundamental sense of identity by revealing the absence of a permanent, unchanging self. Through meditation and investigation, we can directly experience the fluid, interconnected nature of existence.",
     image: "/placeholder.svg?height=400&width=600",
     views: 765,
-    likes: 83,
-    comments: 37,
     relatedPosts: [2, 3],
   },
 ];
@@ -404,16 +392,6 @@ export default function Blog() {
                     ))}
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4 text-sm text-maroon-600">
-                      <span className="flex items-center">
-                        <Heart className="h-4 w-4 mr-1" />
-                        {blogPosts[0].likes}
-                      </span>
-                      <span className="flex items-center">
-                        <span className="i-lucide-message-circle h-4 w-4 mr-1"></span>
-                        {blogPosts[0].comments} comments
-                      </span>
-                    </div>
                     <Link href={`/resources/blog/${blogPosts[0].id}`}>
                       <Button className="bg-crimson-600 hover:bg-crimson-700 text-white">
                         Read Article
@@ -555,16 +533,6 @@ export default function Blog() {
                     </div>
                   </CardContent>
                   <CardFooter className="pt-2 flex justify-between items-center border-t border-saffron-200">
-                    <div className="flex items-center gap-3 text-xs text-maroon-600">
-                      <span className="flex items-center">
-                        <Heart className="h-3 w-3 mr-1" />
-                        {post.likes}
-                      </span>
-                      <span className="flex items-center">
-                        <span className="i-lucide-message-circle h-3 w-3 mr-1"></span>
-                        {post.comments}
-                      </span>
-                    </div>
                     <Link href={`/resources/blog/${post.id}`}>
                       <Button
                         size="sm"

@@ -114,29 +114,11 @@ export function BlogPostCard({
         </CardContent>
         <CardFooter className="pt-2 mt-auto">
           <div className="flex items-center w-full">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={post.author.image} alt={post.author.name} />
-              <AvatarFallback className="text-xs">
-                {post.author.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
+            <span className="text-2xl">~</span>
             <div className="ml-2 flex-grow">
               <p className="text-xs font-medium text-maroon-800 line-clamp-1">
                 {post.author.name}
               </p>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-maroon-600">
-              <span className="flex items-center">
-                <Heart className="h-3 w-3 mr-1" />
-                {post.likes}
-              </span>
-              <span className="flex items-center">
-                <MessageCircle className="h-3 w-3 mr-1" />
-                {post.comments}
-              </span>
             </div>
           </div>
         </CardFooter>

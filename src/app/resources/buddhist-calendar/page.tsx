@@ -22,17 +22,63 @@ import {
   Download,
   Clock,
   MapPin,
+  Search,
 } from "lucide-react";
 import { getBuddhistDate, isUposathaDay } from "@/utils/buddhistCalender";
 import { BuddhistCalendarView } from "@/components/buddhist-calender/BuddhistCalenderView";
 import { BuddhistEventListView } from "@/components/buddhist-calender/BuddhistEventList";
-import type { BuddhistEvent } from "@/types/buddhist-event";
+import { AddEventDialog } from "@/components/buddhist-calender/AddEventDialog";
+import { SearchEvents } from "@/components/buddhist-calender/SeachEvents";
+import type { BuddhistEvent, EventType } from "@/types/buddhist-event";
+import { Input } from "@/components/ui/input";
 
-const buddhistEvents: BuddhistEvent[] = [
-  // ... (keep the existing events, but update dates to be more recent)
+// Sample events
+const initialBuddhistEvents: BuddhistEvent[] = [
+  {
+    id: "1",
+    title: "Vesak Day",
+    description: "Celebration of Buddha's birth, enlightenment, and passing",
+    date: new Date(2025, 4, 12), // May 12, 2025
+    type: "festival",
+    traditions: ["Theravada", "Mahayana"],
+    location: "Global Buddhist Temples",
+    time: "All Day",
+  },
+  {
+    id: "2",
+    title: "Meditation Retreat",
+    description: "Three-day mindfulness and meditation retreat",
+    date: new Date(2025, 2, 18), // March 18, 2025
+    type: "practice",
+    traditions: ["Theravada"],
+    location: "Forest Monastery",
+    time: "8:00 AM - 6:00 PM",
+    teacher: "Ajahn Brahm",
+  },
+  {
+    id: "3",
+    title: "Dharma Talk",
+    description: "Weekly lecture on Buddhist principles",
+    date: new Date(2025, 2, 5), // March 5, 2025
+    type: "teaching",
+    traditions: ["Zen"],
+    location: "Zen Center",
+    time: "7:00 PM - 9:00 PM",
+    teacher: "Thich Nhat Hanh",
+  },
+  {
+    id: "4",
+    title: "Full Moon Ceremony",
+    description: "Monthly ceremony celebrating the full moon",
+    date: new Date(2025, 2, 15), // March 15, 2025
+    type: "moon",
+    traditions: ["Theravada", "Zen"],
+    location: "Main Temple Hall",
+    time: "7:30 PM - 9:00 PM",
+  },
 ];
 
-const getBadgeVariant = (type: BuddhistEvent["type"]) => {
+const getBadgeVariant = (type: EventType) => {
   switch (type) {
     case "teaching":
       return "default";
@@ -48,11 +94,21 @@ const getBadgeVariant = (type: BuddhistEvent["type"]) => {
 };
 
 export default function BuddhistCalendarPage() {
+  const [buddhistEvents, setBuddhistEvents] = useState<BuddhistEvent[]>(
+    initialBuddhistEvents
+  );
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date()
   );
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [activeTab, setActiveTab] = useState<string>("calendar");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<EventType[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const addEvent = (event: BuddhistEvent) => {
+    setBuddhistEvents([...buddhistEvents, event]);
+  };
 
   const getEventsForDate = (date: Date) => {
     return buddhistEvents.filter((event) =>
@@ -61,22 +117,96 @@ export default function BuddhistCalendarPage() {
   };
 
   const getEventCountForDate = (date: Date) => {
-    return getEventsForDate(date).length + (isUposathaDay(date) ? 1 : 0);
+    const filtered =
+      activeFilters.length > 0
+        ? buddhistEvents.filter((event) => activeFilters.includes(event.type))
+        : buddhistEvents;
+
+    return (
+      filtered.filter((event) => dayjs(event.date).isSame(date, "day")).length +
+      (isUposathaDay(date) ? 1 : 0)
+    );
   };
 
   const getUpcomingEvents = () => {
     const today = new Date();
-    return buddhistEvents
+    let filtered = buddhistEvents
       .filter(
         (event) =>
           dayjs(event.date).isAfter(today) ||
           dayjs(event.date).isSame(today, "day")
       )
       .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    // Apply type filters if any are active
+    if (activeFilters.length > 0) {
+      filtered = filtered.filter((event) => activeFilters.includes(event.type));
+    }
+
+    // Apply search term if present
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (event) =>
+          event.title.toLowerCase().includes(term) ||
+          event.description.toLowerCase().includes(term) ||
+          (event.location && event.location.toLowerCase().includes(term)) ||
+          (event.teacher && event.teacher.toLowerCase().includes(term))
+      );
+    }
+
+    return filtered;
   };
 
-  const getEventsByType = (type: BuddhistEvent["type"]) => {
+  const getEventsByType = (type: EventType) => {
     return buddhistEvents.filter((event) => event.type === type);
+  };
+
+  const toggleFilter = (type: EventType) => {
+    if (activeFilters.includes(type)) {
+      setActiveFilters(activeFilters.filter((t) => t !== type));
+    } else {
+      setActiveFilters([...activeFilters, type]);
+    }
+  };
+
+  const isFilterActive = (type: EventType) => {
+    return activeFilters.includes(type);
+  };
+
+  const exportCalendar = () => {
+    // Create iCalendar format
+    let icalContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Anthropic//Buddhist Calendar//EN",
+    ];
+
+    buddhistEvents.forEach((event) => {
+      const eventDate = dayjs(event.date);
+      const formattedDate = eventDate.format("YYYYMMDD");
+
+      icalContent.push("BEGIN:VEVENT");
+      icalContent.push(`SUMMARY:${event.title}`);
+      icalContent.push(`DESCRIPTION:${event.description}`);
+      icalContent.push(`DTSTART:${formattedDate}`);
+      icalContent.push(`DTEND:${formattedDate}`);
+      if (event.location) icalContent.push(`LOCATION:${event.location}`);
+      icalContent.push("END:VEVENT");
+    });
+
+    icalContent.push("END:VCALENDAR");
+
+    // Create a downloadable file
+    const blob = new Blob([icalContent.join("\n")], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "buddhist-calendar.ics";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -118,6 +248,19 @@ export default function BuddhistCalendarPage() {
           </div>
         </div>
 
+        <div className="w-full relative">
+          <div className="relative flex w-full max-w-sm items-center">
+            <Search className="absolute left-2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search events..."
+              className="pl-8 w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {activeTab === "calendar" ? (
             <div className="lg:col-span-2">
@@ -127,6 +270,7 @@ export default function BuddhistCalendarPage() {
                 onSelectDate={setSelectedDate}
                 onMonthChange={setCurrentMonth}
                 getEventCountForDate={getEventCountForDate}
+                activeFilters={activeFilters}
               />
             </div>
           ) : (
@@ -207,7 +351,11 @@ export default function BuddhistCalendarPage() {
                         )}
                       </CardContent>
                       <CardFooter className="gap-2 flex-wrap">
-                        <Button size="sm" className="flex-1">
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setDialogOpen(true)}
+                        >
                           <Plus className="h-4 w-4 mr-1" /> Add to Calendar
                         </Button>
                         <Button size="sm" variant="outline" className="flex-1">
@@ -242,14 +390,17 @@ export default function BuddhistCalendarPage() {
                           No events scheduled
                         </h3>
                         <p className="mt-1 text-primary/60">
-                          {isUposathaDay(selectedDate as Date)
+                          {selectedDate && isUposathaDay(selectedDate)
                             ? "This is an Uposatha day. Consider practicing mindfulness or meditation."
                             : "Select another date or add a new event"}
                         </p>
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full">
+                      <Button
+                        className="w-full"
+                        onClick={() => setDialogOpen(true)}
+                      >
                         <Plus className="h-4 w-4 mr-1" /> Add New Event
                       </Button>
                     </CardFooter>
@@ -265,9 +416,10 @@ export default function BuddhistCalendarPage() {
               <CardContent>
                 <div className="space-y-2">
                   <Button
-                    variant="outline"
+                    variant={isFilterActive("teaching") ? "default" : "outline"}
                     className="w-full justify-start"
                     size="sm"
+                    onClick={() => toggleFilter("teaching")}
                   >
                     <Badge className="mr-2">
                       {getEventsByType("teaching").length}
@@ -275,9 +427,10 @@ export default function BuddhistCalendarPage() {
                     Teaching Events
                   </Button>
                   <Button
-                    variant="outline"
+                    variant={isFilterActive("festival") ? "default" : "outline"}
                     className="w-full justify-start"
                     size="sm"
+                    onClick={() => toggleFilter("festival")}
                   >
                     <Badge variant="destructive" className="mr-2">
                       {getEventsByType("festival").length}
@@ -285,19 +438,21 @@ export default function BuddhistCalendarPage() {
                     Festival Events
                   </Button>
                   <Button
-                    variant="outline"
+                    variant={isFilterActive("practice") ? "default" : "outline"}
                     className="w-full justify-start"
                     size="sm"
+                    onClick={() => toggleFilter("practice")}
                   >
-                    <Badge variant="default" className="mr-2">
+                    <Badge variant="secondary" className="mr-2">
                       {getEventsByType("practice").length}
                     </Badge>
                     Practice Sessions
                   </Button>
                   <Button
-                    variant="outline"
+                    variant={isFilterActive("moon") ? "default" : "outline"}
                     className="w-full justify-start"
                     size="sm"
+                    onClick={() => toggleFilter("moon")}
                   >
                     <Badge variant="outline" className="mr-2">
                       {getEventsByType("moon").length}
@@ -307,7 +462,11 @@ export default function BuddhistCalendarPage() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={exportCalendar}
+                >
                   <Download className="h-4 w-4 mr-1" /> Export Calendar
                 </Button>
               </CardFooter>
@@ -315,6 +474,13 @@ export default function BuddhistCalendarPage() {
           </div>
         </div>
       </motion.div>
+
+      <AddEventDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSave={addEvent}
+        selectedDate={selectedDate}
+      />
     </div>
   );
 }

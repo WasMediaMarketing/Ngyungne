@@ -15,9 +15,6 @@ export interface BlogPost {
   image: string;
   slug: string;
   readTime: string;
-  views: number;
-  likes: number;
-  comments: number;
   description?: string; // Make optional
   related?: BlogPost[]; // Make optional
 }

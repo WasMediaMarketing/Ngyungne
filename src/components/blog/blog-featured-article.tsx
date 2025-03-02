@@ -77,20 +77,6 @@ export function BlogFeaturedArticle({ post }: BlogFeaturedArticleProps) {
             </div>
           </div>
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4 text-sm text-maroon-600">
-              <span className="flex items-center">
-                <Heart className="h-4 w-4 mr-1" />
-                {post.likes}
-              </span>
-              <span className="flex items-center">
-                <MessageCircle className="h-4 w-4 mr-1" />
-                {post.comments}
-              </span>
-              <span className="flex items-center">
-                <Eye className="h-4 w-4 mr-1" />
-                {post.views}
-              </span>
-            </div>
             <Link href={`/resources/blog/${post.id}`}>
               <Button className="bg-crimson-600 hover:bg-crimson-700 text-white">
                 Read Article

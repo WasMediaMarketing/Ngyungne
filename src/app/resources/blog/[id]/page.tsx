@@ -364,18 +364,7 @@ export default function BlogPost() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-4">
-                  <Avatar className="h-16 w-16 border-2 border-saffron-100">
-                    <AvatarImage
-                      src={post?.author?.image}
-                      alt={post?.author?.name}
-                    />
-                    <AvatarFallback className="bg-saffron-200 text-crimson-700">
-                      {post?.author?.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <span className="text-2xl">~</span>
                   <div>
                     <p className="font-medium text-maroon-800">
                       {post?.author?.name}
@@ -383,13 +372,6 @@ export default function BlogPost() {
                     <p className="text-sm text-maroon-600 mt-1">
                       {post?.author?.bio}
                     </p>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="text-crimson-600 hover:text-crimson-700 p-0 mt-1 h-auto"
-                    >
-                      View all posts
-                    </Button>
                   </div>
                 </div>
               </CardContent>

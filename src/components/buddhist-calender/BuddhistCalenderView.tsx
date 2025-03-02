@@ -9,6 +9,7 @@ import {
   getLunarPhase,
   isUposathaDay,
 } from "@/utils/buddhistCalender";
+import type { EventType } from "@/types/buddhist-event";
 
 interface BuddhistCalendarViewProps {
   currentMonth: Date;
@@ -16,6 +17,7 @@ interface BuddhistCalendarViewProps {
   onSelectDate: (date: Date | undefined) => void;
   onMonthChange: (date: Date) => void;
   getEventCountForDate: (date: Date) => number;
+  activeFilters?: EventType[];
 }
 
 export function BuddhistCalendarView({
@@ -24,6 +26,7 @@ export function BuddhistCalendarView({
   onSelectDate,
   onMonthChange,
   getEventCountForDate,
+  activeFilters = [],
 }: BuddhistCalendarViewProps) {
   const goToPreviousMonth = () =>
     onMonthChange(dayjs(currentMonth).subtract(1, "month").toDate());
@@ -57,6 +60,7 @@ export function BuddhistCalendarView({
     const isToday = dayjs(date).isSame(new Date(), "day");
     const lunarPhase = getLunarPhase(date);
     const eventCount = getEventCountForDate(date);
+    const isUposatha = isUposathaDay(date);
 
     return (
       <Button
@@ -70,7 +74,7 @@ export function BuddhistCalendarView({
           {getBuddhistDate(date).split(" ")[0]}
         </span>
         <span className="text-sm font-medium">{date.getDate()}</span>
-        {lunarPhase && <Moon className="w-3 h-3 text-yellow-500" />}
+        {isUposatha && <Moon className="w-3 h-3 text-yellow-500" />}
         {eventCount > 0 && (
           <Badge variant="secondary" className="mt-1 text-xs">
             {eventCount}
@@ -118,9 +122,32 @@ export function BuddhistCalendarView({
           <Badge variant="outline" className="flex items-center gap-1">
             <Moon className="h-3 w-3" /> Uposatha Day
           </Badge>
-          <Badge variant="destructive">🎉 Festival</Badge>
-          <Badge variant="secondary">📚 Teaching</Badge>
-          <Badge>🧘‍♂️ Practice</Badge>
+          <Badge
+            variant={
+              activeFilters?.includes("festival") ? "destructive" : "outline"
+            }
+          >
+            🎉 Festival
+          </Badge>
+          <Badge
+            variant={
+              activeFilters?.includes("teaching") ? "secondary" : "outline"
+            }
+          >
+            📚 Teaching
+          </Badge>
+          <Badge
+            variant={
+              activeFilters?.includes("practice") ? "default" : "outline"
+            }
+          >
+            🧘‍♂️ Practice
+          </Badge>
+          <Badge
+            variant={activeFilters?.includes("moon") ? "outline" : "secondary"}
+          >
+            🌕 Moon Ceremony
+          </Badge>
         </div>
       </CardContent>
     </Card>

@@ -86,12 +86,12 @@ export const siteConfig = {
         description: "Learn various Tibetan Buddhist practices and rituals",
         icon: "Flame",
       },
-      {
-        title: "Sponsors",
-        href: "/resources/sponsors",
-        description: "Support our sangha and ongoing projects",
-        icon: "Handshake",
-      },
+      // {
+      //   title: "Sponsors",
+      //   href: "/resources/sponsors",
+      //   description: "Support our sangha and ongoing projects",
+      //   icon: "Handshake",
+      // },
       {
         title: "Ambassadors",
         href: "/resources/ambassadors",
