@@ -16,7 +16,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Clock,
   BookOpen,
-  Star,
   Users,
   ChevronRight,
   Filter,
@@ -31,6 +30,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CourseEnrollmentDialog } from "./course-enrollment-form";
+import { toast } from "@/components/ui/use-toast";
 
 export function CoursesSection() {
   const [ref, inView] = useInView({
@@ -54,6 +55,16 @@ export function CoursesSection() {
 
   // Extract unique levels for filter dropdown
   const levels = [...new Set(courses.map((course) => course.level))];
+
+  // Handle enrollment form submission
+  const handleEnrollmentSubmit = (data: any) => {
+    console.log("Enrollment submitted:", data);
+    // Here you would typically send the data to your backend
+    toast({
+      title: "Enrollment Submitted",
+      description: "Thank you for enrolling in this course!",
+    });
+  };
 
   // Animation variants
   const containerVariants = {
@@ -222,23 +233,28 @@ export function CoursesSection() {
                         <Users className="mr-2 h-4 w-4" />
                         {course.students || "500+"} students
                       </div>
-                      <div className="flex items-center text-maroon-500">
-                        <Star className="mr-2 h-4 w-4 text-yellow-500" />
-                        <span className="font-medium">{course.rating}/5</span>
-                      </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="pt-2">
+                  <CardFooter className="pt-2 flex gap-2">
                     <Link
                       href={`/teachings/courses/${course.slug}`}
                       passHref
-                      className="w-full"
+                      className="flex-1"
                     >
-                      <Button className="w-full bg-crimson-600 hover:bg-crimson-700 text-white gap-2 group-hover:gap-3 transition-all">
-                        View Course
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2 transition-all"
+                      >
+                        View Details
                         <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </Link>
+                    <CourseEnrollmentDialog
+                      courseTitle={course.title}
+                      onSubmit={handleEnrollmentSubmit}
+                      buttonText="Enroll Now"
+                      buttonClassName="flex-1 bg-crimson-600 hover:bg-crimson-700 text-white"
+                    />
                   </CardFooter>
                 </Card>
               </motion.div>
@@ -277,21 +293,6 @@ export function CoursesSection() {
                             </Badge>
                           )}
                         </div>
-                        <div className="flex items-center mt-4 text-yellow-500">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < Math.floor(course.rating)
-                                  ? "fill-yellow-500"
-                                  : "fill-none"
-                              }`}
-                            />
-                          ))}
-                          <span className="ml-2 text-maroon-700">
-                            {course.rating}
-                          </span>
-                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="md:w-1/2 py-6 md:py-6">
@@ -313,16 +314,22 @@ export function CoursesSection() {
                         </div>
                       </div>
                     </CardContent>
-                    <div className="flex items-center justify-center md:w-1/6 p-6">
+                    <div className="flex items-center justify-center md:w-1/6 p-6 gap-2 flex-col">
                       <Link
                         href={`/teachings/courses/${course.slug}`}
                         passHref
                         className="w-full"
                       >
-                        <Button className="w-full bg-crimson-600 hover:bg-crimson-700 text-white">
-                          View
+                        <Button variant="outline" className="w-full">
+                          Details
                         </Button>
                       </Link>
+                      <CourseEnrollmentDialog
+                        courseTitle={course.title}
+                        onSubmit={handleEnrollmentSubmit}
+                        buttonText="Enroll"
+                        buttonClassName="w-full bg-crimson-600 hover:bg-crimson-700 text-white"
+                      />
                     </div>
                   </div>
                 </Card>

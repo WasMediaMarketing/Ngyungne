@@ -88,11 +88,7 @@ export default function Causes() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                <Button className="bg-crimson-600 text-white hover:bg-crimson-700 rounded-lg">
-                  Donate Now
-                </Button>
-              </motion.div>
+              ></motion.div>
 
               {/* Mobile search */}
               <motion.div

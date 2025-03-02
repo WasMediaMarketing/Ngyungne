@@ -8,13 +8,12 @@ import { PracticeReminder } from "@/components/features/practice-reminder";
 import { VirtualPrayerWheel } from "@/components/features/virtual-prayer-wheel";
 import { VirtualTemple } from "@/components/features/virtual-temple";
 import { Loader } from "@/components/common/loader";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 export default function PracticePage() {
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        Buddhist Practice Center
-      </h1>
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <Breadcrumbs />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <Suspense fallback={<Loader />}>
           <section>
@@ -54,6 +53,6 @@ export default function PracticePage() {
           </section>
         </Suspense>
       </div>
-    </main>
+    </div>
   );
 }

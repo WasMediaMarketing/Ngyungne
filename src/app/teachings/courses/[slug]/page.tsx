@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { CourseDetail } from "@/components/sections/course-detail";
+import { CourseDetail } from "@/components/course/course-detail";
 import { Loader } from "@/components/common/loader";
 
 export default function CoursePage({ params }: { params: { slug: string } }) {

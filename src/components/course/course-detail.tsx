@@ -36,6 +36,8 @@ import { Breadcrumbs } from "../breadcrumbs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { courses } from "@/data/courses";
+import { CourseEnrollmentDialog } from "./course-enrollment-form";
+import { toast } from "@/components/ui/use-toast";
 
 export function CourseDetail({ slug }: { slug: string }) {
   const [course, setCourse] = useState(courses.find((c) => c.slug === slug));
@@ -45,6 +47,15 @@ export function CourseDetail({ slug }: { slug: string }) {
     // In a real application, you would fetch the course data from an API here
     setCourse(courses.find((c) => c.slug === slug));
   }, [slug]);
+
+  const handleEnrollmentSubmit = (data: any) => {
+    console.log("Enrollment submitted:", data);
+    // Here you would typically send the data to your backend
+    toast({
+      title: "Enrollment Submitted",
+      description: "Thank you for enrolling in this course!",
+    });
+  };
 
   if (!course) {
     return <div>Course not found</div>;
@@ -107,10 +118,6 @@ export function CourseDetail({ slug }: { slug: string }) {
                 <GraduationCap className="mr-2 h-4 w-4" />
                 {course.students} students
               </div>
-              <div className="flex items-center">
-                <Star className="mr-2 h-4 w-4 text-yellow-400" />
-                <span className="text-white">{course.rating}/5</span>
-              </div>
             </div>
           </motion.div>
         </div>
@@ -137,12 +144,6 @@ export function CourseDetail({ slug }: { slug: string }) {
               >
                 Overview
               </TabsTrigger>
-              <TabsTrigger
-                value="reviews"
-                className="rounded-t-lg data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-crimson-600 data-[state=active]:text-crimson-700 py-3 px-6"
-              >
-                Reviews
-              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="content" className="mt-0">
@@ -157,21 +158,6 @@ export function CourseDetail({ slug }: { slug: string }) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-slate-700 font-medium">
-                        Your Progress
-                      </span>
-                      <span className="text-crimson-700 font-medium">
-                        {course.progress}%
-                      </span>
-                    </div>
-                    <Progress
-                      value={course.progress}
-                      className="w-full h-2 bg-slate-200"
-                    />
-                  </div>
-
                   <Accordion type="single" collapsible className="w-full">
                     {course.modules.map((module, moduleIndex) => (
                       <AccordionItem
@@ -191,8 +177,6 @@ export function CourseDetail({ slug }: { slug: string }) {
                             </div>
                             <div className="flex items-center gap-3 text-sm text-slate-500">
                               <span>{module.lessons.length} lessons</span>
-                              <span>•</span>
-                              <span>25 min</span>
                             </div>
                           </div>
                         </AccordionTrigger>
@@ -222,9 +206,6 @@ export function CourseDetail({ slug }: { slug: string }) {
                                     {lesson}
                                   </span>
                                 </div>
-                                <span className="text-xs text-slate-500">
-                                  10 min
-                                </span>
                               </motion.li>
                             ))}
                           </ul>
@@ -297,112 +278,6 @@ export function CourseDetail({ slug }: { slug: string }) {
                 </CardContent>
               </Card>
             </TabsContent>
-
-            <TabsContent value="reviews" className="mt-0">
-              <Card className="bg-white border-slate-200 shadow-sm">
-                <CardHeader>
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                    <div>
-                      <CardTitle className="text-2xl text-crimson-700">
-                        Student Reviews
-                      </CardTitle>
-                      <CardDescription>
-                        See what our students are saying about this course
-                      </CardDescription>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-4xl font-bold text-crimson-700">
-                        {course.rating}
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-5 w-5 ${
-                                i < Math.floor(course.rating)
-                                  ? "text-yellow-400"
-                                  : "text-slate-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <div className="text-sm text-slate-500">
-                          Based on 142 reviews
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {[
-                      {
-                        name: "Alex Johnson",
-                        avatar: "/avatars/alex.jpg",
-                        rating: 5,
-                        date: "2 weeks ago",
-                        comment:
-                          "This course exceeded my expectations! The instructor explains complex concepts in a way that's easy to understand, and the project-based approach helped me apply what I learned immediately.",
-                      },
-                      {
-                        name: "Sarah Miller",
-                        avatar: "/avatars/sarah.jpg",
-                        rating: 4,
-                        date: "1 month ago",
-                        comment:
-                          "Great course content and structure. I especially enjoyed the hands-on projects. Would have given 5 stars if there were more advanced topics covered.",
-                      },
-                    ].map((review, index) => (
-                      <motion.div
-                        key={index}
-                        variants={itemVariants}
-                        className="border-b border-slate-200 pb-6 last:border-0 last:pb-0"
-                      >
-                        <div className="flex justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <Avatar>
-                              <AvatarImage src={review.avatar} />
-                              <AvatarFallback>
-                                {review.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium text-slate-800">
-                                {review.name}
-                              </div>
-                              <div className="text-sm text-slate-500">
-                                {review.date}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`h-4 w-4 ${
-                                  i < review.rating
-                                    ? "text-yellow-400"
-                                    : "text-slate-300"
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-slate-700">{review.comment}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    className="mt-6 w-full border-slate-300 text-slate-700 hover:bg-slate-50"
-                  >
-                    Load More Reviews
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
         </motion.div>
 
@@ -437,50 +312,12 @@ export function CourseDetail({ slug }: { slug: string }) {
                 </Button>
               </div>
               <CardContent className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="text-2xl font-bold text-crimson-700">
-                    $49.99
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="text-green-600 bg-green-50 border-green-200"
-                  >
-                    30% OFF
-                  </Badge>
-                </div>
-
-                <Button className="w-full mb-3 bg-crimson-600 hover:bg-crimson-700 text-white">
-                  Enroll Now
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full mb-6 border-slate-300 text-slate-700 hover:bg-slate-50"
-                >
-                  Try Free Preview
-                </Button>
-
-                <div className="space-y-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Full lifetime access</span>
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">
-                      Access on mobile & desktop
-                    </span>
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">
-                      Certificate of completion
-                    </span>
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Premium support</span>
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  </div>
-                </div>
+                <CourseEnrollmentDialog
+                  courseTitle={course.title}
+                  onSubmit={handleEnrollmentSubmit}
+                  buttonText="Enroll Now"
+                  buttonClassName="flex-1 bg-crimson-600 hover:bg-crimson-700 text-white"
+                />
               </CardContent>
             </Card>
 
@@ -511,16 +348,6 @@ export function CourseDetail({ slug }: { slug: string }) {
                   Dr. Chen has over 10 years of industry experience and has
                   taught over 50,000 students worldwide.
                 </p>
-                <div className="flex items-center text-sm text-slate-600 space-x-4">
-                  <div className="flex items-center">
-                    <Star className="mr-1 h-4 w-4 text-yellow-400" />
-                    <span>4.9 Instructor Rating</span>
-                  </div>
-                  <div className="flex items-center">
-                    <MessageSquare className="mr-1 h-4 w-4" />
-                    <span>2,453 Reviews</span>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
@@ -540,14 +367,14 @@ export function CourseDetail({ slug }: { slug: string }) {
                     <Share className="mr-2 h-4 w-4" />
                     Share
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="outline"
                     size="sm"
                     className="flex-1 ml-2 border-slate-300 text-slate-700"
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Download
-                  </Button>
+                  </Button> */}
                 </div>
               </CardContent>
             </Card>

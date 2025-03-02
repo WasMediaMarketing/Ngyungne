@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import Link from "next/link";
 
 const slides = [
   {
@@ -51,9 +52,6 @@ export function HeroSlider() {
         autoplay={{ delay: 5000 }}
         loop
         className="h-[80vh]"
-        onBeforeInit={(swiper) => {
-          swiperRef.current = swiper;
-        }}
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
@@ -80,7 +78,7 @@ export function HeroSlider() {
                     variant="default"
                     className="bg-primary hover:bg-primary/90"
                   >
-                    Register Now
+                    <Link href="/programs/events">View Details</Link>
                   </Button>
                 </div>
               </div>

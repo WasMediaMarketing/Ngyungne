@@ -8,8 +8,7 @@ export const courses = [
     lessons: 16,
     level: "Beginner",
     featured: true,
-    rating: 4.8,
-    progress: 0,
+
     students: 1500,
     image: "/images/foundations-of-buddhism.jpg",
     modules: [
@@ -50,8 +49,7 @@ export const courses = [
     duration: "6 weeks",
     lessons: 12,
     level: "Intermediate",
-    rating: 4.9,
-    progress: 50,
+
     students: 1200,
     featured: true,
     image: "/images/meditation-mastery.jpg",
@@ -93,8 +91,7 @@ export const courses = [
     duration: "10 weeks",
     lessons: 20,
     level: "Advanced",
-    rating: 4.7,
-    progress: 25,
+
     students: 800,
     image: "/images/buddhist-philosophy-advanced.jpg",
     modules: [

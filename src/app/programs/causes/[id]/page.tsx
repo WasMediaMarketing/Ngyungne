@@ -86,9 +86,6 @@ export default function CauseDetail() {
           </motion.div>
         </motion.div>
       </div>
-
-      {/* Add Gallery modal component here */}
-      {/* Add Donation sheet component here */}
     </div>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -16,11 +15,9 @@ import {
   CalendarDays,
   User,
   Tag,
-  Info,
-  MessageCircle,
 } from "lucide-react";
-import Link from "next/link";
-import { Event } from "@/data/events";
+import type { Event } from "@/data/events";
+import { EventRegistrationForm } from "./EventRegistrationForm";
 
 interface EventDetailProps {
   event: Event;
@@ -28,6 +25,7 @@ interface EventDetailProps {
   onToggleFavorite: () => void;
   relatedEvents: Event[];
   onBack: () => void;
+  onRegister?: () => void;
 }
 
 export function EventDetail({
@@ -36,9 +34,12 @@ export function EventDetail({
   onToggleFavorite,
   relatedEvents,
   onBack,
+  onRegister,
 }: EventDetailProps) {
   const [activeTab, setActiveTab] = useState("details");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
 
   // Handle scroll for sticky header
   useEffect(() => {
@@ -54,6 +55,14 @@ export function EventDetail({
   const spotsLeft = event.capacity - event.attending;
   const isSoldOut = spotsLeft <= 0;
   const isAlmostSoldOut = spotsLeft <= 5;
+
+  const handleSuccessfulRegistration = () => {
+    setIsRegistered(true);
+    setIsFormOpen(false);
+    if (onRegister) {
+      onRegister();
+    }
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -90,7 +99,11 @@ export function EventDetail({
               {isFavorite ? "Saved" : "Save"}
             </Button>
             {!isSoldOut && (
-              <Button size="sm" className="bg-crimson-600 hover:bg-crimson-700">
+              <Button
+                size="sm"
+                className="bg-crimson-600 hover:bg-crimson-700"
+                onClick={() => setIsFormOpen(true)}
+              >
                 Register
               </Button>
             )}
@@ -150,7 +163,6 @@ export function EventDetail({
                 <TabsList className="grid w-full grid-cols-3 mb-6">
                   <TabsTrigger value="details">Details</TabsTrigger>
                   <TabsTrigger value="teacher">Teacher</TabsTrigger>
-                  <TabsTrigger value="discussions">Discussions</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="details" className="space-y-6">
@@ -321,39 +333,6 @@ export function EventDetail({
                     </div>
                   </div>
                 </TabsContent>
-
-                <TabsContent value="discussions">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold">Discussions</h2>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-crimson-600"
-                      >
-                        <MessageCircle className="h-4 w-4 mr-1" />
-                        Start Discussion
-                      </Button>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-                      <p className="text-gray-600 text-center">
-                        Join the conversation about this event. Share your
-                        thoughts, ask questions, and connect with other
-                        participants.
-                      </p>
-
-                      <div className="flex justify-center">
-                        <Button
-                          variant="outline"
-                          className="bg-white border-crimson-200 text-crimson-600"
-                        >
-                          Sign in to participate
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
               </Tabs>
             </div>
           </div>
@@ -457,10 +436,20 @@ export function EventDetail({
                       className="w-full bg-gray-600 hover:bg-gray-700"
                       disabled
                     >
-                      Sold Out
+                      Registration Closed
+                    </Button>
+                  ) : isRegistered ? (
+                    <Button
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      disabled
+                    >
+                      Registration Complete
                     </Button>
                   ) : (
-                    <Button className="w-full bg-crimson-600 hover:bg-crimson-700">
+                    <Button
+                      className="w-full bg-crimson-600 hover:bg-crimson-700"
+                      onClick={() => setIsFormOpen(true)}
+                    >
                       Register Now
                     </Button>
                   )}
@@ -536,6 +525,14 @@ export function EventDetail({
           </div>
         </div>
       </div>
+
+      {/* Registration Form Dialog */}
+      <EventRegistrationForm
+        event={event}
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSuccessfulRegistration={handleSuccessfulRegistration}
+      />
     </div>
   );
 }

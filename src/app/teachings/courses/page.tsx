@@ -1,44 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Clock,
-  BookOpen,
-  GraduationCap,
-  Star,
-  Users,
-  Heart,
-  Bookmark,
-  CheckCircle,
-  ChevronDown,
-  Play,
-  FileText,
-  Award,
-} from "lucide-react";
-import { CoursesSection } from "@/components/sections/courses-section";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import { CoursesSection } from "@/components/course/courses-section";
 
 // Simulated popular and featured courses
 const popularCourses = [
@@ -143,71 +108,6 @@ export default function Courses() {
     <div className="min-h-screen bg-gradient-to-b from-saffron-50 via-white to-saffron-50">
       <div className="container mx-auto px-4 py-8">
         <Breadcrumbs />
-
-        {/* Hero Section */}
-        <div className="mb-16">
-          <motion.div
-            className="grid md:grid-cols-2 gap-8 items-center"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-          >
-            <motion.div variants={itemVariants}>
-              <Badge className="bg-crimson-100 text-crimson-700 mb-4">
-                Learning Path
-              </Badge>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-crimson-800">
-                Deepen Your Buddhist Practice
-              </h1>
-              <p className="text-lg text-maroon-700 mb-6">
-                Explore our comprehensive curriculum of Buddhist teachings,
-                designed to support your spiritual growth through structured
-                learning.
-              </p>
-              <div className="flex flex-wrap gap-4 mb-8">
-                <div className="flex items-center">
-                  <GraduationCap className="text-crimson-600 mr-2" />
-                  <span className="text-maroon-700">
-                    {popularCourses.length}+ Courses
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <Users className="text-crimson-600 mr-2" />
-                  <span className="text-maroon-700">1,000+ Students</span>
-                </div>
-                <div className="flex items-center">
-                  <Star className="text-crimson-600 mr-2" />
-                  <span className="text-maroon-700">4.8 Average Rating</span>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-crimson-600 hover:bg-crimson-700 text-white">
-                  Browse All Courses
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-crimson-600 text-crimson-600 hover:bg-crimson-50"
-                >
-                  Take Free Assessment
-                </Button>
-              </div>
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="hidden md:block">
-              <div className="relative">
-                <div className="absolute -top-6 -left-6 w-32 h-32 bg-crimson-100 rounded-full z-0" />
-                <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-saffron-100 rounded-full z-0" />
-                <Card className="border-maroon-100 p-2 z-10 relative bg-white/90 backdrop-blur">
-                  <img
-                    src="/placeholder.svg"
-                    alt="Buddhist teaching"
-                    className="rounded-md w-full object-cover h-64"
-                  />
-                </Card>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
 
         {/* All Courses Section */}
         <CoursesSection />

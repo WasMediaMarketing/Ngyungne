@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import {
@@ -13,9 +14,32 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, MapPin, Clock, Users, DollarSign } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { RetreatRegistrationForm } from "@/components/retreat/RetreatRegistrationForm";
 
-const retreats = [
+interface Retreat {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  duration: string;
+  location: string;
+  participants: string;
+  price: string;
+  type: string;
+  schedule: Array<{ time: string; activity: string }>;
+}
+
+const retreats: Retreat[] = [
   {
+    id: 1,
     title: "Weekend Zen Retreat",
     description:
       "A two-day immersive experience in Zen meditation and mindfulness practices.",
@@ -40,6 +64,7 @@ const retreats = [
     ],
   },
   {
+    id: 2,
     title: "Vipassana Silent Retreat",
     description:
       "A week-long silent retreat focusing on Vipassana meditation techniques.",
@@ -66,6 +91,8 @@ const retreats = [
 ];
 
 export default function Retreats() {
+  const [selectedRetreat, setSelectedRetreat] = useState<Retreat | null>(null);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Breadcrumbs />
@@ -87,7 +114,7 @@ export default function Retreats() {
       </motion.p>
       {retreats.map((retreat, index) => (
         <motion.div
-          key={index}
+          key={retreat.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
@@ -170,9 +197,28 @@ export default function Retreats() {
                       Ready to join this transformative retreat? Register now to
                       secure your spot.
                     </p>
-                    <Button className="bg-crimson-600 hover:bg-crimson-700 text-white">
-                      Register for Retreat
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          className="bg-crimson-600 hover:bg-crimson-700 text-white"
+                          onClick={() => setSelectedRetreat(retreat)}
+                        >
+                          Register for Retreat
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px] md:max-w-[600px] lg:max-w-[800px] max-h-[80vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Register for {selectedRetreat?.title}
+                          </DialogTitle>
+                          <DialogDescription>
+                            Please fill out the form below to register for the
+                            retreat.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <RetreatRegistrationForm retreat={selectedRetreat} />
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </TabsContent>
               </Tabs>

@@ -35,9 +35,9 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
           <h2 className="text-3xl font-bold text-crimson-800">
             Featured Events
           </h2>
-          <Button variant="link" className="text-crimson-600">
+          {/* <Button variant="link" className="text-crimson-600">
             View All Featured <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          </Button> */}
         </div>
 
         <motion.div
