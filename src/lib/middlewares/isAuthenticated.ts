@@ -1,26 +1,34 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { httpMessages } from "@/lib/utils/HttpMessage";
+import { handleError } from "@/lib/utils/errorHandler";
 
-const SECRET_KEY = process.env.JWT_SECRET || "your_default_secret"; // Ensure it's in your .env
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export async function isAuthenticated(req: NextRequest) {
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET is not defined in environment variables.");
+}
+
+export const isAuthenticated = async (
+  req: NextRequest
+): Promise<NextResponse | void> => {
   const authHeader = req.headers.get("authorization");
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new Error("Unauthorized: No token provided");
+  if (!authHeader) {
+    return handleError(httpMessages.UNAUTHORIZED_NO_TOKEN);
   }
 
   const token = authHeader.split(" ")[1];
+  if (!token) {
+    return handleError(httpMessages.UNAUTHORIZED_INVALID_TOKEN);
+  }
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY) as jwt.JwtPayload;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    console.log(decoded);
 
-    if (!decoded || (decoded.exp && Date.now() >= decoded.exp * 1000)) {
-      throw new Error("Unauthorized: Token expired");
-    }
-
-    return decoded;
+    return;
   } catch {
-    throw new Error("Unauthorized: Invalid token");
+    return handleError(httpMessages.UNAUTHORIZED("Invalid or Expired Token"));
   }
-}
+};
