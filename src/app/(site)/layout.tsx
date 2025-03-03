@@ -1,7 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Head from "next/head";

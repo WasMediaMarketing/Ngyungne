@@ -1,14 +1,20 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Phone, Mail, MapPin } from "lucide-react"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Phone, Mail, MapPin } from "lucide-react";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -16,22 +22,25 @@ export default function ContactPage() {
     email: "",
     subject: "",
     message: "",
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle form submission
-    console.log(formData)
-  }
+    e.preventDefault();
+    console.log(formData);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid md:grid-cols-2 gap-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid md:grid-cols-2 gap-12"
+      >
         <div>
           <h1 className="text-3xl font-bold mb-4">Get in Touch</h1>
           <p className="text-primary/60 mb-8">
-            Have questions about our teachings or programs? We'd love to hear from you. Send us a message and we'll
-            respond as soon as possible.
+            Have questions about our teachings or programs? We'd love to hear
+            from you. Send us a message and we'll respond as soon as possible.
           </p>
 
           <div className="space-y-6">
@@ -71,7 +80,9 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Address</h3>
-                    <p className="text-primary/60">123 Temple Street, City, Country</p>
+                    <p className="text-primary/60">
+                      123 Temple Street, City, Country
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -82,7 +93,9 @@ export default function ContactPage() {
         <Card>
           <CardHeader>
             <CardTitle>Send us a message</CardTitle>
-            <CardDescription>Fill out the form below and we'll get back to you soon.</CardDescription>
+            <CardDescription>
+              Fill out the form below and we'll get back to you soon.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -92,7 +105,9 @@ export default function ContactPage() {
                   <Input
                     placeholder="Your name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -102,7 +117,9 @@ export default function ContactPage() {
                     type="email"
                     placeholder="Your email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -112,7 +129,9 @@ export default function ContactPage() {
                 <Input
                   placeholder="Message subject"
                   value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, subject: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -121,7 +140,9 @@ export default function ContactPage() {
                 <Textarea
                   placeholder="Your message"
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, message: e.target.value })
+                  }
                   rows={6}
                   required
                 />
@@ -133,7 +154,19 @@ export default function ContactPage() {
           </CardContent>
         </Card>
       </motion.div>
-    </div>
-  )
-}
 
+      {/* Updated Map Section */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-4 text-center">Find Us Here</h2>
+        <div className="w-full h-[480px] rounded-lg overflow-hidden shadow-lg">
+          <iframe
+            src="https://www.google.com/maps/d/embed?mid=1yUnC8Q3uZWME0ZOVMm2RUipX-5k7Xbk&ehbc=2E312F&noprof=1"
+            className="w-full h-full border-0"
+            allowFullScreen
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  );
+}
