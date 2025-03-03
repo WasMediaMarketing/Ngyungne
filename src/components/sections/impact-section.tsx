@@ -2,32 +2,32 @@
 
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Globe, BookOpen, Heart } from "lucide-react";
 
 const impactStats = [
   {
-    number: "10,000+",
+    number: 10000,
     label: "Students Taught",
     icon: Users,
     description: "Students from around the world",
   },
   {
-    number: "50+",
+    number: 50,
     label: "Countries Reached",
     icon: Globe,
     description: "Global community of practitioners",
   },
   {
-    number: "1,000+",
+    number: 1000,
     label: "Teaching Hours",
     icon: BookOpen,
     description: "Hours of Buddhist teachings",
   },
   {
-    number: "100+",
+    number: 100,
     label: "Retreats Conducted",
     icon: Heart,
     description: "Transformative meditation retreats",
@@ -36,7 +36,8 @@ const impactStats = [
 
 export function ImpactSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  // Change `once: true` to `once: false` to trigger animation on scroll in both directions
+  const isInView = useInView(ref, { once: false });
 
   return (
     <section className="py-20 bg-primary text-primary-foreground">
@@ -83,9 +84,7 @@ export function ImpactSection() {
                         <Icon className="h-6 w-6 text-saffron-500" />
                       </div>
                     </div>
-                    <div className="text-3xl font-bold mb-2 text-saffron-300">
-                      {stat.number}
-                    </div>
+                    <Counter number={stat.number} isInView={isInView} />
                     <div className="text-lg font-medium mb-2 text-saffron-300">
                       {stat.label}
                     </div>
@@ -102,3 +101,37 @@ export function ImpactSection() {
     </section>
   );
 }
+
+// Counter component to animate the numbers
+const Counter = ({
+  number,
+  isInView,
+}: {
+  number: number;
+  isInView: boolean;
+}) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (isInView) {
+      let start = 0;
+      const end = number;
+      const duration = 2000; // 2 seconds
+      const increment = Math.ceil(end / (duration / 50)); // Adjust the interval speed
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= end) {
+          start = end;
+          clearInterval(timer);
+        }
+        setCount(start);
+      }, 50); // 50ms interval for smooth counting
+    }
+  }, [isInView, number]);
+
+  return (
+    <div className="text-3xl font-bold mb-2 text-saffron-300">
+      {count.toLocaleString()} +
+    </div>
+  );
+};

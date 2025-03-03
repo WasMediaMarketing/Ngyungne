@@ -1,5 +1,6 @@
 export const blogPosts = [
   {
+    id: 1,
     title: "Understanding Buddhist Meditation Techniques",
     excerpt:
       "Learn about different meditation techniques and their benefits for daily practice.",
@@ -21,6 +22,7 @@ export const blogPosts = [
     comments: 42,
   },
   {
+    id: 2,
     title: "The Four Noble Truths Explained",
     excerpt:
       "A comprehensive guide to understanding the fundamental teachings of Buddhism.",
@@ -42,6 +44,7 @@ export const blogPosts = [
     comments: 37,
   },
   {
+    id: 3,
     title: "Mindfulness in Daily Life",
     excerpt:
       "Practical tips for incorporating mindfulness into your everyday activities.",
@@ -63,6 +66,7 @@ export const blogPosts = [
     comments: 58,
   },
   {
+    id: 4,
     title: "The Art of Buddhist Chanting",
     excerpt:
       "Explore the tradition of sacred sounds and their role in spiritual practice.",
@@ -84,6 +88,7 @@ export const blogPosts = [
     comments: 31,
   },
   {
+    id: 5,
     title: "Understanding Emptiness (Sunyata)",
     excerpt:
       "A beginner's guide to the profound Buddhist concept of emptiness.",
@@ -105,6 +110,7 @@ export const blogPosts = [
     comments: 46,
   },
   {
+    id: 6,
     title: "The Ethics of Compassionate Action",
     excerpt:
       "How Buddhist principles guide ethical decision-making in a complex world.",

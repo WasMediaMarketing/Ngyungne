@@ -1,32 +1,49 @@
-import { type NavSection } from "@/types";
+import type { NavSection } from "@/types/nav-section";
+
+// Icon Mapping (Update invalid icons with valid ones from Lucide)
+import {
+  BookOpen,
+  Sparkle,
+  ScrollText,
+  GraduationCap,
+  Calendar,
+  CalendarDays,
+  Handshake,
+  Flame,
+  Users,
+  Newspaper,
+  Image,
+  HelpCircle,
+  BookMarked,
+} from "lucide-react";
 
 export const siteConfig = {
   name: "Ngyungne Practice",
-  description: "Buddhist teachings, events, and practices",
+  description: "Tibetan Buddhist teachings, events, and practices",
   mainNav: {
     teachings: [
       {
         title: "Buddhist Philosophy",
         href: "/teachings/philosophy",
-        description: "Learn fundamental Buddhist concepts and teachings",
-        icon: "Book",
+        description: "Explore fundamental Buddhist concepts and teachings",
+        icon: "BookOpen", // Changed from "Lotus"
       },
       {
         title: "Meditation",
         href: "/teachings/meditation",
-        description: "Guided meditation sessions and techniques",
-        icon: "Heart",
+        description: "Learn various meditation techniques and practices",
+        icon: "Sparkle", // Changed from "Sparkles"
       },
       {
         title: "Scriptures",
         href: "/teachings/scriptures",
-        description: "Study Buddhist texts and commentaries",
+        description: "Study Tibetan Buddhist texts and commentaries",
         icon: "ScrollText",
       },
       {
         title: "Courses",
         href: "/teachings/courses",
-        description: "Structured learning programs",
+        description: "Enroll in structured learning programs",
         icon: "GraduationCap",
       },
     ] as NavSection[],
@@ -34,64 +51,77 @@ export const siteConfig = {
       {
         title: "Events",
         href: "/programs/events",
-        description: "View our calendar of upcoming teachings",
+        description: "View our calendar of upcoming teachings and ceremonies",
         icon: "Calendar",
       },
       {
         title: "Causes",
         href: "/programs/causes",
-        description: "Support our causes",
-        icon: "Calendar",
+        description: "Support our charitable initiatives and projects",
+        icon: "Handshake", // Changed from "HeartHandshake"
       },
       {
         title: "Retreats",
         href: "/programs/retreats",
-        description: "Join our meditation retreats",
-        icon: "Users",
+        description: "Join our meditation and contemplation retreats",
+        icon: "Users", // Changed from "Tent"
       },
     ] as NavSection[],
     resources: [
       {
         title: "Practice Journal",
         href: "/resources/practice-journal",
-        description: "Study Buddhist texts and commentaries",
-        icon: "ScrollText",
+        description: "Track your meditation and spiritual progress",
+        icon: "BookMarked",
       },
       {
-        title: "Buddhist Calender",
+        title: "Buddhist Calendar",
         href: "/resources/buddhist-calendar",
-        description: "Study Buddhist texts and commentaries",
-        icon: "ScrollText",
+        description: "View important dates in the Tibetan Buddhist calendar",
+        icon: "CalendarDays",
       },
       {
         title: "Practices",
         href: "/resources/practices",
-        description: "Practice meditation and spiritual development",
-        icon: "ScrollText",
+        description: "Learn various Tibetan Buddhist practices and rituals",
+        icon: "Flame",
+      },
+      // {
+      //   title: "Sponsors",
+      //   href: "/resources/sponsors",
+      //   description: "Support our sangha and ongoing projects",
+      //   icon: "Handshake",
+      // },
+      {
+        title: "Ambassadors",
+        href: "/resources/ambassadors",
+        description: "Meet our dharma ambassadors and teachers",
+        icon: "Users",
       },
       {
         title: "Blog",
         href: "/resources/blog",
-        description: "Articles and updates",
+        description: "Read articles on Buddhist philosophy and practice",
         icon: "Newspaper",
       },
       {
         title: "Gallery",
         href: "/resources/gallery",
-        description: "Photos and videos",
+        description: "View photos and videos of our events and retreats",
         icon: "Image",
       },
       {
         title: "FAQ",
         href: "/resources/faq",
-        description: "Common questions",
+        description: "Find answers to common questions about our practices",
         icon: "HelpCircle",
       },
     ] as NavSection[],
   },
   links: {
-    facebook: "https://facebook.com",
-    twitter: "https://twitter.com",
-    instagram: "https://instagram.com",
+    facebook: "https://facebook.com/ngyungnepractice",
+    twitter: "https://twitter.com/ngyungnepractice",
+    instagram: "https://instagram.com/ngyungnepractice",
+    youtube: "https://youtube.com/ngyungnepractice",
   },
 };
