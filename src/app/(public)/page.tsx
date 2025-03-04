@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef } from "react";
 import { HeroSlider } from "@/components/sections/hero-slider";
 import { AboutSection } from "@/components/sections/about-section";
 import { CausesSection } from "@/components/sections/causes-section";
@@ -11,6 +12,15 @@ import { FeaturedEventsSlider } from "@/components/events/FeaturedEventsSlider";
 import { events } from "@/data/events";
 import { TeachingsSection } from "@/components/sections/teachings-section";
 export default function Home() {
+  const apiCallDone = useRef(false); // useRef to track whether API has been called
+
+  useEffect(() => {
+    if (!apiCallDone.current) {
+      fetch("/api/user/admin-init");
+      apiCallDone.current = true;
+    }
+  }, []);
+
   return (
     <div className="w-full">
       <HeroSlider />

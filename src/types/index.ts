@@ -1,12 +1,4 @@
-import { TypeIcon as type, LucideIcon } from "lucide-react";
+import { IUser, IUserInput, IUserUpdate, IUserLogin } from "./user.types";
+import { IUserService } from "./IUserService";
 
-export interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  author: string;
-  category: string;
-  image: string;
-  slug: string;
-}
+export type { IUser, IUserInput, IUserUpdate, IUserLogin, IUserService };
