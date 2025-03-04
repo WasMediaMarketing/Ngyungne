@@ -22,6 +22,7 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         description: User details retrieved successfully.
  *         content:
  *           application/json:
+ *          header: authtoken required
  *             schema:
  *               type: object
  *               properties:
@@ -43,8 +44,7 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         description: User not found for the given ID.
  *       500:
  *         description: Internal server error.
- *
- * patch:
+ *   patch:
  *     summary: Update user by ID
  *     description: Update the user's details based on their user ID.
  *     tags:
@@ -60,6 +60,7 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *       required: true
  *       content:
  *         application/json:
+ * header: authtoken required
  *           schema:
  *             type: object
  *             properties:
@@ -108,12 +109,13 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         description: User not found for the given ID.
  *       500:
  *         description: Internal server error.
- *
- * delete:
+ *   delete:
  *     summary: Delete user by ID
  *     description: Delete a user based on their user ID.
+ * header: authtoken required
  *     tags:
  *       - User
+ *
  *     parameters:
  *       - in: path
  *         name: userId

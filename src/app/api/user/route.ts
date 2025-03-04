@@ -14,6 +14,7 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  *       required: true
  *       content:
  *         application/json:
+ * header: authtoken required
  *           schema:
  *             type: object
  *             properties:
@@ -32,7 +33,7 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  *                 description: Role of the user
  *               password:
  *                 type: string
- *                 description: Password of the user (only required for creating new user)
+ *                 description: Password of the user (only required for creating new admin)
  *               page:
  *                 type: string
  *                 description: Page for the user (required for non-admin users)
@@ -63,9 +64,8 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  */
 
 export async function POST(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-
-  if (authResult) return authResult;
+  const valdiateuserBody = await validateUserInput(req);
+  if (valdiateuserBody) return valdiateuserBody;
 
   const userController = createUserController();
   return userController.createUser(req);
@@ -74,9 +74,6 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const authResult = await isAuthenticated(req);
   if (authResult) return authResult;
-
-  const valdiateuserBody = await validateUserInput(req);
-  if (valdiateuserBody) return valdiateuserBody;
 
   const userController = createUserController();
   return userController.getUsers();
