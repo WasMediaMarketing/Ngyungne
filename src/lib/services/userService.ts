@@ -43,11 +43,16 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async deleteUser(userId: string): Promise<IUser | null> {
+  async deleteUsers(userIds: string[]): Promise<unknown> {
     await this.initializeDbConnection();
-    const user = await User.findByIdAndDelete(userId);
-    if (!user) throw new Error("User not found");
-    return user;
+    const deletedUsers = await User.deleteMany({
+      _id: { $in: userIds }, // Matching any user whose _id is in the userIds array
+    });
+
+    if (deletedUsers.deletedCount === 0) {
+      throw new Error("No users found to delete");
+    }
+    return deletedUsers;
   }
 
   async loginUser(email: string, password: string): Promise<IUserLogin> {
