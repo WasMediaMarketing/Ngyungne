@@ -2,6 +2,66 @@ import { NextRequest } from "next/server";
 import { createUserController } from "@/lib/factories/userFactory";
 import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
 
+/**
+ * @openapi
+ * /api/user:
+ *   post:
+ *     summary: Create a new user
+ *     description: This endpoint creates a new user in the system.
+ *     tags:
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Name of the user
+ *               email:
+ *                 type: string
+ *                 description: Email of the user
+ *               phoneNumber:
+ *                 type: string
+ *                 description: Phone number of the user
+ *               role:
+ *                 type: string
+ *                 enum: [user, admin, volunteer, donator]
+ *                 description: Role of the user
+ *               password:
+ *                 type: string
+ *                 description: Password of the user (only required for creating new user)
+ *               page:
+ *                 type: string
+ *                 description: Page for the user (required for non-admin users)
+ *               pageTitle:
+ *                 type: string
+ *                 description: Page title for the user (required for non-admin users)
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Bad request if input validation fails
+ *       401:
+ *         description: Unauthorized if token is invalid or missing
+ *       500:
+ *         description: Internal server error
+ *   get:
+ *     summary: Get all users
+ *     description: This endpoint retrieves all users in the system.
+ *     tags:
+ *       - User
+ *     responses:
+ *       200:
+ *         description: List of users retrieved successfully
+ *       401:
+ *         description: Unauthorized if token is invalid or missing
+ *       500:
+ *         description: Internal server error
+ */
+
 export async function POST(req: NextRequest) {
   const authResult = await isAuthenticated(req);
 
