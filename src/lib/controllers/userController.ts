@@ -10,6 +10,7 @@ export class UserController {
   constructor(userService: IUserService) {
     this.userService = userService;
   }
+
   async createUser(req: NextRequest): Promise<NextResponse> {
     try {
       const userData = await req.json();

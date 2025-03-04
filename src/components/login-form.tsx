@@ -41,7 +41,7 @@ export function AdminLoginForm({
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const { data } = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
@@ -53,10 +53,7 @@ export function AdminLoginForm({
 
       // Store the token and user data
       localStorage.setItem("adminToken", data.token);
-      localStorage.setItem("adminUser", JSON.stringify(data.user));
-
-      // Set the token as an HTTP-only cookie
-      document.cookie = `adminToken=${data.token}; path=/; max-age=86400; httponly; secure; samesite=strict`;
+      localStorage.setItem("adminResponse", data);
 
       toast({
         title: "Login Successful",

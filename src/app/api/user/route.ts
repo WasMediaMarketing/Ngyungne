@@ -71,6 +71,8 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  */
 
 export async function POST(req: NextRequest) {
+  const reqClone = req.clone();
+  console.log(reqClone, "req clone");
   const valdiateuserBody = await validateUserInput(req);
   if (valdiateuserBody) return valdiateuserBody;
 
