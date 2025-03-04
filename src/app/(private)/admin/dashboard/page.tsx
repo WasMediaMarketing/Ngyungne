@@ -148,8 +148,6 @@ const NgyungneDashboard = () => {
     }
   }, []);
 
-  console.log("user:", user);
-
   if (!user) {
     return (
       <div>
