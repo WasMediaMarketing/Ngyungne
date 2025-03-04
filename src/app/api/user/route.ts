@@ -14,7 +14,6 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  *       required: true
  *       content:
  *         application/json:
- * header: authtoken required
  *           schema:
  *             type: object
  *             properties:
@@ -54,6 +53,14 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  *     description: This endpoint retrieves all users in the system.
  *     tags:
  *       - User
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <your_token_here>
+ *         description: Authorization token required to access this endpoint.
  *     responses:
  *       200:
  *         description: List of users retrieved successfully
