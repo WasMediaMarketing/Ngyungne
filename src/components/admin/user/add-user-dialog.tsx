@@ -33,6 +33,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import type { IUser, IUserInput } from "@/types/user.types";
+import Spinner from "@/components/spinner";
 
 const userSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -282,7 +283,11 @@ export function AddUserDialog({
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create User"}
+                {isLoading ? (
+                  <Spinner text="Creating User..." />
+                ) : (
+                  "Create User"
+                )}
               </Button>
             </DialogFooter>
           </form>

@@ -156,9 +156,9 @@ const NgyungneDashboard = () => {
     );
   }
   return (
-    <div className="w-full p-4 bg-gray-50">
+    <div className="w-full p-4 ">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
+        <h1 className="text-2xl font-bold text-maroon-800">
           Ngyungne Practice Dashboard
         </h1>
         <p className="text-gray-600">

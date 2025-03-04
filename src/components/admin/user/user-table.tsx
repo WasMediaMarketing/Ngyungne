@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Plus, Eye, Pencil, Trash2, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ import { DeleteUserAlert } from "./delete-user-alert";
 import type { IUser } from "@/types/user.types";
 import { toast } from "@/components/ui/use-toast";
 import { DataTable } from "@/components/ui/data-table";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface UserTableProps {
   users: IUser[];
@@ -71,6 +72,28 @@ export function UserTable({
 
   const columns: ColumnDef<IUser>[] = [
     {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
       accessorKey: "name",
       header: "Name",
     },
@@ -82,6 +105,21 @@ export function UserTable({
       accessorKey: "phoneNumber",
       header: "Phone Number",
       cell: ({ row }) => row.original.phoneNumber || "N/A",
+    },
+    {
+      accessorKey: "address",
+      header: "Address",
+      cell: ({ row }) => row.original.address || "N/A",
+    },
+    {
+      accessorKey: "page",
+      header: "Page",
+      cell: ({ row }) => row.original.page || "N/A",
+    },
+    {
+      accessorKey: "pageTitle",
+      header: "Page Title",
+      cell: ({ row }) => row.original.pageTitle || "N/A",
     },
     {
       accessorKey: "role",
@@ -168,31 +206,27 @@ export function UserTable({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Users</h2>
-        <Button
-          onClick={() => {
-            console.log("Add User button clicked");
-            setIsAddUserOpen(true);
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add User
-        </Button>
+        <h2 className="text-2xl font-bold">User Management</h2>
+        <div className="flex space-x-2">
+          <Button>
+            <Trash className="mr-2 h-4 w-4" /> Delete User
+          </Button>
+          <Button
+            onClick={() => {
+              setIsAddUserOpen(true);
+            }}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Add User
+          </Button>
+        </div>
       </div>
 
-      {users.length === 0 ? (
-        <div className="p-4 text-center">
-          <p className="text-gray-500">
-            No users found. Add a user to get started.
-          </p>
-        </div>
-      ) : (
-        <DataTable
-          columns={columns}
-          data={users}
-          filterColumn="name"
-          filterPlaceholder="Filter by name..."
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={users}
+        filterColumn="name"
+        filterPlaceholder="Filter by name..."
+      />
 
       {isAddUserOpen && (
         <AddUserDialog

@@ -27,8 +27,7 @@ export async function getUsers(): Promise<IUser[]> {
       throw new Error("Failed to fetch users");
     }
 
-    const { data } = await response.json(); // Extract data
-    console.log("Fetched data", data);
+    const { data } = await response.json();
     return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("Error fetching users:", error);
