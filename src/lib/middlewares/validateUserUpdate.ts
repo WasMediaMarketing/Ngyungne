@@ -18,7 +18,8 @@ export const validateUserUpdate = async (
   req: NextRequest
 ): Promise<NextResponse | void> => {
   try {
-    const userData = await req.json();
+    const reqClone = req.clone();
+    const userData = await reqClone.json();
 
     const result = userUpdateSchema.safeParse(userData);
 

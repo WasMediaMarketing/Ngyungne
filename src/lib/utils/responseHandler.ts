@@ -16,6 +16,11 @@ export const handleResponse = (
       message: message,
       data: data,
     },
-    { status: statusCode }
+    {
+      status: statusCode,
+      headers: {
+        "Cache-Control": "no-store", // Disable caching
+      },
+    }
   );
 };

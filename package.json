@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-docs": "node scripts/swagger.js"
+    "generate-docs": "node scripts/swagger.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
@@ -74,6 +76,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-react": "^5.20.0",
     "swiper": "latest",
+    "swr": "^2.3.2",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.173.0",
