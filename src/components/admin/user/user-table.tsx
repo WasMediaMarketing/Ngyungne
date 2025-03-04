@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Plus, Eye, Pencil, Trash2, Trash } from "lucide-react";
+import { MoreHorizontal, Plus, Eye, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +17,7 @@ import { AddUserDialog } from "./add-user-dialog";
 import { EditUserDialog } from "./edit-user-dialog";
 import { ViewUserDialog } from "./view-user-dialog";
 import { DeleteUserAlert } from "./delete-user-alert";
+import { DeleteMultipleUsersAlert } from "./delete-multiple-users-alert";
 import type { IUser } from "@/types/user.types";
 import { toast } from "@/components/ui/use-toast";
 import { DataTable } from "@/components/ui/data-table";
@@ -41,7 +42,10 @@ export function UserTable({
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
   const [isDeleteUserOpen, setIsDeleteUserOpen] = useState(false);
+  const [isDeleteMultipleUsersOpen, setIsDeleteMultipleUsersOpen] =
+    useState(false);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   const handleAddUser = (newUser: IUser) => {
     console.log("UserTable - handleAddUser called with:", newUser);
@@ -69,6 +73,33 @@ export function UserTable({
       description: "User has been deleted successfully.",
     });
   };
+
+  const handleDeleteMultipleUsers = (userIds: string[]) => {
+    console.log("UserTable - handleDeleteMultipleUsers called with:", userIds);
+    userIds.forEach((id) => onUserDeleted(id));
+    setSelectedRows([]);
+    toast({
+      title: "Success",
+      description: `${userIds.length} user(s) have been deleted successfully.`,
+    });
+  };
+
+  // Use useCallback to prevent unnecessary re-renders
+  const handleRowSelectionChange = useCallback(
+    (rowSelection: Record<string, boolean>) => {
+      // Convert row selection object to array of selected user IDs
+      const selectedIds = Object.keys(rowSelection)
+        .filter((index) => rowSelection[index]) // Only include true values
+        .map((index) => {
+          const idx = Number.parseInt(index);
+          return idx >= 0 && idx < users.length ? users[idx].id : null;
+        })
+        .filter(Boolean) as string[]; // Remove any null values
+
+      setSelectedRows(selectedIds);
+    },
+    [users]
+  );
 
   const columns: ColumnDef<IUser>[] = [
     {
@@ -208,9 +239,15 @@ export function UserTable({
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">User Management</h2>
         <div className="flex space-x-2">
-          <Button>
-            <Trash className="mr-2 h-4 w-4" /> Delete User
-          </Button>
+          {selectedRows.length > 0 && (
+            <Button
+              variant="destructive"
+              onClick={() => setIsDeleteMultipleUsersOpen(true)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Delete Selected (
+              {selectedRows.length})
+            </Button>
+          )}
           <Button
             onClick={() => {
               setIsAddUserOpen(true);
@@ -226,6 +263,7 @@ export function UserTable({
         data={users}
         filterColumn="name"
         filterPlaceholder="Filter by name..."
+        onRowSelectionChange={handleRowSelectionChange}
       />
 
       {isAddUserOpen && (
@@ -261,6 +299,17 @@ export function UserTable({
           onOpenChange={setIsDeleteUserOpen}
           user={selectedUser}
           onUserDeleted={handleDeleteUser}
+          refreshUsers={refreshUsers}
+        />
+      )}
+
+      {isDeleteMultipleUsersOpen && selectedRows.length > 0 && (
+        <DeleteMultipleUsersAlert
+          open={isDeleteMultipleUsersOpen}
+          onOpenChange={setIsDeleteMultipleUsersOpen}
+          userIds={selectedRows}
+          users={users}
+          onUsersDeleted={handleDeleteMultipleUsers}
           refreshUsers={refreshUsers}
         />
       )}

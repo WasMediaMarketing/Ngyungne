@@ -42,7 +42,12 @@ export class UserService implements IUserService {
     if (!user) throw new Error("User not found");
     return user;
   }
-
+  async deleteUser(userId: string): Promise<IUser | null> {
+    await this.initializeDbConnection();
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) throw new Error("User not found");
+    return user;
+  }
   async deleteUsers(userIds: string[]): Promise<unknown> {
     await this.initializeDbConnection();
     const deletedUsers = await User.deleteMany({

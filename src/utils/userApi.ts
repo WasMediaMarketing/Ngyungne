@@ -143,3 +143,24 @@ export async function deleteUser(userId: string): Promise<any> {
     throw error;
   }
 }
+
+export async function deleteMultipleUsers(userIds: string[]): Promise<any> {
+  try {
+    const token = getAuthToken();
+    const response = await fetch(`/api/user?userIds=${userIds.join(",")}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete users");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting users:", error);
+    throw error;
+  }
+}

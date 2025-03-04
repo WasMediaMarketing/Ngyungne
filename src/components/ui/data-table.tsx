@@ -2,17 +2,17 @@
 
 import * as React from "react";
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  PaginationState,
+  type PaginationState,
 } from "@tanstack/react-table";
 import { ChevronDown } from "lucide-react";
 
@@ -40,11 +40,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface DataTableProps<TData, TValue> {
+// Make sure the interface includes the onRowSelectionChange prop
+export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filterColumn?: string;
   filterPlaceholder?: string;
+  onRowSelectionChange?: (rowSelection: Record<string, boolean>) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -52,6 +54,7 @@ export function DataTable<TData, TValue>({
   data,
   filterColumn,
   filterPlaceholder = "Filter...",
+  onRowSelectionChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -64,6 +67,21 @@ export function DataTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  // Store the previous rowSelection to compare
+  const prevRowSelectionRef = React.useRef(rowSelection);
+
+  // Call the onRowSelectionChange callback only when rowSelection actually changes
+  React.useEffect(() => {
+    // Use JSON.stringify for deep comparison of objects
+    const currentSelectionStr = JSON.stringify(rowSelection);
+    const prevSelectionStr = JSON.stringify(prevRowSelectionRef.current);
+
+    if (currentSelectionStr !== prevSelectionStr && onRowSelectionChange) {
+      prevRowSelectionRef.current = rowSelection;
+      onRowSelectionChange(rowSelection);
+    }
+  }, [rowSelection, onRowSelectionChange]);
 
   const table = useReactTable({
     data,
