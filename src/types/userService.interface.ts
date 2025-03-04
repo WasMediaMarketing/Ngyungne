@@ -6,5 +6,5 @@ export interface IUserService {
   getUsers(): Promise<IUser[]>;
   getUserById(userId: string): Promise<IUser | null>;
   updateUser(userId: string, userData: IUserUpdate): Promise<IUser | null>;
-  deleteUser(userId: string): Promise<IUser | null>;
+  deleteUsers(userIds: string[]): Promise<unknown>;
 }

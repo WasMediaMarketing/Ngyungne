@@ -108,6 +108,49 @@
             "description": "Internal server error"
           }
         }
+      },
+      "delete": {
+        "summary": "Delete users by their IDs",
+        "description": "Delete multiple users based on their user IDs.",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userIds",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1,2,3,4"
+            },
+            "description": "A comma-separated list of user IDs to delete."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "No users found for the given IDs."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
       }
     },
     "/api/user/login": {

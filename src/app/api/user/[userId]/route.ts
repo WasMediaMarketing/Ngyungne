@@ -121,34 +121,7 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         description: User not found for the given ID.
  *       500:
  *         description: Internal server error.
- *   delete:
- *     summary: Delete user by ID
- *     description: Delete a user based on their user ID.
- *     tags:
- *       - User
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the user to delete.
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: Bearer <your_token_here>
- *         description: Authorization token required to access this endpoint.
- *     responses:
- *       200:
- *         description: User successfully deleted.
- *       401:
- *         description: Unauthorized - The request is not authenticated.
- *       404:
- *         description: User not found for the given ID.
- *       500:
- *         description: Internal server error.
+ *
  */
 export async function GET(req: NextRequest) {
   const authResult = await isAuthenticated(req);
@@ -167,12 +140,4 @@ export async function PATCH(req: NextRequest) {
 
   const userController = createUserController();
   return userController.updateUser(req);
-}
-
-export async function DELETE(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
-
-  const userController = createUserController();
-  return userController.deleteUser(req);
 }

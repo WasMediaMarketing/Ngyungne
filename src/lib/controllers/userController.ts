@@ -77,18 +77,24 @@ export class UserController {
     }
   }
 
-  async deleteUser(req: NextRequest): Promise<NextResponse> {
+  async deleteUsers(req: NextRequest): Promise<NextResponse> {
     try {
-      const userId = req.nextUrl.pathname.split("/").pop();
+      // Extract user IDs from query parameters
+      const url = req.nextUrl;
+      const userIds = url.searchParams.get("userIds");
 
-      if (!userId) {
-        return handleError(httpMessages.BAD_REQUEST("User ID is required"));
+      if (!userIds) {
+        return handleError(httpMessages.BAD_REQUEST("User IDs are required"));
       }
 
-      const deletedUser = await this.userService.deleteUser(userId);
-      return handleResponse(deletedUser);
+      // Parse user IDs into an array
+      const userIdArray = userIds.split(",").map((id) => id.trim());
+
+      // Call the deleteUser method for each ID
+      const deletedUsers = await this.userService.deleteUsers(userIdArray);
+      return handleResponse(deletedUsers);
     } catch (error) {
-      console.error("deleteUserController error:", error);
+      console.error("deleteUsersController error:", error);
       return handleError();
     }
   }
