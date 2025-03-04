@@ -28,6 +28,7 @@ interface UserTableProps {
   onUserAdded: (user: IUser) => void;
   onUserUpdated: (user: IUser) => void;
   onUserDeleted: (userId: string) => void;
+  refreshUsers: () => Promise<void>;
 }
 
 export function UserTable({
@@ -35,6 +36,7 @@ export function UserTable({
   onUserAdded,
   onUserUpdated,
   onUserDeleted,
+  refreshUsers,
 }: UserTableProps) {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
@@ -269,6 +271,7 @@ export function UserTable({
           open={isAddUserOpen}
           onOpenChange={setIsAddUserOpen}
           onUserAdded={handleAddUser}
+          refreshUsers={refreshUsers}
         />
       )}
 
@@ -286,6 +289,7 @@ export function UserTable({
           onOpenChange={setIsEditUserOpen}
           user={selectedUser}
           onUserUpdated={handleUpdateUser}
+          refreshUsers={refreshUsers}
         />
       )}
 
@@ -295,6 +299,7 @@ export function UserTable({
           onOpenChange={setIsDeleteUserOpen}
           user={selectedUser}
           onUserDeleted={handleDeleteUser}
+          refreshUsers={refreshUsers}
         />
       )}
 
@@ -305,6 +310,7 @@ export function UserTable({
           userIds={selectedRows}
           users={users}
           onUsersDeleted={handleDeleteMultipleUsers}
+          refreshUsers={refreshUsers}
         />
       )}
     </div>

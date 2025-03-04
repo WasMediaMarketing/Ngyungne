@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast-hook";
+import { toast } from "sonner";
 import type { IUser, IUserInput } from "@/types/user.types";
 import Spinner from "@/components/spinner";
 
@@ -52,12 +52,14 @@ interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUserAdded: (user: IUser) => void;
+  refreshUsers: () => Promise<void>;
 }
 
 export function AddUserDialog({
   open,
   onOpenChange,
   onUserAdded,
+  refreshUsers,
 }: AddUserDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -125,10 +127,11 @@ export function AddUserDialog({
 
       onUserAdded(newUser);
 
-      toast({
-        title: "Success",
+      toast.success("Success", {
         description: "User has been created successfully.",
       });
+
+      await refreshUsers(); // Refresh the user list
 
       onOpenChange(false);
       form.reset(); // Reset form after successful submission
@@ -136,11 +139,9 @@ export function AddUserDialog({
       console.error("Error in form submission:", error);
       setFormError(error.message || "Failed to create user. Please try again.");
 
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description:
           error.message || "Failed to create user. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

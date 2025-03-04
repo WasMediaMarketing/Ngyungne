@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteMultipleUsers } from "@/utils/userApi";
-import { toast } from "@/components/ui/use-toast-hook";
+import { toast } from "sonner";
 import type { IUser } from "@/types/user.types";
 
 interface DeleteMultipleUsersAlertProps {
@@ -21,6 +21,7 @@ interface DeleteMultipleUsersAlertProps {
   userIds: string[];
   users: IUser[];
   onUsersDeleted: (userIds: string[]) => void;
+  refreshUsers: () => Promise<void>;
 }
 
 export function DeleteMultipleUsersAlert({
@@ -29,6 +30,7 @@ export function DeleteMultipleUsersAlert({
   userIds,
   users,
   onUsersDeleted,
+  refreshUsers,
 }: DeleteMultipleUsersAlertProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,9 +43,9 @@ export function DeleteMultipleUsersAlert({
       );
       await deleteMultipleUsers(userIds);
       onUsersDeleted(userIds);
+      await refreshUsers(); // Refresh the user list
 
-      toast({
-        title: "Users deleted",
+      toast.success("Users deleted", {
         description: `${userIds.length} user(s) have been deleted successfully.`,
       });
 
@@ -51,11 +53,9 @@ export function DeleteMultipleUsersAlert({
     } catch (error: any) {
       console.error("Error deleting users:", error);
 
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description:
           error.message || "Failed to delete users. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

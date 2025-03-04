@@ -13,7 +13,7 @@ import { Poppins } from "next/font/google";
 import "@/app/globals.css";
 import { Metadata } from "next";
 import { DynamicBreadcrumbs } from "@/components/admin-breadcrumbs";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { AuthGuard } from "@/components/auth-guard";
 
 const poppins = Poppins({
