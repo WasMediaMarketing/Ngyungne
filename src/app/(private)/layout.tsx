@@ -13,6 +13,8 @@ import { Poppins } from "next/font/google";
 import "@/app/globals.css";
 import { Metadata } from "next";
 import { DynamicBreadcrumbs } from "@/components/admin-breadcrumbs";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthGuard } from "@/components/auth-guard";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -38,21 +40,24 @@ export default function AdminLayout({
     const pathname = usePathname();
 
     return (
-      <SidebarProvider>
-        <AppSidebar activePath={pathname} />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-saffron-50">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mr-2 h-4" />
-              <DynamicBreadcrumbs />
+      <AuthGuard>
+        <SidebarProvider>
+          <AppSidebar activePath={pathname} />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-saffron-50">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <DynamicBreadcrumbs />
+              </div>
+            </header>
+            <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-saffron-50">
+              {children}
+              <Toaster />
             </div>
-          </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-saffron-50">
-            {children}
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+          </SidebarInset>
+        </SidebarProvider>
+      </AuthGuard>
     );
   };
 

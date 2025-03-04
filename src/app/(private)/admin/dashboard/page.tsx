@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -28,6 +28,8 @@ import {
   GraduationCap,
   Activity,
 } from "lucide-react";
+import { getAuthUser, isAuthenticated } from "@/utils/auth";
+import { Loader } from "@/components/common/loader";
 
 // Sample data for charts
 const monthlyEnrollmentData = [
@@ -137,6 +139,24 @@ const statsCards = [
 ];
 
 const NgyungneDashboard = () => {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const authUser = isAuthenticated();
+    if (authUser) {
+      setUser(authUser);
+    }
+  }, []);
+
+  console.log("user:", user);
+
+  if (!user) {
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
+  }
   return (
     <div className="w-full p-4 bg-gray-50">
       <div className="mb-6">

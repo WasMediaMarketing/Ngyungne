@@ -9,26 +9,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import Spinner from "./spinner";
 
 export function AdminLoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/admin/login", {
+      const response = await fetch("/api/user/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,14 +47,31 @@ export function AdminLoginForm({
         throw new Error(data.error || "Login failed");
       }
 
-      // Store the token in localStorage
+      if (data.user && data.user.role !== "admin") {
+        throw new Error("Unauthorized. Admin access required");
+      }
+
+      // Store the token and user data
       localStorage.setItem("adminToken", data.token);
       localStorage.setItem("adminUser", JSON.stringify(data.user));
 
-      // Redirect to admin dashboard
+      // Set the token as an HTTP-only cookie
+      document.cookie = `adminToken=${data.token}; path=/; max-age=86400; httponly; secure; samesite=strict`;
+
+      toast({
+        title: "Login Successful",
+        description: "Welcome back, admin!",
+        duration: 3000,
+      });
+
       router.push("/admin/dashboard");
     } catch (err: any) {
-      setError(err.message);
+      toast({
+        title: "Login Failed",
+        description: err.message,
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -67,13 +89,6 @@ export function AdminLoginForm({
                   Login to your Ngyungne admin account
                 </p>
               </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
 
               {/* Email Field with Lucide Icon */}
               <div className="grid gap-2">
@@ -96,7 +111,7 @@ export function AdminLoginForm({
                 </div>
               </div>
 
-              {/* Password Field with Lucide Icon */}
+              {/* Password Field with Lucide Icon and Toggle */}
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -106,18 +121,27 @@ export function AdminLoginForm({
                   />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
-                    className="pl-10"
+                    className="pl-10 pr-10"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
                   />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={togglePasswordVisibility}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                 </div>
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? <Spinner text="Logging in..." /> : "Login"}
               </Button>
             </div>
           </form>

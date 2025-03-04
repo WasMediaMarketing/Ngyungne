@@ -27,6 +27,7 @@ import {
 import Image from "next/image";
 // Import site config
 import { siteConfig } from "@/config/site";
+import { title } from "process";
 
 // Organization data
 const data = {

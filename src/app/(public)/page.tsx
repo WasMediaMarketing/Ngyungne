@@ -21,6 +21,8 @@ export default function Home() {
     }
   }, []);
 
+  console.log("API call done:", apiCallDone.current);
+
   return (
     <div className="w-full">
       <HeroSlider />
