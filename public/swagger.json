@@ -1,0 +1,224 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "My API",
+    "version": "1.0.0",
+    "description": "This is the API documentation for my Next.js app."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api"
+    }
+  ],
+  "paths": {
+    "/api/user": {
+      "post": {
+        "summary": "Create a new user",
+        "description": "This endpoint creates a new user in the system.",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the user"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Email of the user"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "Phone number of the user"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "user",
+                      "admin",
+                      "volunteer",
+                      "donator"
+                    ],
+                    "description": "Role of the user"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Password of the user (only required for creating new user)"
+                  },
+                  "page": {
+                    "type": "string",
+                    "description": "Page for the user (required for non-admin users)"
+                  },
+                  "pageTitle": {
+                    "type": "string",
+                    "description": "Page title for the user (required for non-admin users)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Bad request if input validation fails"
+          },
+          "401": {
+            "description": "Unauthorized if token is invalid or missing"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all users",
+        "description": "This endpoint retrieves all users in the system.",
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized if token is invalid or missing"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/user/login": {
+      "post": {
+        "summary": "Login user and return JWT token",
+        "description": "This endpoint allows a user to log in by providing their email and password. On successful login, a JWT token is returned.",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "The user's email address."
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The user's password."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully, returns the user details and JWT token.",
+            "content": {
+              "application/json": null,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The user ID."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The user's name."
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "The user's email address."
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "The user's role (e.g., admin, user, etc.)."
+                      }
+                    }
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "The JWT token for authenticated requests."
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid credentials or bad request."
+          },
+          "401": {
+            "description": "Unauthorized if the login credentials are invalid."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/init-admin": {
+      "get": {
+        "summary": "Initializes the admin user if it doesn't exist",
+        "description": "Checks if an admin user exists in the database, and if not, creates one with the email and password specified in environment variables.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin check complete. Admin user exists or has been created successfully.",
+            "content": {
+              "application/json": null,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Message indicating the status of the admin user creation.",
+                    "example": "Admin check complete"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Could not initialize the admin user.",
+            "content": {
+              "application/json": null,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "description": "Error message indicating the failure reason.",
+                    "example": "Failed to initialize admin user"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {},
+  "tags": []
+}
