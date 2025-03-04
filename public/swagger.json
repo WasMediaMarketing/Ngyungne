@@ -49,7 +49,7 @@
                   },
                   "password": {
                     "type": "string",
-                    "description": "Password of the user (only required for creating new user)"
+                    "description": "Password of the user (only required for creating new admin)"
                   },
                   "page": {
                     "type": "string",
@@ -84,6 +84,18 @@
         "description": "This endpoint retrieves all users in the system.",
         "tags": [
           "User"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
         ],
         "responses": {
           "200": {

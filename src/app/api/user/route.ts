@@ -32,7 +32,7 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  *                 description: Role of the user
  *               password:
  *                 type: string
- *                 description: Password of the user (only required for creating new user)
+ *                 description: Password of the user (only required for creating new admin)
  *               page:
  *                 type: string
  *                 description: Page for the user (required for non-admin users)
@@ -53,6 +53,14 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  *     description: This endpoint retrieves all users in the system.
  *     tags:
  *       - User
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <your_token_here>
+ *         description: Authorization token required to access this endpoint.
  *     responses:
  *       200:
  *         description: List of users retrieved successfully
@@ -63,9 +71,8 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
  */
 
 export async function POST(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-
-  if (authResult) return authResult;
+  const valdiateuserBody = await validateUserInput(req);
+  if (valdiateuserBody) return valdiateuserBody;
 
   const userController = createUserController();
   return userController.createUser(req);
@@ -74,9 +81,6 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const authResult = await isAuthenticated(req);
   if (authResult) return authResult;
-
-  const valdiateuserBody = await validateUserInput(req);
-  if (valdiateuserBody) return valdiateuserBody;
 
   const userController = createUserController();
   return userController.getUsers();

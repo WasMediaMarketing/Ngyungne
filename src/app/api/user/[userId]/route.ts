@@ -17,6 +17,13 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         schema:
  *           type: string
  *         description: The ID of the user to fetch.
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <your_token_here>
+ *         description: Authorization token required to access this endpoint.
  *     responses:
  *       200:
  *         description: User details retrieved successfully.
@@ -43,8 +50,7 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         description: User not found for the given ID.
  *       500:
  *         description: Internal server error.
- *
- * patch:
+ *   patch:
  *     summary: Update user by ID
  *     description: Update the user's details based on their user ID.
  *     tags:
@@ -56,6 +62,13 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         schema:
  *           type: string
  *         description: The ID of the user to update.
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <your_token_here>
+ *         description: Authorization token required to access this endpoint.
  *     requestBody:
  *       required: true
  *       content:
@@ -108,8 +121,7 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         description: User not found for the given ID.
  *       500:
  *         description: Internal server error.
- *
- * delete:
+ *   delete:
  *     summary: Delete user by ID
  *     description: Delete a user based on their user ID.
  *     tags:
@@ -121,6 +133,13 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *         schema:
  *           type: string
  *         description: The ID of the user to delete.
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <your_token_here>
+ *         description: Authorization token required to access this endpoint.
  *     responses:
  *       200:
  *         description: User successfully deleted.
