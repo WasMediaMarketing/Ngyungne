@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteMultipleUsers } from "@/utils/userApi";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast-hook";
 import type { IUser } from "@/types/user.types";
 
 interface DeleteMultipleUsersAlertProps {
@@ -21,7 +21,6 @@ interface DeleteMultipleUsersAlertProps {
   userIds: string[];
   users: IUser[];
   onUsersDeleted: (userIds: string[]) => void;
-  refreshUsers: () => Promise<void>;
 }
 
 export function DeleteMultipleUsersAlert({
@@ -30,7 +29,6 @@ export function DeleteMultipleUsersAlert({
   userIds,
   users,
   onUsersDeleted,
-  refreshUsers,
 }: DeleteMultipleUsersAlertProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +41,6 @@ export function DeleteMultipleUsersAlert({
       );
       await deleteMultipleUsers(userIds);
       onUsersDeleted(userIds);
-      await refreshUsers(); // Refresh the user list
 
       toast({
         title: "Users deleted",

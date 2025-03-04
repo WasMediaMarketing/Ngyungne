@@ -53,10 +53,10 @@ export default function AdminLayout({
             </header>
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-saffron-50">
               {children}
-              <Toaster />
             </div>
           </SidebarInset>
         </SidebarProvider>
+        <Toaster />
       </AuthGuard>
     );
   };
@@ -64,10 +64,6 @@ export default function AdminLayout({
   return (
     <html lang="en" className={poppins.className}>
       <body>
-        {/* 
-          We need to use a client component wrapper since usePathname() 
-          is a client hook and can't be used directly in a Server Component
-        */}
         <ClientLayout />
       </body>
     </html>

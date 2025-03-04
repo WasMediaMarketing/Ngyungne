@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { UserTable } from "@/components/admin/user/user-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast-hook";
 import type { IUser } from "@/types/user.types";
 import { getUsers } from "@/utils/userApi";
 

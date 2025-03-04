@@ -37,7 +37,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { courses } from "@/data/courses";
 import { CourseEnrollmentDialog } from "./course-enrollment-form";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast-hook";
 
 export function CourseDetail({ slug }: { slug: string }) {
   const [course, setCourse] = useState(courses.find((c) => c.slug === slug));

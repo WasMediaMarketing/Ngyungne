@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteUser } from "@/utils/userApi";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast-hook";
 import type { IUser } from "@/types/user.types";
 
 interface DeleteUserAlertProps {
@@ -20,7 +20,6 @@ interface DeleteUserAlertProps {
   onOpenChange: (open: boolean) => void;
   user: IUser;
   onUserDeleted: (userId: string) => void;
-  refreshUsers: () => Promise<void>;
 }
 
 export function DeleteUserAlert({
@@ -28,7 +27,6 @@ export function DeleteUserAlert({
   onOpenChange,
   user,
   onUserDeleted,
-  refreshUsers,
 }: DeleteUserAlertProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,7 +36,6 @@ export function DeleteUserAlert({
       console.log("DeleteUserAlert - Deleting user with ID:", user.id);
       await deleteUser(user.id);
       onUserDeleted(user.id);
-      await refreshUsers(); // Refresh the user list
 
       toast({
         title: "User deleted",

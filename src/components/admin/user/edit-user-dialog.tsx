@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast-hook";
 import type { IUser, IUserUpdate } from "@/types/user.types";
 
 const userSchema = z.object({
@@ -56,7 +56,6 @@ interface EditUserDialogProps {
   onOpenChange: (open: boolean) => void;
   user: IUser;
   onUserUpdated: (user: IUser) => void;
-  refreshUsers: () => Promise<void>;
 }
 
 export function EditUserDialog({
@@ -64,7 +63,6 @@ export function EditUserDialog({
   onOpenChange,
   user,
   onUserUpdated,
-  refreshUsers,
 }: EditUserDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -130,7 +128,6 @@ export function EditUserDialog({
       console.log("User updated successfully:", updatedUser);
 
       onUserUpdated(updatedUser);
-      await refreshUsers(); // Refresh the user list
 
       toast({
         title: "Success",
