@@ -1,3 +1,4 @@
+"use client";
 import { HeroSlider } from "@/components/sections/hero-slider";
 import { AboutSection } from "@/components/sections/about-section";
 import { CausesSection } from "@/components/sections/causes-section";

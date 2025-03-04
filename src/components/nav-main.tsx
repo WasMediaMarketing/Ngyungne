@@ -32,7 +32,6 @@ export function NavMain({
     }[];
   }[];
 }) {
-  console.log("items", items);
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Navbar Items</SidebarGroupLabel>
