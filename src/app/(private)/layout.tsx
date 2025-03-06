@@ -13,7 +13,7 @@ import { Poppins } from "next/font/google";
 import "@/app/globals.css";
 import { Metadata } from "next";
 import { DynamicBreadcrumbs } from "@/components/admin-breadcrumbs";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { AuthGuard } from "@/components/auth-guard";
 
 const poppins = Poppins({
@@ -53,10 +53,10 @@ export default function AdminLayout({
             </header>
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-saffron-50">
               {children}
-              <Toaster />
             </div>
           </SidebarInset>
         </SidebarProvider>
+        <Toaster />
       </AuthGuard>
     );
   };
@@ -64,10 +64,6 @@ export default function AdminLayout({
   return (
     <html lang="en" className={poppins.className}>
       <body>
-        {/* 
-          We need to use a client component wrapper since usePathname() 
-          is a client hook and can't be used directly in a Server Component
-        */}
         <ClientLayout />
       </body>
     </html>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { UserTable } from "@/components/admin/user/user-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast-hook";
 import type { IUser } from "@/types/user.types";
 import { getUsers } from "@/utils/userApi";
 
@@ -53,9 +53,7 @@ export default function AdminUsersPage() {
   return (
     <div className="container mx-auto py-6">
       <Card>
-        <CardHeader>
-          <CardTitle>User Management</CardTitle>
-        </CardHeader>
+        <CardHeader></CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="space-y-2">

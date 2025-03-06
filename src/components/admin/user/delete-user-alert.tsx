@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteUser } from "@/utils/userApi";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import type { IUser } from "@/types/user.types";
 
 interface DeleteUserAlertProps {
@@ -40,8 +40,7 @@ export function DeleteUserAlert({
       onUserDeleted(user.id);
       await refreshUsers(); // Refresh the user list
 
-      toast({
-        title: "User deleted",
+      toast.success("User deleted", {
         description: "The user has been deleted successfully.",
       });
 
@@ -49,11 +48,9 @@ export function DeleteUserAlert({
     } catch (error: any) {
       console.error("Error deleting user:", error);
 
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description:
           error.message || "Failed to delete user. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

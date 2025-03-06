@@ -31,8 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import type { IUser, IUserInput } from "@/types/user.types";
+import Spinner from "@/components/spinner";
 
 const userSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -125,12 +126,12 @@ export function AddUserDialog({
       console.log("User created successfully:", newUser);
 
       onUserAdded(newUser);
-      await refreshUsers(); // Refresh the user list
 
-      toast({
-        title: "Success",
+      toast.success("Success", {
         description: "User has been created successfully.",
       });
+
+      await refreshUsers(); // Refresh the user list
 
       onOpenChange(false);
       form.reset(); // Reset form after successful submission
@@ -138,11 +139,9 @@ export function AddUserDialog({
       console.error("Error in form submission:", error);
       setFormError(error.message || "Failed to create user. Please try again.");
 
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description:
           error.message || "Failed to create user. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -282,7 +281,11 @@ export function AddUserDialog({
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create User"}
+                {isLoading ? (
+                  <Spinner text="Creating User..." />
+                ) : (
+                  "Create User"
+                )}
               </Button>
             </DialogFooter>
           </form>

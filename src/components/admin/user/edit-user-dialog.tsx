@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import type { IUser, IUserUpdate } from "@/types/user.types";
 
 const userSchema = z.object({
@@ -132,8 +132,7 @@ export function EditUserDialog({
       onUserUpdated(updatedUser);
       await refreshUsers(); // Refresh the user list
 
-      toast({
-        title: "Success",
+      toast.success("Success", {
         description: "User has been updated successfully.",
       });
 
@@ -142,11 +141,9 @@ export function EditUserDialog({
       console.error("Error in form submission:", error);
       setFormError(error.message || "Failed to update user. Please try again.");
 
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description:
           error.message || "Failed to update user. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

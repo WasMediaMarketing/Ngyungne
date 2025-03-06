@@ -27,8 +27,7 @@ export async function getUsers(): Promise<IUser[]> {
       throw new Error("Failed to fetch users");
     }
 
-    const { data } = await response.json(); // Extract data
-    console.log("Fetched data", data);
+    const { data } = await response.json();
     return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -141,6 +140,27 @@ export async function deleteUser(userId: string): Promise<any> {
     return await response.json();
   } catch (error) {
     console.error("Error deleting user:", error);
+    throw error;
+  }
+}
+
+export async function deleteMultipleUsers(userIds: string[]): Promise<any> {
+  try {
+    const token = getAuthToken();
+    const response = await fetch(`/api/user?userIds=${userIds.join(",")}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete users");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting users:", error);
     throw error;
   }
 }

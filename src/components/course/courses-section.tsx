@@ -31,7 +31,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseEnrollmentDialog } from "./course-enrollment-form";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast-hook";
 
 export function CoursesSection() {
   const [ref, inView] = useInView({
