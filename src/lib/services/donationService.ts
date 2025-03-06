@@ -1,0 +1,59 @@
+import { IDonationService, IDonationInput, IDonationData } from "@/types";
+import { Donation } from "@/lib/models";
+import { UserService } from "@/lib/services";
+import { connectToDatabase } from "@/lib/utils/mongodb";
+
+export class DonationService implements IDonationService {
+  private async initializeDbConnection() {
+    await connectToDatabase();
+  }
+
+  async createDonation(donationData: IDonationInput): Promise<IDonationData> {
+    await this.initializeDbConnection();
+
+    const userService = new UserService();
+    const user = await userService.createUser({
+      name: donationData.name,
+      email: donationData.email,
+      phoneNumber: donationData.phoneNumber,
+      role: "donator",
+      page: donationData.page,
+      pageTitle: donationData.pageTitle,
+    });
+
+    // Create the donation with the user's ID
+    const donation = new Donation({
+      userId: user.id,
+      amount: donationData.amount,
+      screenshot: donationData.screenshot,
+      donationType: donationData.donationType,
+      donationMethod: donationData.donationMethod,
+    });
+
+    await donation.save();
+    return donation;
+  }
+
+  async getDonations(donationId?: string): Promise<IDonationData[]> {
+    await this.initializeDbConnection();
+
+    if (donationId) {
+      const donation = await Donation.findById(donationId).populate("userId");
+      return donation ? [donation] : [];
+    }
+
+    return await Donation.find().populate("userId");
+  }
+
+  async deleteDonation(donationId: string): Promise<boolean> {
+    await this.initializeDbConnection();
+    const result = await Donation.findByIdAndDelete(donationId);
+    return !!result;
+  }
+
+  async deleteDonations(donationIds: string[]): Promise<boolean> {
+    await this.initializeDbConnection();
+    const result = await Donation.deleteMany({ _id: { $in: donationIds } });
+    return result.deletedCount > 0;
+  }
+}

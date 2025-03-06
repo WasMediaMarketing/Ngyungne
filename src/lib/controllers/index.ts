@@ -1,3 +1,3 @@
 import { UserController } from "./userController";
-
-export { UserController };
+import { DonationController } from "./donationController";
+export { UserController, DonationController };

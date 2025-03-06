@@ -25,8 +25,9 @@ export const validateUserUpdate = async (
 
     if (!result.success) {
       const errorMessages = result.error.errors
-        .map((err) => err.message)
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
+
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 
