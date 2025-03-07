@@ -2,7 +2,7 @@ import { IDonationService, IDonationInput, IDonationData } from "@/types";
 import { Donation } from "@/lib/models";
 import { UserService } from "@/lib/services";
 import { connectToDatabase } from "@/lib/utils/mongodb";
-
+import { deleteFile } from "@/lib/utils/deleteFile";
 export class DonationService implements IDonationService {
   private async initializeDbConnection() {
     await connectToDatabase();
@@ -47,12 +47,18 @@ export class DonationService implements IDonationService {
 
   async deleteDonation(donationId: string): Promise<boolean> {
     await this.initializeDbConnection();
+    console.log(Donation.schema.pre);
+    const donation = await Donation.findById(donationId);
+    if (!donation) return false;
+    deleteFile(donation.screenshot);
     const result = await Donation.findByIdAndDelete(donationId);
     return !!result;
   }
 
   async deleteDonations(donationIds: string[]): Promise<boolean> {
     await this.initializeDbConnection();
+    const donations = await Donation.find({ _id: { $in: donationIds } });
+    donations.forEach((donation) => deleteFile(donation.screenshot));
     const result = await Donation.deleteMany({ _id: { $in: donationIds } });
     return result.deletedCount > 0;
   }

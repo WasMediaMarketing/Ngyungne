@@ -58,7 +58,6 @@ export class DonationController {
       // Extract donation IDs from query parameters
       const url = req.nextUrl;
       const donationIds = url.searchParams.get("donationIds");
-
       if (!donationIds) {
         return handleError(
           httpMessages.BAD_REQUEST("Donation IDs are required")
@@ -69,6 +68,7 @@ export class DonationController {
       const donationIdArray = donationIds.split(",").map((id) => id.trim());
 
       // Call the deleteDonations method for each ID
+      console.log("donation ids", donationIdArray);
       const isDeleted = await this.donationService.deleteDonations(
         donationIdArray
       );

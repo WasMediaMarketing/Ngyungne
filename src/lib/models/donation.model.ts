@@ -14,7 +14,7 @@ const DonationSchema: Schema<IDonationData> = new mongoose.Schema(
       min: 0,
     },
     screenshot: {
-      type: String,
+      type: String, // Stores relative path like /uploads/05-03-2025/image-12345.png
       required: true,
     },
     donationType: {
