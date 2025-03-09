@@ -5,6 +5,7 @@ import { validateDonationInput } from "./validateDonationInput";
 import { validateContactInput } from "./validateContactInput";
 import {validateEventInput} from "./validateEventInput"
 import {validateEventUpdate} from "./validateEventUpdate"
+import {validateVolunteerInput} from "./validateVolunteerInput"
 
 export {
   isAuthenticated,
@@ -13,5 +14,6 @@ export {
   validateDonationInput,
   validateContactInput,
   validateEventInput,
-  validateEventUpdate
+  validateEventUpdate,
+  validateVolunteerInput,
 };

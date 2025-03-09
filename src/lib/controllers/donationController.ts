@@ -4,6 +4,7 @@ import { httpMessages } from "@/lib/utils/HttpMessage";
 import { handleError } from "@/lib/utils/errorHandler";
 import { handleResponse } from "@/lib/utils/responseHandler";
 import { Types } from "mongoose";
+import {ExtendedNextRequest} from "@/lib/utils/requestHelpers"
 
 export class DonationController {
   private donationService: IDonationService;
@@ -13,14 +14,14 @@ export class DonationController {
   }
 
   // Create a new donation
-  async createDonation(req: NextRequest): Promise<NextResponse> {
+  async createDonation(req: ExtendedNextRequest): Promise<NextResponse> {
     try {
       const donationData = await req.json();
       const donation = await this.donationService.createDonation(donationData);
       return handleResponse(donation, httpMessages.CREATED());
     } catch (error) {
       console.error("createDonationController error:", error);
-      return handleError();
+      return handleError(undefined, req);
     }
   }
 
@@ -68,12 +69,12 @@ export class DonationController {
       // Parse donation IDs into an array
       const donationIdArray = donationIds.split(",").map((id) => id.trim());
       for (const id of donationIdArray) {
-              if (!Types.ObjectId.isValid(id)) {
-                return handleError(
-                  httpMessages.BAD_REQUEST(`Invalid Event ID: ${id}`)
-                );
-              }
-            }
+        if (!Types.ObjectId.isValid(id)) {
+          return handleError(
+            httpMessages.BAD_REQUEST(`Invalid Event ID: ${id}`)
+          );
+        }
+      }
       const isDeleted = await this.donationService.deleteDonations(
         donationIdArray
       );

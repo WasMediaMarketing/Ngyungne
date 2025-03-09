@@ -34,6 +34,8 @@ const options = {
     path.join(__dirname, "../src/app/api/contact/[contactId]/route.ts"),
     path.join(__dirname, "../src/app/api/event/route.ts"),
     path.join(__dirname, "../src/app/api/event/[eventId]/route.ts"),
+    path.join(__dirname, "../src/app/api/volunteer/route.ts"),
+    path.join(__dirname, "../src/app/api/volunteer/[volunteerId]/route.ts"),
   ],
 };
 console.log("Swagger API files being considered:");
