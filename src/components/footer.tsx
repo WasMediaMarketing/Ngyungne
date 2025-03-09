@@ -21,8 +21,10 @@ export function Footer() {
             <Image
               src="/logo.png"
               alt="Ngyungne Logo"
-              height={100}
-              width={140}
+              height={0}
+              width={0}
+              priority
+              className="h-16 w-auto"
             />
             <ul className="space-y-2">
               <li className="flex items-center">
@@ -76,11 +78,14 @@ export function Footer() {
                 "Donate",
                 "Contact Us",
               ].map((item, index) => (
-                <li key={index} className="flex items-center space-x-2">
+                <li
+                  key={index}
+                  className="flex items-center space-x-2  hover:tracking-wide transition-all duration-300 ease-in-out"
+                >
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                   <Link
                     href={`#${item.toLowerCase().replace(" ", "-")}`}
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[#FDBE33] transition-colors"
                   >
                     {item}
                   </Link>
@@ -102,11 +107,14 @@ export function Footer() {
                 "Practice Journal",
                 "Volunteers",
               ].map((item, index) => (
-                <li key={index} className="flex items-center space-x-2">
+                <li
+                  key={index}
+                  className="flex items-center space-x-2 hover:tracking-wide transition-all duration-300 ease-in-out"
+                >
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                   <Link
                     href={`/resources/${item.toLowerCase().replace(" ", "-")}`}
-                    className="hover:text-white transition-colors"
+                    className="hover:text-amber-500 transition-colors"
                   >
                     {item}
                   </Link>
