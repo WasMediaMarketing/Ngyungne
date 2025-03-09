@@ -4,6 +4,7 @@ import { Poppins } from "next/font/google";
 import "@/app/globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body className={`${poppins.className} flex flex-col min-h-screen`}>
         <Header />
         <main className="flex-grow">{children}</main>
+        <Toaster />
         <Footer />
       </body>
     </html>

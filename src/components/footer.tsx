@@ -21,21 +21,23 @@ export function Footer() {
             <Image
               src="/logo.png"
               alt="Ngyungne Logo"
-              height={100}
-              width={140}
+              height={0}
+              width={0}
+              priority
+              className="h-16 w-auto"
             />
             <ul className="space-y-2">
               <li className="flex items-center">
                 <MapPin className="h-5 w-5 mr-2 text-gray-400" />
-                <span>123 Community Street, City, Country</span>
+                <span>Jorpati, Gokarneshwor 5, Kathmandu, Nepal</span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 mr-2 text-gray-400" />
-                <span>+1 234 567 890</span>
+                <span>+977 9818123174</span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 mr-2 text-gray-400" />
-                <span>contact@example.com</span>
+                <span>donation@ngyungne.org</span>
               </li>
             </ul>
             <div className="flex space-x-4">
@@ -76,11 +78,14 @@ export function Footer() {
                 "Donate",
                 "Contact Us",
               ].map((item, index) => (
-                <li key={index} className="flex items-center space-x-2">
+                <li
+                  key={index}
+                  className="flex items-center space-x-2  hover:tracking-wide transition-all duration-300 ease-in-out"
+                >
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                   <Link
                     href={`#${item.toLowerCase().replace(" ", "-")}`}
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[#FDBE33] transition-colors"
                   >
                     {item}
                   </Link>
@@ -93,16 +98,23 @@ export function Footer() {
             <ul className="space-y-2">
               {[
                 "Blog",
-                "Meditation Resources",
                 "FAQ",
-                "Privacy Policy",
-                "Terms of Service",
+                "Ambassadors",
+                "Sponsors",
+                "Practices",
+                "Gallery",
+                "Buddhist Calendar",
+                "Practice Journal",
+                "Volunteers",
               ].map((item, index) => (
-                <li key={index} className="flex items-center space-x-2">
+                <li
+                  key={index}
+                  className="flex items-center space-x-2 hover:tracking-wide transition-all duration-300 ease-in-out"
+                >
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                   <Link
-                    href={`/${item.toLowerCase().replace(" ", "-")}`}
-                    className="hover:text-white transition-colors"
+                    href={`/resources/${item.toLowerCase().replace(" ", "-")}`}
+                    className="hover:text-amber-500 transition-colors"
                   >
                     {item}
                   </Link>

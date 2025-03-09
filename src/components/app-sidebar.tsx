@@ -10,6 +10,8 @@ import {
   FileText,
   Mail,
   UsersIcon,
+  FileQuestion,
+  HandCoins,
   LayoutDashboard,
 } from "lucide-react";
 
@@ -86,6 +88,16 @@ const data = {
       title: "Users",
       url: "/admin/users",
       icon: UsersIcon,
+    },
+    {
+      title: "Enquiries",
+      url: "/admin/enquiries",
+      icon: FileQuestion,
+    },
+    {
+      title: "Donations",
+      url: "/admin/donations",
+      icon: HandCoins,
     },
     {
       title: "Newsletter",

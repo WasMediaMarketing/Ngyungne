@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { UserTable } from "@/components/admin/user/user-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/components/ui/use-toast-hook";
+import { toast } from "sonner";
 import type { IUser } from "@/types/user.types";
 import { getUsers } from "@/utils/userApi";
 
@@ -22,10 +22,8 @@ export default function AdminUsersPage() {
     } catch (err) {
       console.error("Error fetching users:", err);
       setError(err instanceof Error ? err : new Error("Failed to fetch users"));
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Failed to fetch users. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

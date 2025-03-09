@@ -99,6 +99,12 @@ export const siteConfig = {
         icon: "Users",
       },
       {
+        title: "Volunteers",
+        href: "/resources/volunteers",
+        description: "Meet our dedicated volunteers and staff",
+        icon: "Users",
+      },
+      {
         title: "Blog",
         href: "/resources/blog",
         description: "Read articles on Buddhist philosophy and practice",

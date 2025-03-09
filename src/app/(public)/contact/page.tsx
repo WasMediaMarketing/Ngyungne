@@ -15,18 +15,62 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Phone, Mail, MapPin } from "lucide-react";
+import { toast } from "sonner";
+import { IContactInput } from "@/types";
+import Spinner from "@/components/spinner";
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IContactInput>({
     name: "",
     email: "",
+    phoneNumber: "",
     subject: "",
     message: "",
+    page: "contact",
+    pageTitle: "Contact Page",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to send message");
+      }
+
+      toast("Message Sent", {
+        description: "Message sent successfully! We'll get back to you soon.",
+      });
+
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        phoneNumber: "",
+        subject: "",
+        message: "",
+        page: "contact",
+        pageTitle: "Contact Page",
+      });
+    } catch (error) {
+      toast("Error", {
+        description: `${(error as Error).message}`,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -125,6 +169,18 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="space-y-2">
+                <label className="text-sm font-medium">Phone Number</label>
+                <Input
+                  type="tel"
+                  placeholder="Your phone number"
+                  value={formData.phoneNumber}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phoneNumber: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium">Subject</label>
                 <Input
                   placeholder="Message subject"
@@ -147,8 +203,8 @@ export default function ContactPage() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Send Message
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? <Spinner text="Sending..." /> : "Send Message"}
               </Button>
             </form>
           </CardContent>

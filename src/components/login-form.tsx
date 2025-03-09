@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast-hook";
 import Spinner from "./spinner";
 
@@ -42,7 +42,6 @@ export function AdminLoginForm({
       });
 
       const { data } = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
       }
@@ -51,9 +50,9 @@ export function AdminLoginForm({
         throw new Error("Unauthorized. Admin access required");
       }
 
-      // Store the token and user data
+      // Store the token and user data properly
       localStorage.setItem("adminToken", data.token);
-      localStorage.setItem("adminResponse", data);
+      localStorage.setItem("adminUser", JSON.stringify(data.user));
 
       toast({
         title: "Login Successful",
@@ -61,7 +60,8 @@ export function AdminLoginForm({
         duration: 3000,
       });
 
-      router.push("/admin/dashboard");
+      // Use replace instead of push to avoid history issues
+      router.replace("/admin/dashboard");
     } catch (err: any) {
       toast({
         title: "Login Failed",
