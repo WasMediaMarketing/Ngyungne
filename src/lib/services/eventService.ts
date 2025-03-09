@@ -2,6 +2,7 @@ import { Event } from "@/lib/models";
 import { IEventInput, IEventUpdate, IEvent, IEventService } from "@/types";
 import { connectToDatabase } from "@/lib/utils/mongodb";
 import { Types } from "mongoose";
+import { deleteFile } from "@/lib/utils/deleteFile"; // Import the deleteFile utility
 
 export class EventService implements IEventService {
   private async initializeDbConnection() {
@@ -66,8 +67,42 @@ export class EventService implements IEventService {
    */
   async deleteEvent(eventId: Types.ObjectId): Promise<IEvent | null> {
     await this.initializeDbConnection();
-    const event = await Event.findByIdAndDelete(eventId);
+    
+    // Find the event to get its image path (if exists)
+    const event = await Event.findById(eventId);
     if (!event) throw new Error("Event not found");
-    return event;
+
+    // If there's an image, delete it
+    if (event.image) {
+      deleteFile(event.image); // Delete the image file from the file system
+    }
+
+    // Now delete the event from the database
+    const deletedEvent = await Event.findByIdAndDelete(eventId);
+    return deletedEvent;
+  }
+
+  /**
+   * @description Deletes multiple events by their IDs
+   * @param {Types.ObjectId[]} eventIds - Array of event IDs to delete
+   * @returns {Promise<unknown>} A promise indicating the deletion status
+   */
+  async deleteEvents(eventIds: Types.ObjectId[]): Promise<unknown> {
+    await this.initializeDbConnection();
+
+    // Find all events to get their image paths (if exists)
+    const events = await Event.find({ _id: { $in: eventIds } });
+    if (events.length === 0) throw new Error("No events found");
+
+    // Delete images for all events
+    events.forEach((event) => {
+      if (event.image) {
+        deleteFile(event.image); // Delete each event's image from the file system
+      }
+    });
+
+    // Delete the events from the database
+    const deletedEvents = await Event.deleteMany({ _id: { $in: eventIds } });
+    return deletedEvents;
   }
 }

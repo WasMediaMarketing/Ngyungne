@@ -3,6 +3,8 @@ import { validateUserInput } from "./validateUserInput";
 import { validateUserUpdate } from "./validateUserUpdate";
 import { validateDonationInput } from "./validateDonationInput";
 import { validateContactInput } from "./validateContactInput";
+import {validateEventInput} from "./validateEventInput"
+import {validateEventUpdate} from "./validateEventUpdate"
 
 export {
   isAuthenticated,
@@ -10,4 +12,6 @@ export {
   validateUserUpdate,
   validateDonationInput,
   validateContactInput,
+  validateEventInput,
+  validateEventUpdate
 };

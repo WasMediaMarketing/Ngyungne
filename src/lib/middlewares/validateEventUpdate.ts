@@ -10,6 +10,15 @@ const scheduleItemSchema = z.object({
   message: "At least one of 'title' or 'description' must be provided",
 });
 
+const teacherSchema = z.object({
+  name: z.string().optional(),
+  speciality: z.string().optional(),
+  description: z.string().optional(),
+  image: z.string().optional(),
+  link: z.string().optional(),
+  credentials: z.array(z.string()).optional(),
+});
+
 const eventUpdateSchema = z.object({
   title: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
@@ -20,7 +29,7 @@ const eventUpdateSchema = z.object({
     .optional(),
   time: z.string().min(1).optional(),
   location: z.string().min(1).optional(),
-  teacher: z.string().min(1).optional(),
+  teacher: teacherSchema,
   image: z.string().optional(),
   tags: z.array(z.string()).min(1).optional(),
   featured: z.boolean().optional(),

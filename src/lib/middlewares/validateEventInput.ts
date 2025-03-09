@@ -10,6 +10,14 @@ const scheduleItemSchema = z.object({
 }).refine(data => data.title || data.description, {
   message: "At least one of 'title' or 'description' must be provided",
 });
+const teacherSchema = z.object({
+  name: z.string().min(1, { message: "Teacher name is required" }),
+  speciality: z.string().optional(),
+  description: z.string().optional(),
+  image: z.string().optional(),
+  link: z.string().optional(),
+  credentials: z.array(z.string()).optional(),
+});
 
 // Main event schema
 const eventSchema = z.object({
@@ -21,7 +29,7 @@ const eventSchema = z.object({
     .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date format" }),
   time: z.string().min(1, { message: "Time is required" }),
   location: z.string().min(1, { message: "Location is required" }),
-  teacher: z.string().min(1, { message: "Teacher name is required" }),
+  teacher: teacherSchema,
   image: z.string().optional(),
   tags: z.array(z.string()).optional(),
   featured: z.boolean().optional(),

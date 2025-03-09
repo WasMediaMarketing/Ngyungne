@@ -1,6 +1,18 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { IEvent } from "@/types";
 
+const TeacherSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    speciality: { type: String, required: false },
+    description: { type: String, required: false },
+    image: { type: String, required: false },
+    link: { type: String, required: false },
+    credentials: { type: [String], required: false },
+  },
+  { _id: false }
+);
+
 const EventSchema: Schema<IEvent> = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -9,7 +21,7 @@ const EventSchema: Schema<IEvent> = new mongoose.Schema(
     date: { type: Date, required: true },
     time: { type: String, required: true },
     location: { type: String, required: true },
-    teacher: { type: String, required: true },
+    teacher: { type: TeacherSchema, required: true },
     image: { type: String, required: false },
     tags: { type: [String], required: false },
     featured: { type: Boolean, required: false },
