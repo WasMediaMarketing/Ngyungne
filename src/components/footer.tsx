@@ -93,15 +93,19 @@ export function Footer() {
             <ul className="space-y-2">
               {[
                 "Blog",
-                "Meditation Resources",
                 "FAQ",
-                "Privacy Policy",
-                "Terms of Service",
+                "Ambassadors",
+                "Sponsors",
+                "Practices",
+                "Gallery",
+                "Buddhist Calendar",
+                "Practice Journal",
+                "Volunteers",
               ].map((item, index) => (
                 <li key={index} className="flex items-center space-x-2">
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                   <Link
-                    href={`/${item.toLowerCase().replace(" ", "-")}`}
+                    href={`/resources/${item.toLowerCase().replace(" ", "-")}`}
                     className="hover:text-white transition-colors"
                   >
                     {item}
