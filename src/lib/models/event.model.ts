@@ -15,6 +15,14 @@ const EventSchema: Schema<IEvent> = new mongoose.Schema(
     featured: { type: Boolean, required: false },
     attending: { type: Number, required: false },
     capacity: { type: Number, required: false },
+    schedule: {
+      type: Map,
+      of: {
+        title: { type: String, required: false },
+        description: { type: String, required: false },
+      }, 
+      required: false,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

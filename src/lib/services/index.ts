@@ -1,3 +1,5 @@
 import { UserService } from "./userService";
+import { DonationService } from "./donationService";
+import { ContactService } from "./contactService";
 
-export { UserService };
+export { UserService, DonationService, ContactService };

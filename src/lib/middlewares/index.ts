@@ -1,5 +1,13 @@
 import { isAuthenticated } from "./isAuthenticated";
 import { validateUserInput } from "./validateUserInput";
 import { validateUserUpdate } from "./validateUserUpdate";
+import { validateDonationInput } from "./validateDonationInput";
+import { validateContactInput } from "./validateContactInput";
 
-export { isAuthenticated, validateUserInput, validateUserUpdate };
+export {
+  isAuthenticated,
+  validateUserInput,
+  validateUserUpdate,
+  validateDonationInput,
+  validateContactInput,
+};

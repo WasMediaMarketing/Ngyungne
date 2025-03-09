@@ -1,64 +1,74 @@
-// import { IncomingForm, File } from "formidable";
-// import { v2 as cloudinary } from "cloudinary";
-// import { NextRequest } from "next/server";
-// import { Readable } from "stream"; // Import the stream module
+import { NextResponse } from "next/server";
+import mime from "mime";
+import { join } from "path";
+import { stat, mkdir, writeFile } from "fs/promises";
+import * as dateFn from "date-fns";
+import { handleError } from "@/lib/utils/errorHandler";
+import { httpMessages } from "@/lib/utils/HttpMessage";
 
-// // Configure Cloudinary
-// cloudinary.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//   api_key: process.env.CLOUDINARY_API_KEY,
-//   api_secret: process.env.CLOUDINARY_API_SECRET,
-// });
+interface NodeError extends Error {
+  code?: string;
+}
 
-// export const config = {
-//   api: {
-//     bodyParser: false, // Disable default body parser
-//   },
-// };
+// Ensure that handleFileUpload accepts a File object
+export async function handleFileUpload(
+  file: File
+): Promise<NextResponse | string> {
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const relativeUploadDir = `/uploads/${dateFn.format(
+      Date.now(),
+      "dd-MM-y"
+    )}`;
+    const uploadDir = join(process.cwd(), "public", relativeUploadDir);
 
-// // Define the upload handler for NextRequest
-// const streamToReadable = (stream: ReadableStream<Uint8Array>) => {
-//   return new Readable({
-//     read() {
-//       this.push(Buffer.from(stream));
-//       this.push(null);
-//     },
-//   });
-// };
-// export const uploadHandler = async (req: NextRequest) => {
-//   const form = new IncomingForm();
+    // Create the upload directory if it doesn't exist
+    try {
+      await stat(uploadDir);
+    } catch (e: unknown) {
+      const error = e as NodeError;
+      if (error.code === "ENOENT") {
+        try {
+          await mkdir(uploadDir, { recursive: true });
+        } catch (mkdirError) {
+          console.error("Error creating upload directory:", mkdirError);
+          throw new Error("Failed to create upload directory.");
+        }
+      } else {
+        console.error("Error checking directory:", error);
+        throw new Error("Something went wrong while accessing storage.");
+      }
+    }
 
-//   // Create a Promise to handle the form parsing
-//   const formPromise = new Promise((resolve, reject) => {
-//     // Cast req.body as a readable stream
-//     const readableStream = streamToReadable(req.body);
+    // Ensure the file has a valid name and type
+    if (!file.name || !file.type) {
+      return handleError(httpMessages.BAD_REQUEST("Invalid file data"));
+    }
 
-//     // Parse the form data from the readable stream
-//     form.parse(readableStream, async (err, fields, files) => {
-//       if (err) {
-//         console.log(err);
-//         return reject("Error during file upload");
-//       }
+    // Generate a unique file name
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const extension = mime.getExtension(file.type);
 
-//       if (!files.image || Array.isArray(files.image)) {
-//         console.log("No file or invalid file");
-//         return reject("Invalid file uploaded");
-//       }
+    if (!extension) {
+      return handleError(httpMessages.BAD_REQUEST("Unsupported file type"));
+    }
 
-//       try {
-//         const file: File = files.image[0]; // Adjust according to your form data
-//         const uploadedImage = await cloudinary.uploader.upload(file.filepath, {
-//           folder: "Ngyune", // optional folder
-//           use_filename: true, // optional
-//         });
+    const filename = `${file.name.replace(
+      /\.[^/.]+$/,
+      ""
+    )}-${uniqueSuffix}.${extension}`;
 
-//         resolve(uploadedImage.secure_url); // Return the uploaded image URL
-//       } catch (uploadError) {
-//         console.log(uploadError);
-//         reject("Cloudinary upload failed");
-//       }
-//     });
-//   });
+    // Write the file to disk
+    try {
+      await writeFile(`${uploadDir}/${filename}`, buffer);
+    } catch (writeError) {
+      console.error("Error writing file:", writeError);
+      return handleError(httpMessages.INTERNAL_SERVER_ERROR);
+    }
 
-//   return formPromise;
-// };
+    return `${relativeUploadDir}/${filename}`;
+  } catch (error) {
+    console.error("File upload failed:", error);
+    return handleError(httpMessages.INTERNAL_SERVER_ERROR);
+  }
+}

@@ -19,7 +19,8 @@
 
 # production
 /build
-
+#uploaded image
+/public/uploads/
 # misc
 .DS_Store
 *.pem

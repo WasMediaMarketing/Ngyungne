@@ -3,15 +3,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
+// Define the schema for a schedule item
+const scheduleItemSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+}).refine(data => data.title || data.description, {
+  message: "At least one of 'title' or 'description' must be provided",
+});
+
+// Main event schema
 const eventSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
   description: z.string().min(1, { message: "Description is required" }),
-  type: z.string().min(1, {
-    message: "Event Type is Required",
-  }),
+  type: z.string().min(1, { message: "Event Type is required" }),
   date: z
-    .date()
-    .refine((val) => !isNaN(val.getTime()), { message: "Invalid date" }),
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date format" }),
   time: z.string().min(1, { message: "Time is required" }),
   location: z.string().min(1, { message: "Location is required" }),
   teacher: z.string().min(1, { message: "Teacher name is required" }),
@@ -26,6 +33,9 @@ const eventSchema = z.object({
     .number()
     .min(1, { message: "Capacity must be at least 1" })
     .optional(),
+  schedule: z
+    .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
+    .optional(),
 });
 
 export const validateEventInput = async (
@@ -38,8 +48,9 @@ export const validateEventInput = async (
 
     if (!result.success) {
       const errorMessages = result.error.errors
-        .map((err) => err.message)
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
+
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

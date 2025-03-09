@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
+const scheduleItemSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+}).refine(data => data.title || data.description, {
+  message: "At least one of 'title' or 'description' must be provided",
+});
+
 const eventUpdateSchema = z.object({
   title: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
@@ -19,6 +26,9 @@ const eventUpdateSchema = z.object({
   featured: z.boolean().optional(),
   attending: z.number().min(0).optional(),
   capacity: z.number().min(1).optional(),
+  schedule: z
+    .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
+    .optional()
 });
 
 export const validateEventUpdate = async (
@@ -31,8 +41,9 @@ export const validateEventUpdate = async (
 
     if (!result.success) {
       const errorMessages = result.error.errors
-        .map((err) => err.message)
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
+
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 
