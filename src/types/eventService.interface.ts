@@ -10,4 +10,5 @@ export interface IEventService {
     eventData: IEventUpdate
   ): Promise<IEvent | null>;
   deleteEvent(eventId: Types.ObjectId): Promise<IEvent | null>;
+  deleteEvents(eventIds: Types.ObjectId[]):Promise<unknown>;
 }
