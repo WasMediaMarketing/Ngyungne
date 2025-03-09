@@ -1,12 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Gift, BookOpen, Users } from "lucide-react";
+import { Heart, Gift, BookOpen, Users, Upload } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +26,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { createDonation } from "@/utils/donationApi";
+import { Label } from "@radix-ui/react-label";
 
 const supportOptions = [
   {
@@ -41,6 +43,7 @@ const supportOptions = [
       "Fund teaching programs",
       "Monthly merit dedication",
     ],
+    donationType: "monthly",
   },
   {
     title: "One-time Donation",
@@ -54,6 +57,7 @@ const supportOptions = [
       "Help with maintenance",
       "Merit dedication",
     ],
+    donationType: "one-time",
   },
   {
     title: "Sponsor a Program",
@@ -66,15 +70,25 @@ const supportOptions = [
       "Enable live streaming",
       "Special dedication ceremony",
     ],
+    donationType: "program",
   },
 ];
 
+const paymentMethods = [
+  { id: "bank", name: "Bank Transfer" },
+  { id: "khalti", name: "Khalti" },
+  { id: "esewa", name: "eSewa" },
+];
+
 export function SupportSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState<any>(null);
   const [donationAmount, setDonationAmount] = useState("");
+  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm({
     defaultValues: {
@@ -90,17 +104,68 @@ export function SupportSection() {
   const handleSupportNow = (option: any) => {
     setSelectedOption(option);
     setIsDialogOpen(true);
+    // Reset form when opening dialog
+    form.reset({
+      fullName: "",
+      email: "",
+      phone: "",
+      amount: donationAmount.replace(/[^0-9]/g, "") || "",
+      paymentMethod: "bank",
+      receiveUpdates: true,
+    });
   };
 
-  const onSubmit = (data: any) => {
-    console.log("Form submitted:", data);
-    // Here you would implement your payment processing logic
-    setIsDialogOpen(false);
-    alert("Thank you for your support!");
+  const handleAmountSelect = (amount: string) => {
+    setDonationAmount(amount);
+    form.setValue("amount", amount.replace(/[^0-9]/g, ""));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setScreenshot(e.target.files[0]);
+    }
+  };
+
+  const onSubmit = async (data: any) => {
+    if (!screenshot) {
+      toast.error("Error", {
+        description: "Please upload a payment screenshot",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const donationData = {
+        name: data.fullName,
+        email: data.email,
+        phoneNumber: data.phone,
+        amount: parseFloat(data.amount),
+        donationType: selectedOption?.donationType || "one-time",
+        donationMethod: data.paymentMethod,
+        page: "support-section",
+        pageTitle: selectedOption?.title || "Support Section",
+      };
+
+      await createDonation(donationData, screenshot);
+
+      // Close dialog and reset form after successful submission
+      setIsDialogOpen(false);
+      form.reset();
+      setScreenshot(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Donation submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-20 bg-muted/30" ref={sectionRef}>
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <motion.div
@@ -122,7 +187,6 @@ export function SupportSection() {
         </div>
 
         <motion.div
-          ref={ref}
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.8 }}
@@ -159,7 +223,7 @@ export function SupportSection() {
                           variant="outline"
                           className="w-full"
                           onClick={() => {
-                            setDonationAmount(amount);
+                            handleAmountSelect(amount);
                             handleSupportNow(option);
                           }}
                         >
@@ -210,7 +274,7 @@ export function SupportSection() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-lg font-medium">
-                        Donation Amount
+                        Donation Amount *
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
@@ -222,6 +286,7 @@ export function SupportSection() {
                             className="pl-8"
                             type="number"
                             min="1"
+                            required
                             {...field}
                             value={
                               donationAmount.replace(/[^0-9]/g, "") ||
@@ -244,7 +309,7 @@ export function SupportSection() {
                   name="fullName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>Full Name *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter your full name"
@@ -262,7 +327,7 @@ export function SupportSection() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Email *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter your email"
@@ -281,7 +346,7 @@ export function SupportSection() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Phone Number *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter your phone number"
@@ -300,7 +365,7 @@ export function SupportSection() {
                   render={({ field }) => (
                     <FormItem className="space-y-2">
                       <FormLabel className="text-lg font-medium">
-                        Payment Method
+                        Payment Method *
                       </FormLabel>
                       <FormControl>
                         <RadioGroup
@@ -393,6 +458,39 @@ export function SupportSection() {
                   )}
                 />
 
+                <div className="space-y-2">
+                  <FormLabel className="text-lg font-medium">
+                    Payment Screenshot *
+                  </FormLabel>
+                  <div className="mt-1 flex items-center">
+                    <Label
+                      htmlFor="support-screenshot-upload"
+                      className="cursor-pointer flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-md p-4 hover:bg-gray-50 transition-colors"
+                    >
+                      <input
+                        id="support-screenshot-upload"
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={handleFileChange}
+                        ref={fileInputRef}
+                        required
+                      />
+                      <div className="text-center">
+                        <Upload className="mx-auto h-8 w-8 text-gray-500 mb-2" />
+                        <p className="text-sm text-gray-700">
+                          {screenshot
+                            ? screenshot.name
+                            : "Upload payment screenshot"}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Click to browse or drag and drop
+                        </p>
+                      </div>
+                    </Label>
+                  </div>
+                </div>
+
                 <FormField
                   control={form.control}
                   name="receiveUpdates"
@@ -427,8 +525,9 @@ export function SupportSection() {
                 <Button
                   type="submit"
                   className="bg-primary hover:bg-primary/90"
+                  disabled={isSubmitting}
                 >
-                  Complete Support
+                  {isSubmitting ? "Processing..." : "Complete Support"}
                 </Button>
               </div>
             </form>

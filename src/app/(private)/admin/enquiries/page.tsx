@@ -148,7 +148,9 @@ export default function ContactsAdminPage() {
       setSelectedRows({});
       fetchContacts();
     } catch (error) {
-      toast.error("Failed to delete contacts");
+      toast("Error", {
+        description: "Failed to delete contacts",
+      });
       console.error(error);
     } finally {
       setIsDeletingMultiple(false);
@@ -165,7 +167,7 @@ export default function ContactsAdminPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Contact Messages</h1>
+        <h1 className="text-3xl font-bold">Enquiries Messages</h1>
 
         <AlertDialog
           open={isDeleteDialogOpen && isDeletingMultiple}

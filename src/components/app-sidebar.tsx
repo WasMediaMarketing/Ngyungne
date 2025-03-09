@@ -11,6 +11,7 @@ import {
   Mail,
   UsersIcon,
   FileQuestion,
+  HandCoins,
   LayoutDashboard,
 } from "lucide-react";
 
@@ -90,8 +91,13 @@ const data = {
     },
     {
       title: "Enquiries",
-      url: "/admin/contact",
+      url: "/admin/enquiries",
       icon: FileQuestion,
+    },
+    {
+      title: "Donations",
+      url: "/admin/donations",
+      icon: HandCoins,
     },
     {
       title: "Newsletter",
