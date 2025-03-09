@@ -5,8 +5,9 @@ import { handleResponse } from "../utils/responseHandler";
 import { httpMessages } from "../utils/HttpMessage";
 import { Types } from "mongoose";
 import {IEvent} from "@/types"
+import {ExtendedNextRequest} from "@/lib/utils/requestHelpers"
 
-export class EventControlller {
+export class EventController {
   private eventService: IEventService;
   constructor(eventService: IEventService) {
     this.eventService = eventService;
@@ -17,14 +18,14 @@ export class EventControlller {
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the created event
    */
-  async createEvent(req: NextRequest): Promise<NextResponse> {
+  async createEvent(req: ExtendedNextRequest): Promise<NextResponse> {
     try {
       const eventData = await req.json();
       const event = await this.eventService.createEvent(eventData);
       return handleResponse(event, httpMessages.CREATED());
     } catch (error) {
       console.log("createEventController error", error);
-      return handleError();
+      return handleError(undefined, req);
     }
   }
 
@@ -77,10 +78,10 @@ export class EventControlller {
   async getEventsForProps(): Promise<IEvent[] | unknown> {
     try {
       const events = await this.eventService.getEvents();
-      return {data:events};
+      return { data: events };
     } catch (error) {
       console.log("getEventsController error", error);
-      return {error:error};
+      return { error: error as Error };
     }
   }
 
@@ -89,21 +90,20 @@ export class EventControlller {
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the event details
    */
-  async getEventByIdForProps(req: NextRequest):Promise<IEvent | unknown> {
+  async getEventByIdForProps(eventId: string): Promise<IEvent | unknown> {
     try {
-      const eventId = req.nextUrl.pathname.split("/").pop();
       if (!eventId || !Types.ObjectId.isValid(eventId)) {
-        throw new Error ("Event ID is either missing or invalid")
+        throw new Error("Event ID is either missing or invalid");
       }
 
       // Fetch the event using the eventId
       const event = await this.eventService.getEventById(
         new Types.ObjectId(eventId)
       );
-      return {data:event};
+      return { data: event };
     } catch (error) {
       console.log("getEventsController error", error);
-      return {error: error};
+      return { error: error };
     }
   }
 
@@ -112,7 +112,7 @@ export class EventControlller {
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the updated event
    */
-  async updateEvent(req: NextRequest): Promise<NextResponse> {
+  async updateEvent(req: ExtendedNextRequest): Promise<NextResponse> {
     try {
       const eventId = req.nextUrl.pathname.split("/").pop();
       if (!eventId || !Types.ObjectId.isValid(eventId)) {
@@ -129,7 +129,7 @@ export class EventControlller {
       return handleResponse(updatedEvent);
     } catch (error) {
       console.log("updateEventController error", error);
-      return handleError();
+      return handleError(undefined, req);
     }
   }
 
@@ -167,9 +167,7 @@ export class EventControlller {
       const url = req.nextUrl;
       const eventIds = url.searchParams.get("eventIds");
       if (!eventIds) {
-        return handleError(
-          httpMessages.BAD_REQUEST("Event IDs are required")
-        );
+        return handleError(httpMessages.BAD_REQUEST("Event IDs are required"));
       }
 
       const eventIdArray = eventIds.split(",").map((id) => id.trim());
@@ -182,7 +180,7 @@ export class EventControlller {
         }
       }
 
-      const objectIds = eventIdArray.map(id => new Types.ObjectId(id));
+      const objectIds = eventIdArray.map((id) => new Types.ObjectId(id));
 
       console.log("Event IDs (ObjectId format):", objectIds);
       const isDeleted = await this.eventService.deleteEvents(objectIds);

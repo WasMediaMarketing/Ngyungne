@@ -12,7 +12,7 @@ const userUpdateSchema = z.object({
   address: z.string().optional(),
   page: z.string().optional(),
   pageTitle: z.string().optional(),
-});
+}).strict();
 
 export const validateUserUpdate = async (
   req: NextRequest

@@ -23,7 +23,7 @@ const contactSchema = z.object({
 
   subject: z.string().min(1, { message: "subject is required" }),
   message: z.string().min(1, { message: "subject is required" }),
-});
+}).strict();
 
 // Create a function to validate the contact input
 export const validateContactInput = async (

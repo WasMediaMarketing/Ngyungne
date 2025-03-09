@@ -38,13 +38,13 @@ const eventUpdateSchema = z.object({
   schedule: z
     .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
     .optional()
-});
+}).strict();
 
 export const validateEventUpdate = async (
   req: NextRequest
 ): Promise<NextResponse | void> => {
   try {
-    const eventData = await req.json();
+    const eventData = await req.clone().json();
 
     const result = eventUpdateSchema.safeParse(eventData);
 

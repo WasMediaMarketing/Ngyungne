@@ -53,6 +53,24 @@ export class EventService implements IEventService {
     eventData: IEventUpdate
   ): Promise<IEvent | null> {
     await this.initializeDbConnection();
+    const existingEvent = await Event.findById(eventId);
+    if(!existingEvent){
+      throw new Error("Event Not Found");
+    }
+    if (
+      eventData.image &&
+      eventData.image !== existingEvent.image &&
+      existingEvent.image
+    ) {
+      deleteFile(existingEvent.image);
+    }
+    if (
+      eventData.teacher?.image &&
+      eventData.teacher.image !== existingEvent.teacher.image &&
+      existingEvent.teacher.image
+    ) {
+      deleteFile(existingEvent.teacher.image);
+    }
     const event = await Event.findByIdAndUpdate(eventId, eventData, {
       new: true,
     });

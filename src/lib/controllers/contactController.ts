@@ -3,6 +3,7 @@ import { IContactService } from "@/types";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 import { handleError } from "@/lib/utils/errorHandler";
 import { handleResponse } from "@/lib/utils/responseHandler";
+import { Types } from "mongoose";
 
 export class ContactController {
   private contactService: IContactService;
@@ -67,8 +68,13 @@ export class ContactController {
       // Parse contact IDs into an array
       const contactIdArray = contactIds.split(",").map((id) => id.trim());
 
-      // Call the deleteContacts method for each ID
-      console.log("contact ids", contactIdArray);
+      for (const id of contactIdArray) {
+              if (!Types.ObjectId.isValid(id)) {
+                return handleError(
+                  httpMessages.BAD_REQUEST(`Invalid Event ID: ${id}`)
+                );
+              }
+            }
       const isDeleted = await this.contactService.deleteContacts(
         contactIdArray
       );

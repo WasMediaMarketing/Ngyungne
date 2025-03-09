@@ -542,6 +542,333 @@
           }
         }
       }
+    },
+    "/api/event": {
+      "post": {
+        "summary": "Create a new event",
+        "description": "This endpoint creates a new event with images, schedule, teacher data, and other required information.",
+        "operationId": "createEvent",
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Event image (optional, processed later)"
+                  },
+                  "teacherImage": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Teacher's image (optional, processed later)"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the event"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description of the event"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Type of the event (e.g., conference, seminar, etc.)"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date of the event"
+                  },
+                  "time": {
+                    "type": "string",
+                    "description": "Time of the event"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Location where the event will take place"
+                  },
+                  "teacher": {
+                    "type": "object",
+                    "description": "Teacher details (name, image, etc.)",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Teacher's name"
+                      },
+                      "speciality": {
+                        "type": "string",
+                        "description": "Teacher's speciality"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Teacher's description"
+                      },
+                      "image": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Teacher's image URL"
+                      },
+                      "link": {
+                        "type": "string",
+                        "description": "Link to teacher's profile"
+                      },
+                      "credentials": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Teacher's credentials"
+                      }
+                    }
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tags related to the event"
+                  },
+                  "attending": {
+                    "type": "integer",
+                    "description": "Number of people attending"
+                  },
+                  "capacity": {
+                    "type": "integer",
+                    "description": "Maximum capacity for the event"
+                  },
+                  "schedule": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Title of the schedule item"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "Description of the schedule item"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve all events",
+        "description": "Fetches all the events from the database.",
+        "operationId": "getEvents",
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple events",
+        "description": "This endpoint deletes multiple events by their IDs, which are passed in the query parameters.",
+        "operationId": "deleteEvents",
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "eventIds",
+            "required": true,
+            "description": "Comma-separated list of event IDs to be deleted.",
+            "schema": {
+              "type": "string",
+              "example": "1,2,3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Events deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message indicating the deletion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing eventIds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {},

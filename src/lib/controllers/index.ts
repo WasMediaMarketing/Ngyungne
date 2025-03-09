@@ -1,6 +1,6 @@
 import { UserController } from "./userController";
 import { DonationController } from "./donationController";
 import { ContactController } from "./contactController";
-import {EventControlller} from "./eventController"
+import {EventController} from "./eventController"
 
-export { UserController, DonationController, ContactController,EventControlller };
+export { UserController, DonationController, ContactController,EventController };

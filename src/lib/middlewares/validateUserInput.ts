@@ -61,7 +61,7 @@ const userSchema = z.object({
     ),
 
   address: z.string().optional(),
-});
+}).strict();
 
 export const validateUserInput = async (
   req: NextRequest

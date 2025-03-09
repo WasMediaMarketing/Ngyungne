@@ -44,13 +44,13 @@ const eventSchema = z.object({
   schedule: z
     .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
     .optional(),
-});
+}).strict();
 
 export const validateEventInput = async (
   req: NextRequest
 ): Promise<NextResponse | void> => {
   try {
-    const eventData = await req.json();
+    const eventData = await req.clone().json();
 
     const result = eventSchema.safeParse(eventData);
 
@@ -58,7 +58,6 @@ export const validateEventInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

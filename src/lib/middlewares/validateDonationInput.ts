@@ -37,7 +37,7 @@ const donationSchema = z.object({
     .string()
     .min(1, { message: "Donation method is required" })
     .optional(),
-});
+}).strict();
 
 // Create a function to validate the donation input
 export const validateDonationInput = async (

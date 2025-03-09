@@ -3,6 +3,7 @@ import { IDonationService } from "@/types";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 import { handleError } from "@/lib/utils/errorHandler";
 import { handleResponse } from "@/lib/utils/responseHandler";
+import { Types } from "mongoose";
 
 export class DonationController {
   private donationService: IDonationService;
@@ -66,9 +67,13 @@ export class DonationController {
 
       // Parse donation IDs into an array
       const donationIdArray = donationIds.split(",").map((id) => id.trim());
-
-      // Call the deleteDonations method for each ID
-      console.log("donation ids", donationIdArray);
+      for (const id of donationIdArray) {
+              if (!Types.ObjectId.isValid(id)) {
+                return handleError(
+                  httpMessages.BAD_REQUEST(`Invalid Event ID: ${id}`)
+                );
+              }
+            }
       const isDeleted = await this.donationService.deleteDonations(
         donationIdArray
       );
