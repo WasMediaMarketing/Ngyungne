@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
   BarChart,
@@ -140,20 +140,31 @@ const statsCards = [
 
 const NgyungneDashboard = () => {
   const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    const authUser = isAuthenticated();
-    if (authUser) {
-      setUser(authUser);
+    // Check if the user is authenticated
+    const user = isAuthenticated();
+    if (!user) {
+      // If not authenticated, redirect to login
+      router.replace("/login");
+    } else {
+      // If authenticated, set authenticated to true
+      setAuthenticated(true);
     }
-  }, []);
 
-  if (!user) {
-    return (
-      <div>
-        <Loader />
-      </div>
-    );
+    setLoading(false);
+  }, [router]);
+  console.log("authenticated", authenticated);
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (!authenticated) {
+    return null; // Will redirect in useEffect
   }
   return (
     <div className="w-full p-4 ">
