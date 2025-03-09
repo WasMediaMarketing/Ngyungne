@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -20,24 +20,26 @@ import { Toaster } from "@/components/ui/toaster";
 import { toast } from "sonner";
 import {
   Heart,
-  Gift,
-  BookOpen,
-  Users,
   CreditCard,
   Banknote,
   Upload,
+  X,
+  ImageIcon,
 } from "lucide-react";
 import { SupportSection } from "@/components/sections/support-section";
 import { createDonation } from "@/utils/donationApi";
+import Image from "next/image";
+import Spinner from "@/components/spinner";
 
 const paymentMethods = [
   {
     id: "bank",
     name: "Bank Transfer",
-    accountInfo: "Bank: ABC Bank\nAccount: 1234567890\nIFSC: ABCD0001234",
+    accountInfo:
+      "Bank: B.T.M.C. Foundation\nA/C Number: 2222410016305780\nSWIFT: NMBBNPKA\nBranch: Boudha Branch, Kathmandu, Nepal",
   },
-  { id: "esewa", name: "eSewa", accountInfo: "eSewa ID: 9876543210" },
-  { id: "khalti", name: "Khalti", accountInfo: "Khalti ID: 1234567890" },
+  { id: "esewa", name: "eSewa", accountInfo: "eSewa ID: 9849118562" },
+  { id: "khalti", name: "Khalti", accountInfo: "Khalti ID: 9849118562" },
 ];
 
 export default function DonatePage() {
@@ -55,7 +57,11 @@ export default function DonatePage() {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(
+    null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAmountSelect = (value: string) => {
@@ -64,9 +70,70 @@ export default function DonatePage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setScreenshot(e.target.files[0]);
+      const file = e.target.files[0];
+      setScreenshot(file);
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setScreenshotPreview(previewUrl);
     }
   };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+
+      // Check if file is an image
+      if (!file.type.startsWith("image/")) {
+        toast.error("Error", {
+          description: "Please upload an image file",
+        });
+        return;
+      }
+
+      setScreenshot(file);
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setScreenshotPreview(previewUrl);
+
+      // Update the file input for form validity
+      if (fileInputRef.current) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInputRef.current.files = dataTransfer.files;
+      }
+    }
+  }, []);
+
+  const removeScreenshot = useCallback(() => {
+    setScreenshot(null);
+    setScreenshotPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,6 +181,7 @@ export default function DonatePage() {
       setEmail("");
       setPhoneNumber("");
       setScreenshot(null);
+      setScreenshotPreview(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -317,32 +385,68 @@ export default function DonatePage() {
                   <Label htmlFor="screenshot" className="text-maroon-700">
                     Payment Screenshot *
                   </Label>
-                  <div className="mt-1 flex items-center">
-                    <Label
-                      htmlFor="screenshot-upload"
-                      className="cursor-pointer flex items-center justify-center w-full border-2 border-dashed border-saffron-300 rounded-md p-4 hover:bg-saffron-100 transition-colors"
-                    >
-                      <input
-                        id="screenshot-upload"
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={handleFileChange}
-                        ref={fileInputRef}
-                        required
-                      />
-                      <div className="text-center">
-                        <Upload className="mx-auto h-8 w-8 text-maroon-500 mb-2" />
-                        <p className="text-sm text-maroon-700">
-                          {screenshot
-                            ? screenshot.name
-                            : "Upload payment screenshot"}
-                        </p>
-                        <p className="text-xs text-maroon-500 mt-1">
-                          Click to browse or drag and drop
+                  <div
+                    className={`mt-1 border-2 border-dashed rounded-md transition-colors ${
+                      isDragging
+                        ? "border-crimson-500 bg-saffron-100"
+                        : screenshotPreview
+                        ? "border-saffron-300"
+                        : "border-saffron-300 hover:bg-saffron-100"
+                    }`}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                  >
+                    <input
+                      id="screenshot-upload"
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={handleFileChange}
+                      ref={fileInputRef}
+                      required
+                    />
+
+                    {screenshotPreview ? (
+                      <div className="relative p-2">
+                        <div className="relative aspect-video w-full overflow-hidden rounded-md">
+                          <Image
+                            src={screenshotPreview || "/placeholder.svg"}
+                            alt="Payment screenshot preview"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-4 right-4 h-8 w-8 rounded-full"
+                          onClick={removeScreenshot}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                        <p className="text-sm text-center mt-2 text-maroon-700">
+                          {screenshot?.name}
                         </p>
                       </div>
-                    </Label>
+                    ) : (
+                      <Label
+                        htmlFor="screenshot-upload"
+                        className="cursor-pointer flex items-center justify-center w-full p-4 hover:bg-saffron-100 transition-colors"
+                      >
+                        <div className="text-center">
+                          <Upload className="mx-auto h-8 w-8 text-maroon-500 mb-2" />
+                          <p className="text-sm text-maroon-700">
+                            Upload payment screenshot
+                          </p>
+                          <p className="text-xs text-maroon-500 mt-1">
+                            Click to browse or drag and drop
+                          </p>
+                        </div>
+                      </Label>
+                    )}
                   </div>
                 </div>
                 <Button
@@ -351,7 +455,11 @@ export default function DonatePage() {
                   disabled={isSubmitting}
                 >
                   <Heart className="mr-2 h-4 w-4" />
-                  {isSubmitting ? "Processing..." : "Donate Now"}
+                  {isSubmitting ? (
+                    <Spinner text="Processing..." />
+                  ) : (
+                    "Donate Now"
+                  )}
                 </Button>
               </CardContent>
             </Card>

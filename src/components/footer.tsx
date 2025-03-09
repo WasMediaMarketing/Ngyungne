@@ -29,15 +29,15 @@ export function Footer() {
             <ul className="space-y-2">
               <li className="flex items-center">
                 <MapPin className="h-5 w-5 mr-2 text-gray-400" />
-                <span>123 Community Street, City, Country</span>
+                <span>Jorpati, Gokarneshwor 5, Kathmandu, Nepal</span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 mr-2 text-gray-400" />
-                <span>+1 234 567 890</span>
+                <span>+977 9818123174</span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 mr-2 text-gray-400" />
-                <span>contact@example.com</span>
+                <span>donation@ngyungne.org</span>
               </li>
             </ul>
             <div className="flex space-x-4">

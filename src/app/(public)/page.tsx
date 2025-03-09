@@ -11,6 +11,7 @@ import { SupportSection } from "@/components/sections/support-section";
 import { FeaturedEventsSlider } from "@/components/events/FeaturedEventsSlider";
 import { events } from "@/data/events";
 import { TeachingsSection } from "@/components/sections/teachings-section";
+import VolunteerCTA from "@/components/volunteer/volunteerCTA";
 export default function Home() {
   const apiCallDone = useRef(false); // useRef to track whether API has been called
   const [readingProgress, setReadingProgress] = useState(0);
@@ -49,6 +50,9 @@ export default function Home() {
       <CausesSection />
       <TestimonialsSection />
       <ImpactSection />
+      <div className="max-w-7xl mx-auto">
+        <VolunteerCTA />
+      </div>
       <BlogSection />
       <SupportSection />
     </div>

@@ -284,7 +284,9 @@ export function DonationsDataTable() {
 
         return (
           <div>
-            <div className="font-medium">{donor}</div>
+            <div className="font-medium" title={donor}>
+              {donor}
+            </div>
             {email && (
               <div className="text-sm text-muted-foreground">{email}</div>
             )}
@@ -438,7 +440,7 @@ export function DonationsDataTable() {
             columns={columns}
             data={filteredDonations}
             filterColumn="donor"
-            filterPlaceholder="Filter donations..."
+            filterPlaceholder="Filter donor..."
             onRowSelectionChange={handleRowSelectionChange}
           />
         )}
@@ -512,18 +514,30 @@ export function DonationsDataTable() {
                 </div>
               </div>
 
+              {/* Payment Screenshot */}
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground mb-2">
                   Payment Screenshot
                 </h4>
-                <div className="relative aspect-video rounded-md overflow-hidden border">
+                <div className="relative aspect-video rounded-md overflow-hidden border group">
                   {viewDonation.screenshot ? (
-                    <Image
-                      src={viewDonation.screenshot || "/placeholder.svg"}
-                      alt="Payment Screenshot"
-                      fill
-                      className="object-contain"
-                    />
+                    <>
+                      <Image
+                        src={viewDonation.screenshot || "/placeholder.svg"}
+                        alt="Payment Screenshot"
+                        fill
+                        className="object-contain"
+                      />
+                      {/* View Button (Hidden by default, shows on hover) */}
+                      <Button
+                        onClick={() =>
+                          window.open(viewDonation.screenshot, "_blank")
+                        }
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      >
+                        View
+                      </Button>
+                    </>
                   ) : (
                     <div className="flex items-center justify-center h-full bg-muted">
                       No screenshot available
@@ -532,6 +546,7 @@ export function DonationsDataTable() {
                 </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setViewDonation(null)}>
                   Close

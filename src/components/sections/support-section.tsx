@@ -1,11 +1,15 @@
 "use client";
 
+import { Label } from "@/components/ui/label";
+
+import type React from "react";
+
 import { motion, useInView } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Gift, BookOpen, Users, Upload } from "lucide-react";
+import { Heart, Gift, BookOpen, Users, Upload, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +32,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createDonation } from "@/utils/donationApi";
-import { Label } from "@radix-ui/react-label";
+import Spinner from "../spinner";
 
 const supportOptions = [
   {
@@ -87,8 +91,13 @@ export function SupportSection() {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [donationAmount, setDonationAmount] = useState("");
   const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(
+    null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLLabelElement>(null);
 
   const form = useForm({
     defaultValues: {
@@ -122,7 +131,69 @@ export function SupportSection() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setScreenshot(e.target.files[0]);
+      const file = e.target.files[0];
+      setScreenshot(file);
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setScreenshotPreview(previewUrl);
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+
+      // Check if file is an image
+      if (!file.type.match("image.*")) {
+        toast.error("Error", {
+          description: "Please upload an image file",
+        });
+        return;
+      }
+
+      setScreenshot(file);
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setScreenshotPreview(previewUrl);
+
+      // Update the file input
+      if (fileInputRef.current) {
+        // Create a DataTransfer object to set the files property
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInputRef.current.files = dataTransfer.files;
+      }
+    }
+  }, []);
+
+  const removeScreenshot = () => {
+    setScreenshot(null);
+    setScreenshotPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -141,7 +212,7 @@ export function SupportSection() {
         name: data.fullName,
         email: data.email,
         phoneNumber: data.phone,
-        amount: parseFloat(data.amount),
+        amount: Number.parseFloat(data.amount),
         donationType: selectedOption?.donationType || "one-time",
         donationMethod: data.paymentMethod,
         page: "support-section",
@@ -154,11 +225,20 @@ export function SupportSection() {
       setIsDialogOpen(false);
       form.reset();
       setScreenshot(null);
+      setScreenshotPreview(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+
+      toast.success("Thank you for your support!", {
+        description: "Your donation has been received successfully.",
+      });
     } catch (error) {
       console.error("Donation submission error:", error);
+      toast.error("Submission failed", {
+        description:
+          "There was an error processing your donation. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -385,20 +465,22 @@ export function SupportSection() {
                             </div>
                             {field.value === "bank" && (
                               <div className="p-3 bg-gray-50">
-                                <p className="text-sm mb-2">
-                                  Bank Account Details:
+                                <p>
+                                  <strong>Beneficiary Name:</strong> B.T.M.C.
+                                  Foundation
                                 </p>
-                                <p className="text-sm">
-                                  Bank Name: Example Bank
+                                <p>
+                                  <strong>Bank Name:</strong> NMB Bank
                                 </p>
-                                <p className="text-sm">
-                                  Account Name: Buddhist Center
+                                <p>
+                                  <strong>SWIFT:</strong> NMBBNPKA
                                 </p>
-                                <p className="text-sm">
-                                  Account Number: 1234567890
+                                <p>
+                                  <strong>A/C No.:</strong> 2222410016305780
                                 </p>
-                                <p className="text-sm mt-2 text-gray-600">
-                                  Please include your name as reference
+                                <p>
+                                  <strong>Branch:</strong> Boudha Branch,
+                                  Kathmandu, Nepal
                                 </p>
                               </div>
                             )}
@@ -417,12 +499,9 @@ export function SupportSection() {
                             {field.value === "khalti" && (
                               <div className="p-3 bg-gray-50">
                                 <p className="text-sm mb-2">Khalti Payment:</p>
-                                <p className="text-sm">
-                                  You will be redirected to Khalti to complete
-                                  your payment.
-                                </p>
+
                                 <p className="text-sm mt-2 text-gray-600">
-                                  Khalti ID: buddhist.center@example.com
+                                  Khalti ID: 9849118562
                                 </p>
                               </div>
                             )}
@@ -441,12 +520,9 @@ export function SupportSection() {
                             {field.value === "esewa" && (
                               <div className="p-3 bg-gray-50">
                                 <p className="text-sm mb-2">eSewa Payment:</p>
-                                <p className="text-sm">
-                                  You will be redirected to eSewa to complete
-                                  your payment.
-                                </p>
+
                                 <p className="text-sm mt-2 text-gray-600">
-                                  eSewa ID: 9876543210
+                                  eSewa ID: 9849118562
                                 </p>
                               </div>
                             )}
@@ -462,10 +538,19 @@ export function SupportSection() {
                   <FormLabel className="text-lg font-medium">
                     Payment Screenshot *
                   </FormLabel>
-                  <div className="mt-1 flex items-center">
+                  <div className="mt-1">
                     <Label
                       htmlFor="support-screenshot-upload"
-                      className="cursor-pointer flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-md p-4 hover:bg-gray-50 transition-colors"
+                      ref={dropZoneRef}
+                      className={`cursor-pointer flex flex-col items-center justify-center w-full border-2 ${
+                        isDragging
+                          ? "border-primary"
+                          : "border-dashed border-gray-300"
+                      } rounded-md p-4 hover:bg-gray-50 transition-colors`}
+                      onDragEnter={handleDragEnter}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
                     >
                       <input
                         id="support-screenshot-upload"
@@ -476,17 +561,48 @@ export function SupportSection() {
                         ref={fileInputRef}
                         required
                       />
-                      <div className="text-center">
-                        <Upload className="mx-auto h-8 w-8 text-gray-500 mb-2" />
-                        <p className="text-sm text-gray-700">
-                          {screenshot
-                            ? screenshot.name
-                            : "Upload payment screenshot"}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Click to browse or drag and drop
-                        </p>
-                      </div>
+
+                      {!screenshotPreview ? (
+                        <div className="text-center">
+                          <Upload className="mx-auto h-8 w-8 text-gray-500 mb-2" />
+                          <p className="text-sm text-gray-700">
+                            {screenshot
+                              ? screenshot.name
+                              : "Upload payment screenshot"}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Click to browse or drag and drop
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="relative w-full">
+                          <div className="absolute top-2 right-2 z-10">
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="h-6 w-6 rounded-full"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                removeScreenshot();
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <div className="relative w-full aspect-video">
+                            <img
+                              src={screenshotPreview || "/placeholder.svg"}
+                              alt="Payment screenshot"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <p className="text-xs text-center text-gray-500 mt-2">
+                            Click to change image
+                          </p>
+                        </div>
+                      )}
                     </Label>
                   </div>
                 </div>
@@ -518,7 +634,11 @@ export function SupportSection() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                    setScreenshot(null);
+                    setScreenshotPreview(null);
+                  }}
                 >
                   Cancel
                 </Button>
@@ -527,7 +647,11 @@ export function SupportSection() {
                   className="bg-primary hover:bg-primary/90"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Processing..." : "Complete Support"}
+                  {isSubmitting ? (
+                    <Spinner text="Submitting..." />
+                  ) : (
+                    "Complete Support"
+                  )}
                 </Button>
               </div>
             </form>
