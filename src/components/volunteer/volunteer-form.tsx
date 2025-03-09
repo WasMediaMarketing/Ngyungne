@@ -10,7 +10,8 @@ interface VolunteerFormData {
   phone: string;
   email: string;
   address: string;
-  image: string | null;
+  reason: string;
+  image: File | string | null;
   socialLinks: {
     instagram: string;
     facebook: string;
@@ -29,6 +30,7 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
     phone: "",
     email: "",
     address: "",
+    reason: "",
     image: null,
     socialLinks: {
       instagram: "",
@@ -124,6 +126,7 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
       phone: "",
       email: "",
       address: "",
+      reason: "",
       image: null,
       socialLinks: {
         instagram: "",
@@ -214,6 +217,24 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
             rows={3}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-saffron-500 focus:border-saffron-500"
             placeholder="Your address"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="address"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Can you share why you're interested in volunteering?
+          </label>
+          <textarea
+            name="reason"
+            id="reason"
+            required
+            value={formData.reason}
+            onChange={handleInputChange}
+            rows={3}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-saffron-500 focus:border-saffron-500"
+            placeholder="Your answer"
           />
         </div>
 
