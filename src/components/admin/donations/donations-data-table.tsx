@@ -104,7 +104,7 @@ export function DonationsDataTable() {
       }
     } catch (error) {
       console.error("Error fetching donations:", error);
-      toast.error("Error", {
+      toast("Error", {
         description: "Failed to fetch donations",
       });
       setDonations([]);
@@ -177,7 +177,7 @@ export function DonationsDataTable() {
       }
 
       const result = await response.json();
-      toast.success("Success", {
+      toast("Success", {
         description: `${
           result.deletedCount || selectedDonationIds.length
         } donations deleted successfully`,

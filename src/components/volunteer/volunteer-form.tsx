@@ -1,26 +1,24 @@
 "use client";
 import { useState, useRef, type ChangeEvent, type FormEvent } from "react";
 import type React from "react";
-
 import { motion } from "framer-motion";
 import { InstagramIcon } from "lucide-react";
+import { volunteerApi } from "@/utils/volunteerApi";
+import Spinner from "../spinner";
 
+// Interface to match the simplified API
 interface VolunteerFormData {
   fullname: string;
   phone: string;
   email: string;
   address: string;
   reason: string;
-  image: File | string | null;
-  socialLinks: {
-    instagram: string;
-    facebook: string;
-    linkedin: string;
-  };
+  image: File | null;
+  socialLinks: Record<string, string>;
 }
 
 interface VolunteerFormProps {
-  onSubmit: (data: VolunteerFormData) => void;
+  onSubmit?: (data: VolunteerFormData) => void;
 }
 
 export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
@@ -38,6 +36,10 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
       linkedin: "",
     },
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   // Image preview state
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -76,7 +78,7 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
         setImagePreview(result);
         setFormData({
           ...formData,
-          image: result,
+          image: file,
         });
       };
       reader.readAsDataURL(file);
@@ -94,7 +96,7 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
         setImagePreview(result);
         setFormData({
           ...formData,
-          image: result,
+          image: file,
         });
       };
       reader.readAsDataURL(file);
@@ -111,16 +113,8 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
     fileInputRef.current?.click();
   };
 
-  // Handle form submission
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    onSubmit({
-      ...formData,
-      image: imagePreview || "https://i.pravatar.cc/150?img=12", // Fallback image
-    });
-
-    // Reset form
+  // Reset form to initial state
+  const resetForm = () => {
     setFormData({
       fullname: "",
       phone: "",
@@ -135,6 +129,57 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
       },
     });
     setImagePreview(null);
+    setSuccess(true);
+
+    // Reset success message after 5 seconds
+    setTimeout(() => {
+      setSuccess(false);
+    }, 5000);
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      // Validate required fields
+      if (!formData.fullname.trim()) throw new Error("Name is required");
+      if (!formData.email.trim()) throw new Error("Email is required");
+      if (!formData.phone.trim()) throw new Error("Phone number is required");
+      if (!formData.reason.trim()) throw new Error("Reason is required");
+      if (!formData.address.trim()) throw new Error("Address is required");
+
+      // Submit to API using the simplified API
+      const success = await volunteerApi.createVolunteer({
+        fullname: formData.fullname,
+        phone: formData.phone,
+        email: formData.email,
+        address: formData.address,
+        reason: formData.reason,
+        image: formData.image,
+        socialLinks: formData.socialLinks,
+      });
+
+      if (success) {
+        // Call the onSubmit prop if provided (for backward compatibility)
+        if (onSubmit) {
+          onSubmit(formData);
+        }
+
+        // Reset form
+        resetForm();
+      }
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+      setError(
+        error.message || "Failed to submit application. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -142,6 +187,18 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
       <h2 className="text-3xl font-bold text-maroon-700 mb-6">
         Become a Volunteer
       </h2>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md">
+          Your volunteer application has been submitted successfully!
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -219,9 +276,10 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
             placeholder="Your address"
           />
         </div>
+
         <div>
           <label
-            htmlFor="address"
+            htmlFor="reason"
             className="block text-sm font-medium text-gray-700"
           >
             Can you share why you're interested in volunteering?
@@ -248,7 +306,7 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
             <div className="flex items-center">
               <InstagramIcon className="h-5 w-5 mr-2" />
               <input
-                type="text"
+                type="url"
                 name="social.instagram"
                 id="social-instagram"
                 value={formData.socialLinks.instagram}
@@ -273,7 +331,7 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
                 />
               </svg>
               <input
-                type="text"
+                type="url"
                 name="social.facebook"
                 id="social-facebook"
                 value={formData.socialLinks.facebook}
@@ -294,7 +352,7 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
               </svg>
               <input
-                type="text"
+                type="url"
                 name="social.linkedin"
                 id="social-linkedin"
                 value={formData.socialLinks.linkedin}
@@ -371,9 +429,14 @@ export default function VolunteerForm({ onSubmit }: VolunteerFormProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-base font-semibold text-white bg-gradient-to-r from-crimson-600 to-saffron-600 hover:from-crimson-700 hover:to-saffron-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-crimson-500 transition-all duration-300"
+            disabled={isSubmitting}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-base font-semibold text-white bg-gradient-to-r from-crimson-600 to-saffron-600 hover:from-crimson-700 hover:to-saffron-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-crimson-500 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Submit Application
+            {isSubmitting ? (
+              <Spinner text="Submitting..." />
+            ) : (
+              "Submit Application"
+            )}
           </motion.button>
         </div>
       </form>

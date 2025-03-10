@@ -5,17 +5,13 @@ import Image from "next/image";
 import SocialLinks from "./social-links";
 
 interface Volunteer {
-  id: number;
+  id: number | string;
   fullname: string;
   phone: string;
   email: string;
   address: string;
   image: string | null;
-  socialLinks?: {
-    instagram?: string;
-    facebook?: string;
-    linkedin?: string;
-  };
+  socialLinks?: Record<string, string>;
 }
 
 interface VolunteerCardProps {
@@ -41,7 +37,7 @@ export default function VolunteerCard({ volunteer }: VolunteerCardProps) {
         {/* Full width image at top */}
         <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
           <Image
-            src={volunteer.image || "/placeholder.svg"}
+            src={volunteer.image || "/placeholder.svg?height=300&width=400"}
             alt={volunteer.fullname}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"

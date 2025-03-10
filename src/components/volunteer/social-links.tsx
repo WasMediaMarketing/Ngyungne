@@ -4,11 +4,7 @@ import { motion } from "framer-motion";
 import { InstagramIcon } from "lucide-react";
 
 interface SocialLinksProps {
-  links?: {
-    instagram?: string;
-    facebook?: string;
-    linkedin?: string;
-  };
+  links?: Record<string, string>;
   className?: string;
 }
 
@@ -16,8 +12,7 @@ export default function SocialLinks({
   links,
   className = "",
 }: SocialLinksProps) {
-  if (!links || (!links.instagram && !links.facebook && !links.linkedin))
-    return null;
+  if (!links || Object.keys(links).length === 0) return null;
 
   return (
     <div className={`flex space-x-4 justify-center ${className}`}>
