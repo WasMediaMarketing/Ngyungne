@@ -6,6 +6,8 @@ import { IDonationData, IDonationInput } from "./donation.types";
 import { IDonationService } from "./donationService.interface";
 import { IContactData, IContactInput } from "./contact.types";
 import { IContactService } from "./contactService.interface";
+import {IVolunteerData,IVolunteerInput} from "./volunteer.types"
+import {IVolunteerService} from "./volunteer.interface"
 
 export type {
   IUser,
@@ -23,4 +25,7 @@ export type {
   IContactData,
   IContactInput,
   IContactService,
+  IVolunteerData,
+  IVolunteerInput,
+  IVolunteerService,
 };
