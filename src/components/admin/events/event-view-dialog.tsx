@@ -127,7 +127,8 @@ export default function EventViewDialog({
                   <Image
                     src={
                       event.teacher.image ||
-                      "/placeholder.svg?height=200&width=200"
+                      "/placeholder.svg?height=200&width=200" ||
+                      "/placeholder.svg"
                     }
                     alt={event.teacher.name}
                     fill

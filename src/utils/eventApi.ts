@@ -63,11 +63,9 @@ export const eventApi = {
         console.log(`${pair[0]}: ${value}`);
       }
 
-      //   const headers: HeadersInit = getAuthHeaders();
       const response = await fetch("/api/event", {
         method: "POST",
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
         // Don't set Content-Type for FormData - browser will set it with boundary
@@ -98,7 +96,6 @@ export const eventApi = {
       const response = await fetch(`/api/event/${id}`, {
         method: "PATCH",
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
         // Don't set Content-Type for FormData - browser will set it with boundary

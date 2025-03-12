@@ -293,7 +293,8 @@ export default function EventFormDialog({
       formData.append("date", date.toISOString());
       formData.append("time", time);
       formData.append("location", location);
-      formData.append("featured", featured.toString());
+      // Convert boolean to a format the server can parse correctly
+      formData.append("featured", featured ? "true" : "false");
 
       if (capacity) formData.append("capacity", capacity);
       if (attending) formData.append("attending", attending);
