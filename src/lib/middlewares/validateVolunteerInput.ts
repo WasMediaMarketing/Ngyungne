@@ -2,7 +2,8 @@ import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
-// Define the schema for volunteer input
+
+
 const volunteerSchema = z
   .object({
     name: z.string().min(1, { message: "Name is required" }),
@@ -16,17 +17,13 @@ const volunteerSchema = z
 
     page: z.string().min(1, { message: "Page is required" }),
 
-    pageTitle: z
-      .string()
-      .min(1, { message: "Page title is required" }),
+    pageTitle: z.string().min(1, { message: "Page title is required" }),
 
     image: z.string().min(1, { message: "Image URL is required" }),
 
     reason: z.string().min(1, { message: "Reason is required" }),
 
-    socialLink: z
-      .record(z.string())
-      .optional(),
+    socialLink: z.record(z.string()).optional(),
   })
   .strict();
 

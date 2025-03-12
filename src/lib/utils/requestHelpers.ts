@@ -1,4 +1,3 @@
-// lib/utils/requestHelpers.ts
 import { NextRequest } from "next/server";
 
 /**
@@ -15,7 +14,8 @@ export class ExtendedNextRequest extends NextRequest {
     options: RequestInit,
     uploadedFiles: Record<string, string>
   ) {
-    super(url);
+    // Cast the options to match the NextRequest's expected RequestInit type
+    super(url, options as RequestInit); // Type casting
     this.uploadedFiles = uploadedFiles; // Custom property to hold uploaded files
   }
 }

@@ -46,7 +46,6 @@ export const validateDonationInput = async (
   try {
     const reqClone = req.clone();
     const donationData = await reqClone.json();
-    console.log(donationData);
 
     // Parse the donation input using the zod schema
     const result = donationSchema.safeParse(donationData);
