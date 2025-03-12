@@ -16,13 +16,15 @@ import { ExtendedNextRequest } from "@/lib/utils/requestHelpers";
  * @param uploadFields Mapping of file fields to body fields
  * @param jsonFields Array of fields to be parsed as JSON
  * @param numericFields Array of fields to be parsed as numbers
+ * @param booleanFields Array of fields to be parsed as boolean
  * @returns A NextResponse (success or error)
  */
 export async function handleMultipartRequest(
   req: NextRequest,
   uploadFields: { fileField: string; bodyField: string }[],
   jsonFields: string[] = [], // Default to an empty array
-  numericFields: string[] = [] // Default to an empty array
+  numericFields: string[] = [], // Default to an empty array
+   booleanFields: string[] = [] // Fields to be parsed as booleans
 ) {
   const reqClone = req.clone();
   const formData = await reqClone.formData();
@@ -46,7 +48,12 @@ export async function handleMultipartRequest(
   // Parse the specified fields as JSON and/or numbers (if any)
   let parsedBody;
   try {
-    parsedBody = parseJsonAndNumbersFields(body, jsonFields, numericFields);
+    parsedBody = parseJsonAndNumbersFields(
+      body,
+      jsonFields,
+      numericFields,
+      booleanFields
+    );
   } catch {
     return handleError(
       httpMessages.BAD_REQUEST(
@@ -75,7 +82,7 @@ export async function handleMultipartRequest(
           if (!nestedObject[key]) {
             nestedObject[key] = {};
           }
-          nestedObject = nestedObject[key]; // Move deeper into the object
+          nestedObject = nestedObject[key] as Record<string, unknown>; // Move deeper into the object
         }
       }
     }

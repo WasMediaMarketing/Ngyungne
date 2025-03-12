@@ -14,8 +14,14 @@ export class ExtendedNextRequest extends NextRequest {
     options: RequestInit,
     uploadedFiles: Record<string, string>
   ) {
-    // Cast the options to match the NextRequest's expected RequestInit type
-    super(url, options as RequestInit); // Type casting
+    // Create a new options object to ensure signal is not null
+    const modifiedOptions: RequestInit = {
+      ...options,
+      signal: options.signal === null ? undefined : options.signal, // Set null to undefined
+    };
+
+    // Cast the modified options to match the NextRequest's expected RequestInit type
+    super(url, modifiedOptions); // Type casting
     this.uploadedFiles = uploadedFiles; // Custom property to hold uploaded files
   }
 }

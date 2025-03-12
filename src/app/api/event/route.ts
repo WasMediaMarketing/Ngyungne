@@ -144,11 +144,13 @@ export async function POST(req: NextRequest) {
   ];
   const jsonFields = ["tags", "teacher", "schedule"];
   const numericFields = ["attending", "capacity"];
+  const booleanFields = ["featured"];
   const processedRequest = await handleMultipartRequest(
     req,
     uploadFields,
     jsonFields,
-    numericFields
+    numericFields,
+    booleanFields
   );
 
   if (processedRequest instanceof NextResponse) return processedRequest;
