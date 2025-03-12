@@ -8,6 +8,8 @@ import { IContactData, IContactInput } from "./contact.types";
 import { IContactService } from "./contactService.interface";
 import {IVolunteerData,IVolunteerInput} from "./volunteer.types"
 import {IVolunteerService} from "./volunteer.interface"
+import {IBookEventData,IBookEventInput, IBookEventupdate} from "./bookEvent.types"
+import {IBookEventService} from "./bookEventService.interface"
 
 export type {
   IUser,
@@ -28,4 +30,8 @@ export type {
   IVolunteerData,
   IVolunteerInput,
   IVolunteerService,
+  IBookEventData,
+  IBookEventInput,
+  IBookEventupdate,
+  IBookEventService,
 };

@@ -3,7 +3,6 @@ import { processFormData } from "@/lib/utils/processFormData";
 import { parseJsonAndNumbersFields } from "@/lib/utils/parseJsonAndNumbersFields";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
-import {deleteFile} from "@/lib/utils/deleteFile";
 import { ExtendedNextRequest } from "@/lib/utils/requestHelpers";
 
 /**
@@ -50,7 +49,7 @@ export async function handleMultipartRequest(
       body[bodyField] = fileUrls[fileField];
     }
   });
-
+  let updatedRequest;
   // Parse the specified fields as JSON and/or numbers (if any)
   try {
     const parsedBody = parseJsonAndNumbersFields(
@@ -58,8 +57,7 @@ export async function handleMultipartRequest(
       jsonFields,
       numericFields
     );
-    // Clone request with updated body
-    const updatedRequest = new ExtendedNextRequest(
+    updatedRequest = new ExtendedNextRequest(
       req.url,
       {
         method: req.method,
@@ -71,15 +69,11 @@ export async function handleMultipartRequest(
 
     return updatedRequest;
   } catch {
-    if(fileUrls){
-      Object.values(fileUrls).forEach((url) => {
-        deleteFile(url); 
-      });
-    }
     return handleError(
       httpMessages.BAD_REQUEST(
         `Invalid JSON format in one of the fields: ${jsonFields.join(", ")}`
-      )
+      ),
+      updatedRequest
     );
   }
 }

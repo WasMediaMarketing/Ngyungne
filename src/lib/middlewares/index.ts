@@ -3,9 +3,10 @@ import { validateUserInput } from "./validateUserInput";
 import { validateUserUpdate } from "./validateUserUpdate";
 import { validateDonationInput } from "./validateDonationInput";
 import { validateContactInput } from "./validateContactInput";
-import {validateEventInput} from "./validateEventInput"
-import {validateEventUpdate} from "./validateEventUpdate"
-import {validateVolunteerInput} from "./validateVolunteerInput"
+import {validateEventInput} from "./validateEventInput";
+import {validateEventUpdate} from "./validateEventUpdate";
+import {validateVolunteerInput} from "./validateVolunteerInput";
+import {validateBookEventInput} from "./validateBookEventInput"
 
 export {
   isAuthenticated,
@@ -16,4 +17,5 @@ export {
   validateEventInput,
   validateEventUpdate,
   validateVolunteerInput,
+  validateBookEventInput,
 };

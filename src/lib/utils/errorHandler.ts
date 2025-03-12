@@ -13,6 +13,7 @@ export const handleError = (
   },
   req?: ExtendedNextRequest
 ) => {
+  console.log("Handling Error......")
   const message = error.message
   const statusCode = error.statusCode
 
