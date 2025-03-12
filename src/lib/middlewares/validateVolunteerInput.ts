@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
-
 const volunteerSchema = z
   .object({
     name: z.string().min(1, { message: "Name is required" }),
@@ -14,6 +13,8 @@ const volunteerSchema = z
       .min(1, { message: "Email is required" }),
 
     phoneNumber: z.string().min(1, { message: "Phone number is required" }),
+
+    address: z.string().min(1, { message: "address is required" }),
 
     page: z.string().min(1, { message: "Page is required" }),
 
@@ -35,7 +36,6 @@ export const validateVolunteerInput = async (
     const reqClone = req.clone();
     const volunteerData = await reqClone.json();
     console.log(volunteerData);
-
     // Parse the volunteer input using the zod schema
     const result = volunteerSchema.safeParse(volunteerData);
 
@@ -43,7 +43,7 @@ export const validateVolunteerInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-
+      console.log(errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

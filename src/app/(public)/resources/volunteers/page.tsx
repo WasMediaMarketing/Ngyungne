@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Head from "next/head";
 import VolunteerForm from "@/components/volunteer/volunteer-form";
@@ -7,124 +7,51 @@ import VolunteerCard from "@/components/volunteer/volunteer-card";
 import BenefitsSection from "@/components/volunteer/benefits-section";
 import PageBadge from "@/components/volunteer/page-badge";
 import VolunteerCTA from "@/components/volunteer/volunteerCTA";
+import { volunteerApi } from "@/utils/volunteerApi";
 
 interface Volunteer {
-  id: number;
+  id: number | string;
   fullname: string;
   phone: string;
   email: string;
   address: string;
   image: string | null;
-  socialLinks?: {
-    twitter?: string;
-    facebook?: string;
-    linkedin?: string;
-  };
-}
-
-interface VolunteerFormData {
-  fullname: string;
-  phone: string;
-  email: string;
-  address: string;
-  image: string | null;
-  socialLinks?: {
-    twitter?: string;
-    facebook?: string;
-    linkedin?: string;
-  };
+  reason: string;
+  socialLinks?: Record<string, string>;
 }
 
 const VolunteerPage = () => {
-  // Volunteers state (in a real app, this would come from an API)
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([
-    {
-      id: 1,
-      fullname: "John Doe",
-      phone: "+1 (555) 123-4567",
-      email: "john.doe@example.com",
-      address: "123 Main St, Anytown, USA",
-      image: "https://i.pravatar.cc/150?img=1",
-      socialLinks: {
-        twitter: "https://twitter.com/johndoe",
-        facebook: "https://facebook.com/johndoe",
-        linkedin: "https://linkedin.com/in/johndoe",
-      },
-    },
-    {
-      id: 2,
-      fullname: "Jane Smith",
-      phone: "+1 (555) 987-6543",
-      email: "jane.smith@example.com",
-      address: "456 Oak Ave, Somewhere, USA",
-      image: "https://i.pravatar.cc/150?img=5",
-      socialLinks: {
-        twitter: "https://twitter.com/janesmith",
-        linkedin: "https://linkedin.com/in/janesmith",
-      },
-    },
-    {
-      id: 3,
-      fullname: "Alex Johnson",
-      phone: "+1 (555) 456-7890",
-      email: "alex.johnson@example.com",
-      address: "789 Pine Rd, Elsewhere, USA",
-      image: "https://i.pravatar.cc/150?img=8",
-      socialLinks: {
-        facebook: "https://facebook.com/alexjohnson",
-        linkedin: "https://linkedin.com/in/alexjohnson",
-      },
-    },
-    {
-      id: 4,
-      fullname: "Samantha Lee",
-      phone: "+1 (555) 234-5678",
-      email: "samantha.lee@example.com",
-      address: "101 Cedar Ln, Nearby, USA",
-      image: "https://i.pravatar.cc/150?img=10",
-      socialLinks: {
-        twitter: "https://twitter.com/samanthalee",
-        facebook: "https://facebook.com/samanthalee",
-      },
-    },
-    {
-      id: 5,
-      fullname: "Michael Chen",
-      phone: "+1 (555) 876-5432",
-      email: "michael.chen@example.com",
-      address: "202 Maple Dr, Adjacent, USA",
-      image: "https://i.pravatar.cc/150?img=12",
-      socialLinks: {
-        linkedin: "https://linkedin.com/in/michaelchen",
-      },
-    },
-    {
-      id: 6,
-      fullname: "Taylor Wilson",
-      phone: "+1 (555) 345-6789",
-      email: "taylor.wilson@example.com",
-      address: "303 Birch Blvd, Yonder, USA",
-      image: "https://i.pravatar.cc/150?img=15",
-      socialLinks: {
-        twitter: "https://twitter.com/taylorwilson",
-        facebook: "https://facebook.com/taylorwilson",
-        linkedin: "https://linkedin.com/in/taylorwilson",
-      },
-    },
-  ]);
+  // Volunteers state
+  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch volunteers on component mount
+  useEffect(() => {
+    const fetchVolunteers = async () => {
+      try {
+        const data = await volunteerApi.getVolunteers();
+        setVolunteers(data);
+      } catch (error) {
+        console.error("Error fetching volunteers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVolunteers();
+  }, []);
 
   // Handle form submission
-  const handleAddVolunteer = (newVolunteer: VolunteerFormData) => {
+  const handleAddVolunteer = (newVolunteer: any) => {
+    // The API call is now handled in the form component
+    // This is just for immediate UI update after submission
     const volunteerWithId = {
       ...newVolunteer,
       id: volunteers.length + 1,
-      image: newVolunteer.image || "https://i.pravatar.cc/150?img=12", // Ensure image is never null
+      image: newVolunteer.image || "/placeholder.svg?height=150&width=150",
     };
 
     setVolunteers([...volunteers, volunteerWithId]);
-
-    // Show success message (in a real app, handle this better)
-    alert("Thank you for volunteering!");
   };
 
   return (
@@ -136,7 +63,6 @@ const VolunteerPage = () => {
           content="Join our volunteer team for the Ngyungne Project"
         />
       </Head>
-
       <div className="min-h-screen bg-gradient-to-b from-saffron-50 to-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header with Badge */}
@@ -193,11 +119,23 @@ const VolunteerPage = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {volunteers.map((volunteer) => (
-                <VolunteerCard key={volunteer.id} volunteer={volunteer} />
-              ))}
-            </div>
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-saffron-500"></div>
+              </div>
+            ) : volunteers.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {volunteers.map((volunteer) => (
+                  <VolunteerCard key={volunteer.id} volunteer={volunteer} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-lg text-gray-600">
+                  No volunteers yet. Be the first to join our team!
+                </p>
+              </div>
+            )}
           </motion.div>
 
           {/* Call to Action */}

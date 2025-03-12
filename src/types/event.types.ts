@@ -1,27 +1,27 @@
 import { Types, Document } from "mongoose";
 
 // ScheduleItem interface for the title and description
-interface ScheduleItem {
+export interface ScheduleItem {
   title?: string;
   description?: string;
 }
 
-interface TeacherInput{
-  name:string;
-  speciality?:string;
+interface TeacherInput {
+  name: string;
+  speciality?: string;
   description?: string;
-  image?:string;
-  link?:string;
-  credentials?:string[];
+  image?: string;
+  link?: string;
+  credentials?: string[];
 }
 
-interface TeacherUpdate{
-  name?:string;
-  speciality?:string;
+interface TeacherUpdate {
+  name?: string;
+  speciality?: string;
   description?: string;
-  image?:string;
-  link?:string;
-  credentials?:string[];
+  image?: string;
+  link?: string;
+  credentials?: string[];
 }
 
 // The schedule can be an object of key-value pairs
@@ -32,13 +32,13 @@ export interface IEventInput {
   date: Date;
   time: string;
   location: string;
-  teacher: TeacherInput
+  teacher: TeacherInput;
   image?: string;
   tags?: string[];
   featured?: boolean;
   attending?: number;
   capacity?: number;
-  schedule?: { [key: string]: ScheduleItem };  // schedule added here
+  schedule?: { [key: string]: ScheduleItem }; // schedule added here
 }
 
 export interface IEventUpdate {
@@ -54,7 +54,7 @@ export interface IEventUpdate {
   featured?: boolean;
   attending?: number;
   capacity?: number;
-  schedule?: { [key: string]: ScheduleItem };  // schedule added here
+  schedule?: { [key: string]: ScheduleItem }; // schedule added here
 }
 
 export interface IEvent extends Document {
@@ -72,5 +72,5 @@ export interface IEvent extends Document {
   featured?: boolean;
   attending?: number;
   capacity?: number;
-  schedule?: { [key: string]: ScheduleItem };  // schedule added here
+  schedule?: { [key: string]: ScheduleItem }; // schedule added here
 }
