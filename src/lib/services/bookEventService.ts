@@ -1,4 +1,4 @@
-import { IBookEventService, IBookEventInput, IBookEventData } from "@/types";
+import { IBookEventService, IBookEventInput, IBookEventData, IBookEventupdate } from "@/types";
 import { BookEvent, Event } from "@/lib/models";
 import { UserService } from "@/lib/services";
 import { connectToDatabase } from "@/lib/utils/mongodb";
@@ -15,10 +15,14 @@ export class BookEventService implements IBookEventService {
       throw new Error("Event not found");
     }
 
-    if (event.capacity && ticketNumber + (event.attending?event.attending:0) > event.capacity) {
+    if (
+      event.availableTickets &&
+      ticketNumber >
+        event.availableTickets
+    ) {
       throw new Error(
         `Booking exceeds the event's capacity of ${event.capacity}. Only ${
-          event.capacity - (event.attending ? event.attending : 0)
+          event.availableTickets 
         } tickets are available.`
       );
     }
@@ -56,7 +60,10 @@ export class BookEventService implements IBookEventService {
 
     await bookEvent.save();
 
-    event.attending = (event.attending?event.attending:0) + bookEventData.TicketNumber;
+    event.attending =
+      (event.attending ? event.attending : 0) + bookEventData.TicketNumber;
+    event.availableTickets =
+      event.availableTickets - bookEventData.TicketNumber;
     await event.save();
 
     return bookEvent;
@@ -100,5 +107,49 @@ export class BookEventService implements IBookEventService {
 
     const result = await BookEvent.deleteMany({ _id: { $in: bookEventIds } });
     return result.deletedCount > 0;
+  } 
+
+  async updateBookEvent(bookEventId: string, bookEventData: IBookEventupdate): Promise<boolean> {
+    await this.initializeDbConnection();
+    const existingBookEvent = await BookEvent.findById(
+      bookEventId
+    );
+    if (!existingBookEvent) {
+      throw new Error("Booking event not found");
+    }
+    const event = await Event.findById(existingBookEvent.eventId);
+    if (!event) {
+      throw new Error("Event not found");
+    }
+    if(bookEventData.TicketNumber){const ticketDifference =
+      bookEventData.TicketNumber - existingBookEvent.TicketNumber;
+    if(ticketDifference <= 0) //condition for reducing ticket number
+    {
+      await BookEvent.findByIdAndUpdate(bookEventId, bookEventData,{new: true});
+      event.attending = (event.attending || 0 ) + Math.abs(ticketDifference);
+      event.availableTickets = event.availableTickets - Math.abs(ticketDifference);
+      await event.save();
+    }else if (ticketDifference > 0) //condition for increasing the ticket number
+    {
+      if(event.availableTickets < ticketDifference){
+        throw new Error(
+          `Booking exceeds the event's capacity of ${event.capacity}. Only ${event.availableTickets} tickets are available.`
+        );
+      }
+      await BookEvent.findByIdAndUpdate(bookEventId, bookEventData, {
+        new: true,
+      });
+      event.attending = (event.attending || 0) + ticketDifference;
+      event.availableTickets =
+        event.availableTickets - ticketDifference;
+      await event.save();
+
+    }
+  }else {
+    await BookEvent.findByIdAndUpdate(bookEventId, bookEventData, {
+      new: true,
+    });
+  }
+  return true;
   }
 }

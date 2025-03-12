@@ -76,6 +76,7 @@ export class UserController {
       return handleError();
     }
   }
+  
   async deleteUser(req: NextRequest): Promise<NextResponse> {
     try {
       const userId = req.nextUrl.pathname.split("/").pop();

@@ -15,7 +15,9 @@ export class BookEventController {
   async createBookEvent(req: NextRequest): Promise<NextResponse> {
     try {
       const bookEventData = await req.json();
-      const bookEvent = await this.bookEventService.createBookEvent(bookEventData);
+      const bookEvent = await this.bookEventService.createBookEvent(
+        bookEventData
+      );
       return handleResponse(bookEvent, httpMessages.CREATED());
     } catch (error) {
       console.error("createBookEventController error:", error);
@@ -26,10 +28,44 @@ export class BookEventController {
   async getBookEvents(): Promise<NextResponse> {
     try {
       const bookEvents = await this.bookEventService.getBookEvents();
-
       return handleResponse(bookEvents);
     } catch (error) {
       console.error("getBookEventsController error:", error);
+      return handleError();
+    }
+  }
+
+  async getBookEventById(req: NextRequest): Promise<NextResponse> {
+    try {
+      const bookEventId = req.nextUrl.pathname.split("/").pop();
+
+      if (!bookEventId) {
+        return handleError(
+          httpMessages.BAD_REQUEST("BookEvent ID is required")
+        );
+      }
+
+      const bookEvent = await this.bookEventService.getBookEvents(bookEventId);
+      return handleResponse(bookEvent);
+    } catch (error) {
+      console.error("getBookEventByIdController error:", error);
+      return handleError();
+    }
+  }
+
+  async updateBookEvent(req: NextRequest): Promise<NextResponse> {
+    try {
+      const bookEventId = req.nextUrl.pathname.split("/").pop();
+
+      if (!bookEventId) {
+        return handleError(httpMessages.BAD_REQUEST("BookEvent ID is required"));
+      }
+
+      const bookEventData = await req.json();
+      const updatedBookEvent = await this.bookEventService.updateBookEvent(bookEventId, bookEventData);
+      return handleResponse(updatedBookEvent);
+    } catch (error) {
+      console.error("updateBookEventController error:", error);
       return handleError();
     }
   }
@@ -40,10 +76,14 @@ export class BookEventController {
       const bookEventId = req.nextUrl.pathname.split("/").pop(); // Extract the bookEventId from the URL path
 
       if (!bookEventId) {
-        return handleError(httpMessages.BAD_REQUEST("BookEvent ID is required"));
+        return handleError(
+          httpMessages.BAD_REQUEST("BookEvent ID is required")
+        );
       }
 
-      const isDeleted = await this.bookEventService.deleteBookEvent(bookEventId);
+      const isDeleted = await this.bookEventService.deleteBookEvent(
+        bookEventId
+      );
       return handleResponse(isDeleted);
     } catch (error) {
       console.error("deleteBookEventController error:", error);
@@ -67,12 +107,12 @@ export class BookEventController {
       const bookEventIdArray = bookEventIds.split(",").map((id) => id.trim());
 
       for (const id of bookEventIdArray) {
-              if (!Types.ObjectId.isValid(id)) {
-                return handleError(
-                  httpMessages.BAD_REQUEST(`Invalid Event ID: ${id}`)
-                );
-              }
-            }
+        if (!Types.ObjectId.isValid(id)) {
+          return handleError(
+            httpMessages.BAD_REQUEST(`Invalid Event ID: ${id}`)
+          );
+        }
+      }
       const isDeleted = await this.bookEventService.deleteBookEvents(
         bookEventIdArray
       );

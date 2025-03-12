@@ -33,11 +33,12 @@ export interface IEventInput {
   time: string;
   location: string;
   teacher: TeacherInput;
+  isVisible?:boolean;
   image?: string;
   tags?: string[];
   featured?: boolean;
   attending?: number;
-  capacity?: number;
+  capacity: number;
   schedule?: { [key: string]: ScheduleItem }; // schedule added here
 }
 
@@ -52,6 +53,7 @@ export interface IEventUpdate {
   image?: string;
   tags?: string[];
   featured?: boolean;
+  isVisible?:boolean;
   attending?: number;
   capacity?: number;
   schedule?: { [key: string]: ScheduleItem }; // schedule added here
@@ -70,7 +72,9 @@ export interface IEvent extends Document {
   image?: string;
   tags?: string[];
   featured?: boolean;
+  isVisible:boolean;
   attending?: number;
-  capacity?: number;
+  capacity: number;
+  availableTickets: number;
   schedule?: { [key: string]: ScheduleItem }; // schedule added here
 }

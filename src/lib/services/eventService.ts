@@ -16,7 +16,7 @@ export class EventService implements IEventService {
    */
   async createEvent(eventData: IEventInput): Promise<IEvent> {
     await this.initializeDbConnection();
-    const event = new Event(eventData);
+    const event = new Event({...eventData, availableTickets: eventData.capacity});
     await event.save();
     return event;
   }
@@ -25,8 +25,11 @@ export class EventService implements IEventService {
    * @description Retrieves all events in the system
    * @returns {Promise<IEvent[]>} List of all events
    */
-  async getEvents(): Promise<IEvent[]> {
+  async getEvents(isVisible?: boolean): Promise<IEvent[]> {
     await this.initializeDbConnection();
+    if(isVisible){
+      return await Event.find({isVisible: true});
+    }
     return await Event.find();
   }
 

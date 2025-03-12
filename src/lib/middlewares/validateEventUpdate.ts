@@ -19,26 +19,29 @@ const teacherSchema = z.object({
   credentials: z.array(z.string()).optional(),
 });
 
-const eventUpdateSchema = z.object({
-  title: z.string().min(1).optional(),
-  description: z.string().min(1).optional(),
-  type: z.string().optional(),
-  date: z
-    .date()
-    .refine((val) => !isNaN(val.getTime()), { message: "Invalid date" })
-    .optional(),
-  time: z.string().min(1).optional(),
-  location: z.string().min(1).optional(),
-  teacher: teacherSchema,
-  image: z.string().optional(),
-  tags: z.array(z.string()).min(1).optional(),
-  featured: z.boolean().optional(),
-  attending: z.number().min(0).optional(),
-  capacity: z.number().min(1).optional(),
-  schedule: z
-    .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
-    .optional()
-}).strict();
+const eventUpdateSchema = z
+  .object({
+    title: z.string().min(1).optional(),
+    description: z.string().min(1).optional(),
+    type: z.string().optional(),
+    date: z
+      .date()
+      .refine((val) => !isNaN(val.getTime()), { message: "Invalid date" })
+      .optional(),
+    time: z.string().min(1).optional(),
+    location: z.string().min(1).optional(),
+    teacher: teacherSchema,
+    image: z.string().optional(),
+    tags: z.array(z.string()).min(1).optional(),
+    featured: z.boolean().optional(),
+    isVisible: z.boolean().optional(),
+    attending: z.number().min(0).optional(),
+    capacity: z.number().min(1).optional(),
+    schedule: z
+      .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
+      .optional(),
+  })
+  .strict();
 
 export const validateEventUpdate = async (
   req: NextRequest

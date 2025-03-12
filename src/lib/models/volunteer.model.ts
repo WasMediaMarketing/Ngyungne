@@ -12,6 +12,10 @@ const VolunteerSchema: Schema<IVolunteerData> = new mongoose.Schema(
       type: String, 
       required: true,
     },
+    isVisible:{
+      type:Boolean,
+      deafult: false
+    },
     reason: {
       type: String, 
       required: true,

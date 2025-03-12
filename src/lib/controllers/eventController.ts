@@ -46,6 +46,22 @@ export class EventController {
   }
 
   /**
+   * @summary Get all published events
+   * @description Retrieves all events from the system
+   * @param {NextRequest} req - The request object
+   * @returns {NextResponse} The response with the list of events
+   */
+  async getPublishedEvents(): Promise<NextResponse> {
+    try {
+      const events = await this.eventService.getEvents(true);
+      return handleResponse(events);
+    } catch (error) {
+      console.log("getEventsController error", error);
+      return handleError();
+    }
+  }
+
+  /**
    * @summary Get an event by ID
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the event details

@@ -22,7 +22,7 @@ export interface IBookEventupdate{
 export interface IBookEventData extends Document {
   _id: Types.ObjectId;
   id: string;
-  userId?: Types.ObjectId | IUser;
+  userId: Types.ObjectId | IUser;
   eventId: Types.ObjectId | IEvent;
   TicketNumber: number;
   dietaryRequirements?: string;

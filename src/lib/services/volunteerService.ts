@@ -36,8 +36,11 @@ export class VolunteerService implements IVolunteerService {
     return volunteer;
   }
 
-  async getVolunteers(): Promise<IVolunteerData[]> {
+  async getVolunteers(isVisible?:boolean): Promise<IVolunteerData[]> {
     await this.initializeDbConnection();
+    if(isVisible){
+      return await Volunteer.find({isVisible: true}).populate("userId");
+    }
     return await Volunteer.find().populate("userId");
   }
 

@@ -17,5 +17,6 @@ export interface IVolunteerData extends Document {
   userId?: Types.ObjectId | IUser;
   image: string;
   socialLink: Record<string, string>;
+  isVisible:boolean;
   reason: string;
 }

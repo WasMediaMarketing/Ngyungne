@@ -2,7 +2,8 @@ import { UserService } from "./userService";
 import { DonationService } from "./donationService";
 import { ContactService } from "./contactService";
 import {EventService} from "./eventService";
-import {VolunteerService} from "./volunteerService"
+import {VolunteerService} from "./volunteerService";
+import {BookEventService} from "./bookEventService";
 
 export {
   UserService,
@@ -10,4 +11,5 @@ export {
   ContactService,
   EventService,
   VolunteerService,
+  BookEventService,
 };
