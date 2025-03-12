@@ -106,7 +106,12 @@ import { isAuthenticated } from "@/lib/middlewares";
  */
 export async function POST(req: NextRequest) {
   const uploadFields = [{ fileField: "image", bodyField: "image" }];
-  const processedRequest = await handleMultipartRequest(req, uploadFields);
+  const jsonFields = ["socialLink"];
+  const processedRequest = await handleMultipartRequest(
+    req,
+    uploadFields,
+    jsonFields
+  );
   if (processedRequest instanceof NextResponse) return processedRequest;
 
   const validationResponse = await validateVolunteerInput(processedRequest);

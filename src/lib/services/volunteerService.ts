@@ -19,7 +19,8 @@ export class VolunteerService implements IVolunteerService {
       name: volunteerData.name,
       email: volunteerData.email,
       phoneNumber: volunteerData.phoneNumber,
-      role: "volunteer", 
+      address: volunteerData.address,
+      role: "volunteer",
       page: volunteerData.page,
       pageTitle: volunteerData.pageTitle,
     });

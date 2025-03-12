@@ -54,9 +54,6 @@ export const createDonation = async (
     }
 
     const data = await response.json();
-    toast.success("Success", {
-      description: "Donation submitted successfully!",
-    });
     return data;
   } catch (error) {
     return handleApiError(error, "Failed to submit donation");

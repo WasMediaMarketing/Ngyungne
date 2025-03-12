@@ -4,7 +4,7 @@ import { IUser, IUserInput } from "@/types";
 export interface IVolunteerInput
   extends Pick<
     IUserInput,
-    "name" | "email" | "phoneNumber" | "page" | "pageTitle"
+    "name" | "email" | "phoneNumber" | "page" | "pageTitle" | "address"
   > {
   image: string;
   reason: string;
