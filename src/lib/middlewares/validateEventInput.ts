@@ -53,11 +53,13 @@ export const validateEventInput = async (
     const eventData = await req.clone().json();
 
     const result = eventSchema.safeParse(eventData);
+    console.log("eventData", eventData);
 
     if (!result.success) {
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
+        console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

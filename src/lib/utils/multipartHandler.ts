@@ -43,37 +43,55 @@ export async function handleMultipartRequest(
     }
   });
 
-  // Map file URLs to the respective body fields
-  uploadFields.forEach(({ fileField, bodyField }) => {
-    if (fileUrls[fileField]) {
-      body[bodyField] = fileUrls[fileField];
-    }
-  });
-  let updatedRequest;
   // Parse the specified fields as JSON and/or numbers (if any)
+  let parsedBody;
   try {
-    const parsedBody = parseJsonAndNumbersFields(
-      body,
-      jsonFields,
-      numericFields
-    );
-    updatedRequest = new ExtendedNextRequest(
-      req.url,
-      {
-        method: req.method,
-        headers: req.headers,
-        body: JSON.stringify(parsedBody),
-      },
-      fileUrls
-    );
-
-    return updatedRequest;
+    parsedBody = parseJsonAndNumbersFields(body, jsonFields, numericFields);
   } catch {
     return handleError(
       httpMessages.BAD_REQUEST(
         `Invalid JSON format in one of the fields: ${jsonFields.join(", ")}`
       ),
-      updatedRequest
+      undefined,
+      fileUrls
     );
   }
+
+  // Map file URLs to the respective body fields, including nested fields
+  for (const { fileField, bodyField } of uploadFields) {
+    if (fileUrls[fileField]) {
+      // Handle nested fields (e.g., "teacher.image")
+      const keys = bodyField.split("."); // Split the field path into an array of keys
+      let nestedObject = parsedBody;
+
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+
+        // If we are at the last key, assign the value
+        if (i === keys.length - 1) {
+          nestedObject[key] = fileUrls[fileField]; // Set the final value
+        } else {
+          // Ensure the nested object exists before accessing it
+          if (!nestedObject[key]) {
+            nestedObject[key] = {};
+          }
+          nestedObject = nestedObject[key]; // Move deeper into the object
+        }
+      }
+    }
+  }
+
+
+  // Create a new ExtendedNextRequest with the updated body (now parsed and with file URLs)
+  const updatedRequest = new ExtendedNextRequest(
+    req.url,
+    {
+      method: req.method,
+      headers: req.headers,
+      body: JSON.stringify(parsedBody),
+    },
+    fileUrls
+  );
+
+  return updatedRequest;
 }

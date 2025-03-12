@@ -11,7 +11,8 @@ export const handleError = (
     message: httpMessages.INTERNAL_SERVER_ERROR.message,
     statusCode: httpMessages.INTERNAL_SERVER_ERROR.statusCode,
   },
-  req?: ExtendedNextRequest
+  req?: ExtendedNextRequest,
+  fileUrls?: Record<string, string>
 ) => {
   console.log("Handling Error......")
   const message = error.message
@@ -23,6 +24,11 @@ export const handleError = (
       deleteFile(fileUrl);
     });
   }
+  if(fileUrls){
+   Object.values(fileUrls).forEach((fileUrl) => {
+     deleteFile(fileUrl);
+   });
+}
 
   return NextResponse.json({ message }, { status: statusCode });
 };
