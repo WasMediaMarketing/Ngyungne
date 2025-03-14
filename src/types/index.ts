@@ -6,10 +6,15 @@ import { IDonationData, IDonationInput } from "./donation.types";
 import { IDonationService } from "./donationService.interface";
 import { IContactData, IContactInput } from "./contact.types";
 import { IContactService } from "./contactService.interface";
-import {IVolunteerData,IVolunteerInput} from "./volunteer.types"
-import {IVolunteerService} from "./volunteer.interface"
-import {IBookEventData,IBookEventInput, IBookEventupdate} from "./bookEvent.types"
-import {IBookEventService} from "./bookEventService.interface"
+import { IVolunteerData, IVolunteerInput } from "./volunteer.types";
+import { IVolunteerService } from "./volunteer.interface";
+import {
+  IBookEventData,
+  IBookEventInput,
+  IBookEventupdate,
+} from "./bookEvent.types";
+import { IBookEventService } from "./bookEventService.interface";
+import { ICause } from "./cause.types";
 
 export type {
   IUser,
@@ -34,4 +39,5 @@ export type {
   IBookEventInput,
   IBookEventupdate,
   IBookEventService,
+  ICause,
 };

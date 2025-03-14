@@ -33,7 +33,7 @@ const createAdminIfNeeded = async () => {
 };
 /**
  * @openapi
- * /api/init-admin:
+ * /api/user/init-admin:
  *   get:
  *     summary: Initializes the admin user if it doesn't exist
  *     description: Checks if an admin user exists in the database, and if not, creates one with the email and password specified in environment variables.

@@ -104,6 +104,113 @@ import { handleMultipartRequest } from "@/lib/utils/multipartHandler";
  *     requestBody:
  *       required: true
  *       content:
+ *         multipart-form data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The updated title of the event.
+ *               description:
+ *                 type: string
+ *                 description: The updated description of the event.
+ *               type:
+ *                 type: string
+ *                 description: The updated type of the event.
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 description: The updated date of the event.
+ *               time:
+ *                 type: string
+ *                 description: The updated time of the event.
+ *               location:
+ *                 type: string
+ *                 description: The updated location of the event.
+ *               teacher:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   speciality:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   image:
+ *                     type: string
+ *                   link:
+ *                     type: string
+ *                   credentials:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *               image:
+ *                 type: string
+ *                 description: The updated image URL for the event.
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               featured:
+ *                 type: boolean
+ *                 description: Whether the event should be featured.
+ *               attending:
+ *                 type: integer
+ *                 description: The updated number of attendees.
+ *               capacity:
+ *                 type: integer
+ *                 description: The updated capacity of the event.
+ *               schedule:
+ *                 type: object
+ *                 additionalProperties:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                 description: The updated event schedule.
+ *     responses:
+ *       200:
+ *         description: Event details updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: The event's ID.
+ *                 title:
+ *                   type: string
+ *                   description: The updated title of the event.
+ *                 description:
+ *                   type: string
+ *                   description: The updated description of the event.
+ *       400:
+ *         description: Bad request - Invalid or incomplete data.
+ *       401:
+ *         description: Unauthorized - The request is not authenticated.
+ *       404:
+ *         description: Event not found for the given ID.
+ *       500:
+ *         description: Internal server error.
+ *
+ *   put:
+ *     summary: Update event by ID(only for no file related updates, epcifically made for isvisible update)
+ *     description: Update the event's details based on its event ID, does not havndle any files
+ *     tags:
+ *       - Event
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event to update.
+ *     requestBody:
+ *       required: true
+ *       content:
  *         application/json:
  *           schema:
  *             type: object
@@ -232,7 +339,7 @@ export async function PATCH(req: NextRequest) {
   ];
   const jsonFields = ["tags", "teacher", "schedule"];
   const numericFields = ["attending", "capacity"];
-  const booleanFields = ["featured"];
+  const booleanFields = ["featured", "isVisible"];
   const processedRequest = await handleMultipartRequest(
     req,
     uploadFields,
@@ -247,6 +354,16 @@ export async function PATCH(req: NextRequest) {
 
   const eventController = createEventController();
   return eventController.updateEvent(processedRequest);
+}
+export async function PUT(req: NextRequest) {
+  const authResult = await isAuthenticated(req);
+  if (authResult) return authResult;
+
+  const validationResponse = await validateEventUpdate(req);
+  if (validationResponse) return validationResponse;
+
+  const eventController = createEventController();
+  return eventController.updateEvent(req);
 }
 
 export async function DELETE(req: NextRequest) {

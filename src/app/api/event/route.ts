@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
   ];
   const jsonFields = ["tags", "teacher", "schedule"];
   const numericFields = ["attending", "capacity"];
-  const booleanFields = ["featured"];
+  const booleanFields = ["featured", "isVisible"];
   const processedRequest = await handleMultipartRequest(
     req,
     uploadFields,

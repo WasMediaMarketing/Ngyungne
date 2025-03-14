@@ -4,8 +4,8 @@ import { handleError } from "../utils/errorHandler";
 import { handleResponse } from "../utils/responseHandler";
 import { httpMessages } from "../utils/HttpMessage";
 import { Types } from "mongoose";
-import {IEvent} from "@/types"
-import {ExtendedNextRequest} from "@/lib/utils/requestHelpers"
+import { IEvent } from "@/types";
+import { ExtendedNextRequest } from "@/lib/utils/requestHelpers";
 
 export class EventController {
   private eventService: IEventService;
@@ -128,7 +128,9 @@ export class EventController {
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the updated event
    */
-  async updateEvent(req: ExtendedNextRequest): Promise<NextResponse> {
+  async updateEvent(
+    req: ExtendedNextRequest | NextRequest
+  ): Promise<NextResponse> {
     try {
       const eventId = req.nextUrl.pathname.split("/").pop();
       if (!eventId || !Types.ObjectId.isValid(eventId)) {
@@ -145,7 +147,9 @@ export class EventController {
       return handleResponse(updatedEvent);
     } catch (error) {
       console.log("updateEventController error", error);
-      return handleError(undefined, req);
+      return req instanceof ExtendedNextRequest
+        ? handleError(undefined, req)
+        : handleError();
     }
   }
 
