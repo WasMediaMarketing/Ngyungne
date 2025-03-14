@@ -3,11 +3,13 @@ import { validateUserInput } from "./validateUserInput";
 import { validateUserUpdate } from "./validateUserUpdate";
 import { validateDonationInput } from "./validateDonationInput";
 import { validateContactInput } from "./validateContactInput";
-import {validateEventInput} from "./validateEventInput";
-import {validateEventUpdate} from "./validateEventUpdate";
-import {validateVolunteerInput} from "./validateVolunteerInput";
-import {validateBookEventInput} from "./validateBookEventInput";
-import {validateBookEventUpdate} from "./validateBookEventUpdate";
+import { validateEventInput } from "./validateEventInput";
+import { validateEventUpdate } from "./validateEventUpdate";
+import { validateVolunteerInput } from "./validateVolunteerInput";
+import { validateBookEventInput } from "./validateBookEventInput";
+import { validateBookEventUpdate } from "./validateBookEventUpdate";
+import { validateCauseInput } from "./validateCauseInput";
+import { validateCauseUpdate } from "./validateCauseUpdate";
 
 export {
   isAuthenticated,
@@ -19,5 +21,7 @@ export {
   validateEventUpdate,
   validateVolunteerInput,
   validateBookEventInput,
-  validateBookEventUpdate
+  validateBookEventUpdate,
+  validateCauseInput,
+  validateCauseUpdate,
 };

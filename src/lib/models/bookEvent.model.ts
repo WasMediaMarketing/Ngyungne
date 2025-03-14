@@ -1,17 +1,17 @@
-import { Schema, model, Types } from "mongoose";
-import { IBookEventData } from "@/types"; 
+import mongoose, { Schema, Types, Model } from "mongoose";
+import { IBookEventData } from "@/types";
 
-const BookEventSchema:Schema <IBookEventData> = new Schema<IBookEventData>(
+const BookEventSchema: Schema<IBookEventData> = new Schema<IBookEventData>(
   {
     userId: {
       type: Types.ObjectId,
-      ref: "User", 
+      ref: "User",
       required: true,
     },
-    eventId:{
-      type:Types.ObjectId,
-      ref:"Event",
-      required: true
+    eventId: {
+      type: Types.ObjectId,
+      ref: "Event",
+      required: true,
     },
     TicketNumber: {
       type: Number,
@@ -25,9 +25,12 @@ const BookEventSchema:Schema <IBookEventData> = new Schema<IBookEventData>(
     },
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 
-export const BookEvent = model<IBookEventData>("BookEvent", BookEventSchema);
+const BookEvent =
+  (mongoose.models.BookEvent as Model<IBookEventData>) ||
+  mongoose.model<IBookEventData>("BookEvent", BookEventSchema);
 
+export { BookEvent };
