@@ -5,7 +5,7 @@ import { isAuthenticated, validateBookEventInput } from "@/lib/middlewares";
 /**
  * @openapi
  * paths:
- *   /api/bookEvent:
+ *   /api/book-event:
  *     post:
  *       summary: Create a new event booking
  *       description: This endpoint allows the bookEvent to create a new event booking.
@@ -77,18 +77,18 @@ import { isAuthenticated, validateBookEventInput } from "@/lib/middlewares";
  *         500:
  *           description: Internal server error
  *     delete:
- *       summary: Delete bookEvents by their IDs
- *       description: Delete multiple bookEvents based on their bookEvent IDs.
+ *       summary: Delete book-events by their IDs
+ *       description: Delete multiple book-events based on their book-event IDs.
  *       tags:
  *         - User
  *       parameters:
  *         - in: query
- *           name: bookEventIds
+ *           name: book-eventIds
  *           required: true
  *           schema:
  *             type: string
  *             example: "1,2,3,4"
- *           description: A comma-separated list of bookEvent IDs to delete.
+ *           description: A comma-separated list of book-event IDs to delete.
  *         - in: header
  *           name: Authorization
  *           required: true
@@ -102,11 +102,11 @@ import { isAuthenticated, validateBookEventInput } from "@/lib/middlewares";
  *         401:
  *           description: Unauthorized - The request is not authenticated.
  *         404:
- *           description: No bookEvents found for the given IDs.
+ *           description: No book-events found for the given IDs.
  *         500:
  *           description: Internal server error.
  */
- 
+
 export async function POST(req: NextRequest) {
   const valdiatebookEventBody = await validateBookEventInput(req);
   if (valdiatebookEventBody) return valdiatebookEventBody;

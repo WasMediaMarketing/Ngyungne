@@ -9,7 +9,7 @@ export interface IUserInput {
   address?: string;
   page?: string;
   pageTitle?: string;
-  pageId: string;
+  pageId?: string;
 }
 
 export interface IUserUpdate {
