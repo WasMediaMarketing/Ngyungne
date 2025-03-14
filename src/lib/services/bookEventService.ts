@@ -100,10 +100,12 @@ export class BookEventService implements IBookEventService {
     await this.initializeDbConnection();
 
     if (eventId) {
-      return await BookEvent.find({ eventId }).populate("userId");
+      return await BookEvent.find({ eventId })
+        .populate("userId")
+        .populate("eventId");
     }
 
-    return await BookEvent.find().populate("userId");
+    return await BookEvent.find().populate("userId").populate("eventId");
   }
 
   async deleteBookEvent(bookEventId: string): Promise<boolean> {
@@ -123,6 +125,7 @@ export class BookEventService implements IBookEventService {
 
   async deleteBookEvents(bookEventIds: string[]): Promise<boolean> {
     await this.initializeDbConnection();
+    console.log("book event ids", bookEventIds);
     const bookEvents = await BookEvent.find({ _id: { $in: bookEventIds } });
     for (const bookEvent of bookEvents) {
       const event = await Event.findById(bookEvent.eventId);
