@@ -3,7 +3,7 @@ import { IEventUpdate, IEvent, IEventInput } from "@/types";
 
 export interface IEventService {
   createEvent(eventData: IEventInput): Promise<IEvent>;
-  getEvents(): Promise<IEvent[]>;
+  getEvents(isVisible?: boolean): Promise<IEvent[]>;
   getEventById(eventId: Types.ObjectId): Promise<IEvent | null>;
   updateEvent(
     eventId: Types.ObjectId,

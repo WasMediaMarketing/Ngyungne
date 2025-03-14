@@ -167,8 +167,8 @@ export async function POST(req: NextRequest) {
  * @openapi
  * /api/event:
  *   get:
- *     summary: Retrieve all events
- *     description: Fetches all the events from the database.
+ *     summary: Retrieve all events or published events
+ *     description: Fetches all events for authenticated users, or only published events for unauthenticated users.
  *     operationId: getEvents
  *     tags:
  *       - Event
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: List of events
+ *         description: List of events (all events for authenticated users, only published events for unauthenticated)
  *         content:
  *           application/json:
  *             schema:
@@ -199,10 +199,14 @@ export async function POST(req: NextRequest) {
  *         description: Internal server error
  */
 export async function GET(req: NextRequest) {
+  const authResult = await isAuthenticated(req);
   const eventController = createEventController();
-
+  if (authResult) {
+    return eventController.getPublishedEvents();
+  }
   return eventController.getEvents();
 }
+
 /**
  * @openapi
  * /api/event:

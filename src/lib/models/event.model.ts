@@ -26,7 +26,9 @@ const EventSchema: Schema<IEvent> = new mongoose.Schema(
     tags: { type: [String], required: false },
     featured: { type: Boolean, required: false },
     attending: { type: Number, required: false },
-    capacity: { type: Number, required: false },
+    capacity: { type: Number, required: true },
+    availableTickets:{type:Number, required: true},
+    isVisible:{type:Boolean, default: false},
     schedule: {
       type: Map,
       of: {

@@ -62,16 +62,14 @@ import { isAuthenticated } from "@/lib/middlewares";
  *       parameters:
  *         - in: header
  *           name: Authorization
- *           required: true
+ *           required: conditional
  *           schema:
  *             type: string
  *             example: Bearer <your_token_here>
- *           description: Authorization token required to access this endpoint.
+ *           description: Authorization token required to get not visible volunteers, no need authorization token for getting visible volunteers.
  *       responses:
  *         200:
  *           description: List of volunteers retrieved successfully
- *         401:
- *           description: Unauthorized if token is invalid or missing
  *         500:
  *           description: Internal server error
  *     delete:
@@ -123,9 +121,10 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
-
   const volunteerController = createVolunteerController();
+  if (authResult){
+    return volunteerController.getVolunteersToDisplay();
+  }
   return volunteerController.getVolunteers();
 }
 

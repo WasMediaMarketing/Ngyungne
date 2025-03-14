@@ -1,10 +1,14 @@
+import { NextRequest } from "next/server";
+import { createBookEventController } from "@/lib/factories/bookEventFactory";
+import { isAuthenticated, validateBookEventInput } from "@/lib/middlewares";
+
 /**
  * @openapi
  * paths:
  *   /api/bookEvent:
  *     post:
  *       summary: Create a new event booking
- *       description: This endpoint allows the user to create a new event booking.
+ *       description: This endpoint allows the bookEvent to create a new event booking.
  *       tags:
  *         - BookEvent
  *       requestBody:
@@ -73,26 +77,56 @@
  *         500:
  *           description: Internal server error
  *     delete:
- *       summary: Delete event booking by its ID
- *       description: This endpoint deletes an event booking from the system based on the provided booking ID.
+ *       summary: Delete bookEvents by their IDs
+ *       description: Delete multiple bookEvents based on their bookEvent IDs.
  *       tags:
- *         - BookEvent
+ *         - User
  *       parameters:
- *         - in: path
- *           name: id
+ *         - in: query
+ *           name: bookEventIds
  *           required: true
  *           schema:
  *             type: string
- *             example: "12345"
- *           description: The unique ID of the booking to be deleted.
+ *             example: "1,2,3,4"
+ *           description: A comma-separated list of bookEvent IDs to delete.
+ *         - in: header
+ *           name: Authorization
+ *           required: true
+ *           schema:
+ *             type: string
+ *             example: Bearer <your_token_here>
+ *           description: Authorization token required to access this endpoint.
  *       responses:
  *         200:
- *           description: Booking successfully deleted
- *         400:
- *           description: Bad request if the booking ID is invalid
+ *           description: Users successfully deleted.
+ *         401:
+ *           description: Unauthorized - The request is not authenticated.
  *         404:
- *           description: Booking not found for the given ID
+ *           description: No bookEvents found for the given IDs.
  *         500:
- *           description: Internal server error
+ *           description: Internal server error.
  */
  
+export async function POST(req: NextRequest) {
+  const valdiatebookEventBody = await validateBookEventInput(req);
+  if (valdiatebookEventBody) return valdiatebookEventBody;
+
+  const bookEventController = createBookEventController();
+  return bookEventController.createBookEvent;
+}
+
+export async function GET(req: NextRequest) {
+  const authResult = await isAuthenticated(req);
+  if (authResult) return authResult;
+
+  const bookEventController = createBookEventController();
+  return bookEventController.getBookEvents();
+}
+
+export async function DELETE(req: NextRequest) {
+  const authResult = await isAuthenticated(req);
+  if (authResult) return authResult;
+
+  const bookEventController = createBookEventController();
+  return bookEventController.deleteBookEvents(req);
+}

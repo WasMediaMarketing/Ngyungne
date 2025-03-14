@@ -27,10 +27,8 @@ const eventUpdateSchema = z
     description: z.string().min(1).optional(),
     type: z.string().optional(),
     date: z
-      .string()
-      .refine((val) => !isNaN(Date.parse(val)), {
-        message: "Invalid date format",
-      })
+      .date()
+      .refine((val) => !isNaN(val.getTime()), { message: "Invalid date" })
       .optional(),
     time: z.string().min(1).optional(),
     location: z.string().min(1).optional(),
@@ -38,6 +36,7 @@ const eventUpdateSchema = z
     image: z.string().optional(),
     tags: z.array(z.string()).min(1).optional(),
     featured: z.boolean().optional(),
+    isVisible: z.boolean().optional(),
     attending: z.number().min(0).optional(),
     capacity: z.number().min(1).optional(),
     schedule: z

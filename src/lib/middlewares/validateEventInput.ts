@@ -38,14 +38,12 @@ const eventSchema = z
     image: z.string().optional(),
     tags: z.array(z.string()).optional(),
     featured: z.boolean().optional(),
+    isVisible: z.boolean().optional(),
     attending: z
       .number()
       .min(0, { message: "Attending count cannot be negative" })
       .optional(),
-    capacity: z
-      .number()
-      .min(1, { message: "Capacity must be at least 1" })
-      .optional(),
+    capacity: z.number().min(1, { message: "Capacity must be at least 1" }),
     schedule: z
       .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
       .optional(),

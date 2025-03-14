@@ -36,6 +36,16 @@ export class VolunteerController {
     }
   }
 
+  async getVolunteersToDisplay(): Promise<NextResponse> {
+    try {
+      const volunteers = await this.volunteerService.getVolunteers(true);
+      return handleResponse(volunteers);
+    } catch (error) {
+      console.error("getVolunteersController error:", error);
+      return handleError();
+    }
+  }
+
   async deleteVolunteer(req: NextRequest): Promise<NextResponse> {
     try {
       const volunteerId = req.nextUrl.pathname.split("/").pop(); 

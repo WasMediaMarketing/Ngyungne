@@ -1,4 +1,6 @@
 import { NextRequest } from "next/server";
+// Import RequestInit from the path given in the error
+import { RequestInit as NextRequestInit } from "next/dist/server/web/spec-extension/request";
 
 /**
  * Extend the request object to attach uploadedFileUrls.
@@ -11,17 +13,14 @@ export class ExtendedNextRequest extends NextRequest {
 
   constructor(
     url: string,
-    options: RequestInit,
+    options: NextRequestInit,
     uploadedFiles: Record<string, string>
   ) {
-    // Create a new options object to ensure signal is not null
-    const modifiedOptions: RequestInit = {
-      ...options,
-      signal: options.signal === null ? undefined : options.signal, // Set null to undefined
-    };
-
-    // Cast the modified options to match the NextRequest's expected RequestInit type
-    super(url, modifiedOptions); // Type casting
-    this.uploadedFiles = uploadedFiles; // Custom property to hold uploaded files
+    // const modifiedOptions: NextRequestInit = {
+    //   ...options,
+    //   signal: options.signal ?? undefined,
+    // };
+    super(url, options);
+    this.uploadedFiles = uploadedFiles;
   }
 }
