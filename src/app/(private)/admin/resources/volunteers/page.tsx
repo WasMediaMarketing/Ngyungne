@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { volunteerApi } from "@/utils/volunteerApi";
+import { volunteerApi, VolunteerUI } from "@/utils/volunteerApi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/data-table";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -27,36 +28,32 @@ import {
   MoreHorizontal,
   Eye,
   AlertCircle,
+  EyeOff,
+  EyeIcon,
 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
-
-interface Volunteer {
-  id: number | string;
-  fullname: string;
-  email: string;
-  phone: string;
-  reason: string;
-  image: string | null;
-  address?: string;
-  socialLinks?: Record<string, string>;
-}
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminVolunteerList() {
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const [volunteers, setVolunteers] = useState<VolunteerUI[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [viewVolunteer, setViewVolunteer] = useState<Volunteer | null>(null);
+  const [viewVolunteer, setViewVolunteer] = useState<VolunteerUI | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [volunteerToDelete, setVolunteerToDelete] = useState<string | null>(
     null
   );
+  const [isUpdatingVisibility, setIsUpdatingVisibility] = useState<
+    string | null
+  >(null);
 
   const fetchVolunteers = async () => {
     setLoading(true);
     try {
-      const data = await volunteerApi.getVolunteers();
+      // Use the admin-specific function to get all volunteers including hidden ones
+      const data = await volunteerApi.getAdminVolunteers();
       setVolunteers(data);
     } catch (error) {
       console.error("Error fetching volunteers:", error);
@@ -82,7 +79,7 @@ export default function AdminVolunteerList() {
     setSelectedIds(ids);
   };
 
-  const handleViewVolunteer = (volunteer: Volunteer) => {
+  const handleViewVolunteer = (volunteer: VolunteerUI) => {
     setViewVolunteer(volunteer);
   };
 
@@ -139,7 +136,33 @@ export default function AdminVolunteerList() {
     }
   };
 
-  const columns: ColumnDef<Volunteer>[] = [
+  const handleToggleVisibility = async (
+    id: string,
+    currentVisibility: boolean
+  ) => {
+    setIsUpdatingVisibility(id);
+    try {
+      const success = await volunteerApi.toggleVisibility(
+        id,
+        !currentVisibility
+      );
+      if (success) {
+        setVolunteers(
+          volunteers.map((volunteer) =>
+            volunteer.id.toString() === id
+              ? { ...volunteer, isVisible: !currentVisibility }
+              : volunteer
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error toggling volunteer visibility:", error);
+    } finally {
+      setIsUpdatingVisibility(null);
+    }
+  };
+
+  const columns: ColumnDef<VolunteerUI>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -197,6 +220,45 @@ export default function AdminVolunteerList() {
       ),
     },
     {
+      accessorKey: "isVisible",
+      header: "Visibility",
+      cell: ({ row }) => {
+        const volunteer = row.original;
+        const isUpdating = isUpdatingVisibility === volunteer.id.toString();
+
+        return (
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={volunteer.isVisible}
+              onCheckedChange={() =>
+                handleToggleVisibility(
+                  volunteer.id.toString(),
+                  volunteer.isVisible
+                )
+              }
+              disabled={isUpdating}
+              aria-label="Toggle visibility"
+            />
+            {isUpdating ? (
+              <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
+            ) : (
+              <Badge variant={volunteer.isVisible ? "outline" : "secondary"}>
+                {volunteer.isVisible ? (
+                  <>
+                    <EyeIcon className="h-3 w-3 mr-1" /> Visible
+                  </>
+                ) : (
+                  <>
+                    <EyeOff className="h-3 w-3 mr-1" /> Hidden
+                  </>
+                )}
+              </Badge>
+            )}
+          </div>
+        );
+      },
+    },
+    {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
@@ -216,6 +278,27 @@ export default function AdminVolunteerList() {
               <DropdownMenuItem onClick={() => handleViewVolunteer(volunteer)}>
                 <Eye className="mr-2 h-4 w-4" />
                 View
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  handleToggleVisibility(
+                    volunteer.id.toString(),
+                    volunteer.isVisible
+                  )
+                }
+                disabled={isUpdatingVisibility === volunteer.id.toString()}
+              >
+                {volunteer.isVisible ? (
+                  <>
+                    <EyeOff className="mr-2 h-4 w-4" />
+                    Hide from website
+                  </>
+                ) : (
+                  <>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Show on website
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => handleDeleteConfirm(volunteer.id.toString())}
@@ -261,7 +344,7 @@ export default function AdminVolunteerList() {
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <RefreshCw className="h-8 w-8 animate-spin text-saffron-500" />
+          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
         <DataTable
@@ -289,7 +372,7 @@ export default function AdminVolunteerList() {
             <div className="space-y-4 py-4">
               <div className="flex justify-center">
                 {viewVolunteer.image ? (
-                  <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-saffron-100">
+                  <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-primary/10">
                     <Image
                       src={viewVolunteer.image || "/placeholder.svg"}
                       alt={viewVolunteer.fullname}
@@ -306,27 +389,52 @@ export default function AdminVolunteerList() {
                 )}
               </div>
 
+              <div className="flex items-center justify-center">
+                <Badge
+                  variant={viewVolunteer.isVisible ? "outline" : "secondary"}
+                  className="text-xs"
+                >
+                  {viewVolunteer.isVisible ? (
+                    <>
+                      <EyeIcon className="h-3 w-3 mr-1" /> Visible on website
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="h-3 w-3 mr-1" /> Hidden from website
+                    </>
+                  )}
+                </Badge>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Name</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground">
+                    Name
+                  </h4>
                   <p className="text-base">{viewVolunteer.fullname}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Email</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground">
+                    Email
+                  </h4>
                   <p className="text-base">{viewVolunteer.email}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Phone</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground">
+                    Phone
+                  </h4>
                   <p className="text-base">{viewVolunteer.phone}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Address</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground">
+                    Address
+                  </h4>
                   <p className="text-base">{viewVolunteer.address || "N/A"}</p>
                 </div>
               </div>
 
               <div>
-                <h4 className="text-sm font-medium text-gray-500">
+                <h4 className="text-sm font-medium text-muted-foreground">
                   Reason for Volunteering
                 </h4>
                 <p className="text-base mt-1">{viewVolunteer.reason}</p>
@@ -335,7 +443,7 @@ export default function AdminVolunteerList() {
               {viewVolunteer.socialLinks &&
                 Object.keys(viewVolunteer.socialLinks).length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">
+                    <h4 className="text-sm font-medium text-muted-foreground">
                       Social Links
                     </h4>
                     <div className="mt-1 space-y-1">
@@ -358,8 +466,35 @@ export default function AdminVolunteerList() {
                   </div>
                 )}
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setViewVolunteer(null)}>
+            <DialogFooter className="flex gap-2 sm:gap-0">
+              <Button
+                variant={viewVolunteer.isVisible ? "outline" : "default"}
+                onClick={() => {
+                  handleToggleVisibility(
+                    viewVolunteer.id.toString(),
+                    viewVolunteer.isVisible
+                  );
+                  setViewVolunteer(null);
+                }}
+                className="flex-1 sm:flex-none"
+              >
+                {viewVolunteer.isVisible ? (
+                  <>
+                    <EyeOff className="h-4 w-4 mr-2" />
+                    Hide from website
+                  </>
+                ) : (
+                  <>
+                    <EyeIcon className="h-4 w-4 mr-2" />
+                    Show on website
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setViewVolunteer(null)}
+                className="flex-1 sm:flex-none"
+              >
                 Close
               </Button>
             </DialogFooter>
