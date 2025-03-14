@@ -3,12 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
-const scheduleItemSchema = z.object({
-  title: z.string().optional(),
-  description: z.string().optional(),
-}).refine(data => data.title || data.description, {
-  message: "At least one of 'title' or 'description' must be provided",
-});
+const scheduleItemSchema = z
+  .object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+  })
+  .refine((data) => data.title || data.description, {
+    message: "At least one of 'title' or 'description' must be provided",
+  });
 
 const teacherSchema = z.object({
   name: z.string().optional(),
@@ -25,8 +27,10 @@ const eventUpdateSchema = z
     description: z.string().min(1).optional(),
     type: z.string().optional(),
     date: z
-      .date()
-      .refine((val) => !isNaN(val.getTime()), { message: "Invalid date" })
+      .string()
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: "Invalid date format",
+      })
       .optional(),
     time: z.string().min(1).optional(),
     location: z.string().min(1).optional(),

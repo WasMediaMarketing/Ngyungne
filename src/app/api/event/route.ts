@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
   ];
   const jsonFields = ["tags", "teacher", "schedule"];
   const numericFields = ["attending", "capacity"];
-  const booleanFields = ["featured"];
+  const booleanFields = ["featured", "isVisible"];
   const processedRequest = await handleMultipartRequest(
     req,
     uploadFields,
@@ -202,9 +202,9 @@ export async function GET(req: NextRequest) {
   const authResult = await isAuthenticated(req);
   const eventController = createEventController();
   if (authResult) {
-    return eventController.getPublishedEvents(); 
+    return eventController.getPublishedEvents();
   }
- return eventController.getEvents(); 
+  return eventController.getEvents();
 }
 
 /**
@@ -272,4 +272,3 @@ export async function DELETE(req: NextRequest) {
   const eventController = createEventController();
   return eventController.deleteEvents(req);
 }
-
