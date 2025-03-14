@@ -10,6 +10,8 @@ import { validateBookEventInput } from "./validateBookEventInput";
 import { validateBookEventUpdate } from "./validateBookEventUpdate";
 import { validateCauseInput } from "./validateCauseInput";
 import { validateCauseUpdate } from "./validateCauseUpdate";
+import { validateRetreatInput } from "./validateRetreatInput";
+import { validateRetreatUpdate } from "./validateRetreatUpdate";
 
 export {
   isAuthenticated,
@@ -24,4 +26,6 @@ export {
   validateBookEventUpdate,
   validateCauseInput,
   validateCauseUpdate,
+  validateRetreatInput,
+  validateRetreatUpdate,
 };

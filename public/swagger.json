@@ -1151,6 +1151,450 @@
           }
         }
       }
+    },
+    "/api/cause": {
+      "post": {
+        "summary": "Create a new cause",
+        "description": "This endpoint creates a new cause with images, updates, goals, and other required information.",
+        "operationId": "createCause",
+        "tags": [
+          "Cause"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Main image for the cause"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the cause"
+                  },
+                  "subtitle": {
+                    "type": "string",
+                    "description": "Subtitle of the cause"
+                  },
+                  "goal": {
+                    "type": "integer",
+                    "description": "Goal amount for the cause"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Start date of the cause"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "End date of the cause"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Location of the cause"
+                  },
+                  "impact": {
+                    "type": "string",
+                    "description": "Expected impact of the cause"
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the cause is visible"
+                  },
+                  "gallery": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of image URLs for the cause gallery"
+                  },
+                  "updates": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Update date"
+                        },
+                        "title": {
+                          "type": "string",
+                          "description": "Title of the update"
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "Content of the update"
+                        },
+                        "image": {
+                          "type": "string",
+                          "format": "binary",
+                          "description": "Image for the update (optional)"
+                        }
+                      }
+                    }
+                  },
+                  "faq": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "question": {
+                          "type": "string",
+                          "description": "The question for FAQ"
+                        },
+                        "answer": {
+                          "type": "string",
+                          "description": "The answer for FAQ"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cause created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error"
+          },
+          "401": {
+            "description": "Unauthorized or invalid token"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve all causes or published causes",
+        "description": "Fetches all causes for authenticated users, or only published causes for unauthenticated users.",
+        "operationId": "getCauses",
+        "tags": [
+          "Cause"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of causes (all causes for authenticated users, only published causes for unauthenticated)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "goal": {
+                        "type": "integer"
+                      },
+                      "startDate": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "endDate": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple causes",
+        "description": "This endpoint deletes multiple causes by their IDs, which are passed in the query parameters.",
+        "operationId": "deleteCauses",
+        "tags": [
+          "Cause"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "causeIds",
+            "required": true,
+            "description": "Comma-separated list of cause IDs to be deleted.",
+            "schema": {
+              "type": "string",
+              "example": "1,2,3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Causes deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message indicating the deletion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing causeIds"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/retreat": {
+      "post": {
+        "summary": "Create a new retreat",
+        "description": "This endpoint allows the user to create a new retreat.",
+        "tags": [
+          "Retreat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The title of the retreat.",
+                    "example": "Mountain Wellness Retreat"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "A brief description of the retreat.",
+                    "example": "A weekend retreat focusing on wellness and mindfulness."
+                  },
+                  "date": {
+                    "type": "string",
+                    "description": "The date of the retreat.",
+                    "example": "2025-07-15"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "description": "The duration of the retreat.",
+                    "example": "3 days"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "The location where the retreat will take place.",
+                    "example": "Lake Tahoe, CA"
+                  },
+                  "participants": {
+                    "type": "string",
+                    "description": "The number of participants for the retreat.",
+                    "example": "20"
+                  },
+                  "price": {
+                    "type": "string",
+                    "description": "The price per participant for the retreat.",
+                    "example": "$500"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "The type/category of the retreat.",
+                    "example": "Wellness"
+                  },
+                  "schedule": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "time": {
+                          "type": "string",
+                          "description": "The time of a scheduled activity.",
+                          "example": "9:00 AM"
+                        },
+                        "activity": {
+                          "type": "string",
+                          "description": "The scheduled activity at the given time.",
+                          "example": "Morning Yoga"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retreat successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The ID of the newly created retreat.",
+                      "example": "60b8c6b0f1f1a51a6d5a7a6e"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request if the input is invalid"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all retreats",
+        "description": "This endpoint retrieves all retreats in the system, with an option to filter visible ones based on the user’s authentication.",
+        "tags": [
+          "Retreat"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": "conditional",
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to retrieve non-visible retreats. If the retreats are visible, no authorization token is required."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of retreats retrieved successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete retreats by their IDs",
+        "description": "Delete multiple retreats based on their retreat IDs.",
+        "tags": [
+          "Retreat"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "retreatIds",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1,2,3,4"
+            },
+            "description": "A comma-separated list of retreat IDs to delete."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retreats successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "No retreats found for the given IDs."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
     }
   },
   "components": {},
