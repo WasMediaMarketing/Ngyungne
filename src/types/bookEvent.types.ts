@@ -12,9 +12,8 @@ export interface IBookEventInput
   specialAccomodation?: string;
 }
 
-export interface IBookEventupdate{
+export interface IBookEventupdate {
   TicketNumber?: number;
-  eventId?: Types.ObjectId;
   dietaryRequirements?: string;
   specialAccomodation?: string;
 }

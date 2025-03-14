@@ -41,7 +41,8 @@ CauseSchema.virtual("id").get(function () {
   return this._id.toHexString();
 });
 
-const Cause: Model<ICause> =
-  mongoose.models.Cause || mongoose.model<ICause>("Cause", CauseSchema);
+const Cause =
+  (mongoose.models.Cause as Model<ICause>) ||
+  mongoose.model<ICause>("Cause", CauseSchema);
 
 export { Cause };

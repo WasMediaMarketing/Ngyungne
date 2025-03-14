@@ -14,7 +14,8 @@ import {
   IBookEventupdate,
 } from "./bookEvent.types";
 import { IBookEventService } from "./bookEventService.interface";
-import { ICause } from "./cause.types";
+import { ICause, ICauseInput, ICauseUpdate } from "./cause.types";
+import { ICauseService } from "./causeService.interface";
 
 export type {
   IUser,
@@ -40,4 +41,7 @@ export type {
   IBookEventupdate,
   IBookEventService,
   ICause,
+  ICauseInput,
+  ICauseUpdate,
+  ICauseService,
 };

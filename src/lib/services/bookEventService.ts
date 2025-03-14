@@ -100,10 +100,12 @@ export class BookEventService implements IBookEventService {
     await this.initializeDbConnection();
 
     if (eventId) {
-      return await BookEvent.find({ eventId }).populate("userId");
+      return await BookEvent.find({ eventId })
+        .populate("userId")
+        .populate("eventId");
     }
 
-    return await BookEvent.find().populate("userId");
+    return await BookEvent.find().populate("userId").populate("eventId");
   }
 
   async deleteBookEvent(bookEventId: string): Promise<boolean> {
