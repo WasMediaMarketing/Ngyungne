@@ -34,7 +34,7 @@ const eventUpdateSchema = z
       .optional(),
     time: z.string().min(1).optional(),
     location: z.string().min(1).optional(),
-    teacher: teacherSchema,
+    teacher: teacherSchema.optional(),
     image: z.string().optional(),
     tags: z.array(z.string()).min(1).optional(),
     featured: z.boolean().optional(),

@@ -326,9 +326,6 @@ import { handleMultipartRequest } from "@/lib/utils/multipartHandler";
  *         description: Internal server error.
  */
 export async function GET(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
-
   const eventController = createEventController();
   return eventController.getEventById(req);
 }
