@@ -36,19 +36,32 @@ export class VolunteerService implements IVolunteerService {
     return volunteer;
   }
 
-  async getVolunteers(isVisible?:boolean): Promise<IVolunteerData[]> {
+  async getVolunteers(isVisible?: boolean): Promise<IVolunteerData[]> {
     await this.initializeDbConnection();
-    if(isVisible){
-      return await Volunteer.find({isVisible: true}).populate("userId");
+    if (isVisible) {
+      return await Volunteer.find({ isVisible: true }).populate("userId");
     }
     return await Volunteer.find().populate("userId");
+  }
+
+  async updateVolunteersToDisplay(
+    volunteerId: string,
+    volunteerData: { isVisible: boolean }
+  ): Promise<boolean> {
+    const volunteer = await Volunteer.findById(volunteerId);
+    if (!volunteer) throw new Error("Volunteer not Found");
+
+    await Volunteer.findByIdAndUpdate(volunteerId, volunteerData, {
+      new: true,
+    });
+    return true;
   }
 
   async deleteVolunteer(volunteerId: string): Promise<boolean> {
     await this.initializeDbConnection();
 
     const volunteer = await Volunteer.findById(volunteerId);
-    if (!volunteer) return false;
+    if (!volunteer) throw new Error("Volunteer not Found");
 
     deleteFile(volunteer.image);
 

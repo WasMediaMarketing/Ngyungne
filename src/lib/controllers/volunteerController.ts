@@ -46,9 +46,29 @@ export class VolunteerController {
     }
   }
 
+  async updateVolunteersToDisplay(req: NextRequest): Promise<NextResponse> {
+    try {
+      const volunteerId = req.nextUrl.pathname.split("/").pop();
+      if (!volunteerId || !Types.ObjectId.isValid(volunteerId)) {
+        return handleError(
+          httpMessages.BAD_REQUEST("Event ID is either missing or invalid")
+        );
+      }
+      const updateData = await req.json();
+      const volunteers = await this.volunteerService.updateVolunteersToDisplay(
+        volunteerId,
+        updateData
+      );
+      return handleResponse(volunteers);
+    } catch (error) {
+      console.error("getVolunteersController error:", error);
+      return handleError();
+    }
+  }
+
   async deleteVolunteer(req: NextRequest): Promise<NextResponse> {
     try {
-      const volunteerId = req.nextUrl.pathname.split("/").pop(); 
+      const volunteerId = req.nextUrl.pathname.split("/").pop();
       if (!volunteerId || !Types.ObjectId.isValid(volunteerId)) {
         return handleError(
           httpMessages.BAD_REQUEST("Event ID is either missing or invalid")

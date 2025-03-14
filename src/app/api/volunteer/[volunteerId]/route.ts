@@ -45,3 +45,11 @@ export async function DELETE(req: NextRequest) {
   const volunteerController = createVolunteerController();
   return volunteerController.deleteVolunteer(req);
 }
+
+export async function PATCH(req: NextRequest) {
+  const authResult = await isAuthenticated(req);
+  if (authResult) return authResult;
+
+  const volunteerController = createVolunteerController();
+  return volunteerController.updateVolunteersToDisplay(req);
+}
