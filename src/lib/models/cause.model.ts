@@ -14,18 +14,13 @@ const CauseSchema: Schema<ICause> = new Schema(
     volunteers: { type: Number, default: 0 },
     location: { type: String, required: true },
     totalDonors: { type: Number, default: 0 },
-    longDescription: { type: String, required: false },
-    objectives: { type: [String], required: true },
+    about: {
+      longDescription: { type: String, required: false },
+      objectives: { type: [String], required: true },
+    },
     impact: { type: String, required: true },
     isVisible: { type: Boolean, default: true },
-    updates: [
-      {
-        date: { type: Date, required: true },
-        title: { type: String, required: true },
-        content: { type: String, required: true },
-        image: { type: String, required: false },
-      },
-    ],
+    updates: { type: String, required: true },
     faq: [
       {
         question: { type: String, required: true },

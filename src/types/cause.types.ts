@@ -12,16 +12,10 @@ export interface ICauseInput {
   volunteers?: number; // Default: 0
   location: string;
   totalDonors?: number; // Default: 0
-  longDescription?: string;
-  objectives: string[];
+  about?: { longDescription: string; objectives: string[] };
   impact: string;
   isVisible?: boolean; // Default: true
-  updates?: {
-    date: Date;
-    title: string;
-    content: string;
-    image?: string;
-  }[];
+  updates?: string;
   faq?: {
     question: string;
     answer: string;
@@ -38,16 +32,10 @@ export interface ICauseUpdate {
   startDate?: Date;
   endDate?: Date;
   location?: string;
-  longDescription?: string;
-  objectives?: string[];
+  about?: { longDescription: string; objectives: string[] };
   impact?: string;
   isVisible?: boolean;
-  updates?: {
-    date: Date;
-    title: string;
-    content: string;
-    image?: string;
-  }[];
+  updates?: string;
   faq?: {
     question: string;
     answer: string;
@@ -70,16 +58,10 @@ export interface ICause extends Document {
   volunteers: number;
   location: string;
   totalDonors: number;
-  longDescription: string;
-  objectives: string[];
+  about: { longDescription: string; objectives: string[] };
   impact: string;
   isVisible: boolean;
-  updates: {
-    date: Date;
-    title: string;
-    content: string;
-    image: string;
-  }[];
+  updates: string;
   faq: {
     question: string;
     answer: string;

@@ -21,10 +21,14 @@ import { ExtendedNextRequest } from "@/lib/utils/requestHelpers";
  */
 export async function handleMultipartRequest(
   req: NextRequest,
-  uploadFields: { fileField: string; bodyField: string }[],
+  uploadFields: {
+    fileField: string;
+    bodyField: string;
+    maxCount?: number;
+  }[],
   jsonFields: string[] = [], // Default to an empty array
   numericFields: string[] = [], // Default to an empty array
-   booleanFields: string[] = [] // Fields to be parsed as booleans
+  booleanFields: string[] = [] // Fields to be parsed as booleans
 ) {
   const reqClone = req.clone();
   const formData = await reqClone.formData();
@@ -32,7 +36,10 @@ export async function handleMultipartRequest(
   // Process file uploads
   const fileUrls = await processFormData(
     formData,
-    uploadFields.map(({ fileField }) => ({ name: fileField, maxCount: 1 }))
+    uploadFields.map(({ fileField, maxCount }) => ({
+      name: fileField,
+      maxCount: maxCount || 1,
+    }))
   );
 
   if (fileUrls instanceof NextResponse) return fileUrls; // If an error occurred in file processing, return the response
@@ -87,7 +94,6 @@ export async function handleMultipartRequest(
       }
     }
   }
-
 
   // Create a new ExtendedNextRequest with the updated body (now parsed and with file URLs)
   const updatedRequest = new ExtendedNextRequest(

@@ -3,15 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
-const updateSchema = z.object({
-  date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid date format",
-  }),
-  title: z.string().min(1, { message: "Update title is required" }),
-  content: z.string().min(1, { message: "Update content is required" }),
-  image: z.string().optional(),
-});
-
 // Define the schema for a FAQ item
 const faqSchema = z.object({
   question: z.string().min(1, { message: "FAQ question is required" }),
@@ -45,13 +36,15 @@ const causeInputSchema = z
       .number()
       .min(0, { message: "Total donors cannot be negative" })
       .optional(),
-    longDescription: z.string().optional(),
-    objectives: z
-      .array(z.string())
-      .min(1, { message: "At least one objective is required" }),
+    about: z
+      .object({
+        longDescription: z.string(),
+        objectives: z.array(z.string()).optional(),
+      })
+      .optional(),
     impact: z.string().min(1, { message: "Impact description is required" }),
     isVisible: z.boolean().optional(),
-    updates: z.array(updateSchema).optional(),
+    updates: z.string().optional(),
     faq: z.array(faqSchema).optional(),
     gallery: z.array(z.string()).optional(),
   })
