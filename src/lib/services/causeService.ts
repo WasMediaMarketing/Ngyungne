@@ -71,15 +71,6 @@ export class CauseService implements ICauseService {
       deleteFile(existingCause.image);
     }
 
-    if (
-      causeData.updates?.length &&
-      causeData.updates[0].image &&
-      causeData.updates[0].image !== existingCause.updates[0]?.image &&
-      existingCause.updates[0]?.image
-    ) {
-      deleteFile(existingCause.updates[0]?.image);
-    }
-
     if (causeData.gallery) {
       existingCause.gallery.forEach((image) => {
         if (!causeData.gallery!.includes(image)) {
@@ -110,13 +101,6 @@ export class CauseService implements ICauseService {
       deleteFile(cause.image);
     }
 
-    if (cause.updates?.length) {
-      cause.updates.forEach((update) => {
-        if (update.image) {
-          deleteFile(update.image);
-        }
-      });
-    }
     if (cause.gallery?.length) {
       cause.gallery.forEach((image) => {
         deleteFile(image);
@@ -143,13 +127,6 @@ export class CauseService implements ICauseService {
         deleteFile(cause.image);
       }
 
-      if (cause.updates?.length) {
-        cause.updates.forEach((update) => {
-          if (update.image) {
-            deleteFile(update.image);
-          }
-        });
-      }
       if (cause.gallery?.length) {
         cause.gallery.forEach((image) => {
           deleteFile(image);

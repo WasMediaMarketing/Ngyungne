@@ -13,48 +13,51 @@ import { NextResponse } from "next/server";
 export async function processFormData(
   formData: FormData,
   uploadFields: { name: string; maxCount: number }[] // maxCount now properly used
-): Promise<NextResponse | Record<string, string>> {
-  const fileUrls: Record<string, string> = {};
+): Promise<NextResponse | Record<string, string | string[]>> {
+  const fileUrls: Record<string, string | string[]> = {}; // Allow both string and string[] for file URLs
 
   try {
     for (const field of uploadFields) {
       const files = formData.getAll(field.name) as File[]; // Get all files for this field
 
-      if (files.length > 0) {
-        if (files.length > field.maxCount) {
-          return handleError(
-            httpMessages.BAD_REQUEST(
-              `Cannot upload more than ${field.maxCount} files for field "${field.name}"`
-            )
-          );
+      // If no files are uploaded, continue to the next field
+      if (files.length === 0) continue;
+
+      // Check for max file count
+      if (files.length > field.maxCount) {
+        return handleError(
+          httpMessages.BAD_REQUEST(
+            `Cannot upload more than ${field.maxCount} files for field "${field.name}"`
+          )
+        );
+      }
+
+      const uploadedFileUrls: string[] = [];
+
+      for (const file of files) {
+        // Validate file properties (name and type)
+        if (!file.name || !file.type) {
+          return handleError(httpMessages.BAD_REQUEST("Invalid file data"));
         }
 
-        const uploadedFileUrls: string[] = [];
-
-        for (const file of files) {
-          if (!file.name || !file.type) {
-            return handleError(httpMessages.BAD_REQUEST("Invalid file data"));
+        try {
+          // Call the file upload handler
+          const fileUrl = await handleFileUpload(file);
+          if (fileUrl instanceof NextResponse) {
+            return fileUrl; // Return response if file upload fails
           }
 
-          try {
-            const fileUrl = await handleFileUpload(file);
-            if (fileUrl instanceof NextResponse) {
-              return fileUrl;
-            }
-
-            uploadedFileUrls.push(fileUrl);
-          } catch (uploadError) {
-            console.error("File upload error:", uploadError);
-            return handleError(httpMessages.INTERNAL_SERVER_ERROR);
-          }
-        }
-
-        if (uploadedFileUrls.length === 1) {
-          fileUrls[field.name] = uploadedFileUrls[0];
-        } else {
-          fileUrls[field.name] = uploadedFileUrls.join(",");
+          // Push file URL to the array
+          uploadedFileUrls.push(fileUrl);
+        } catch (uploadError) {
+          console.error("File upload error:", uploadError);
+          return handleError(httpMessages.INTERNAL_SERVER_ERROR);
         }
       }
+
+      // If only one file, store as a single string; if multiple files, store as an array of strings
+      fileUrls[field.name] =
+        uploadedFileUrls.length === 1 ? uploadedFileUrls[0] : uploadedFileUrls;
     }
 
     return fileUrls;

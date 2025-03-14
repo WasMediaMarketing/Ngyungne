@@ -1,16 +1,3 @@
-/**
- * Function to parse specified fields of the request body that contain valid JSON strings,
- * numeric strings, or boolean strings. If a field contains a valid JSON string, it will be
- * parsed to an object or array. If a field contains a valid numeric string, it will be converted
- * to a number. If a field contains 'true' or 'false' (case-insensitive), it will be parsed as
- * a boolean value. If parsing fails, an error response is returned.
- *
- * @param body - The body of the request to parse
- * @param fields - Array of field names to parse as JSON
- * @param numericFields - Array of field names to parse as numbers
- * @param booleanFields - Array of field names to parse as booleans
- * @returns The updated body with parsed fields.
- */
 export function parseJsonAndNumbersFields(
   body: Record<string, unknown>,
   fields: string[] = [], // Fields to be parsed as JSON
@@ -21,8 +8,14 @@ export function parseJsonAndNumbersFields(
   fields.forEach((field) => {
     if (body[field] && typeof body[field] === "string") {
       try {
+        // Trying to parse the field as JSON
         body[field] = JSON.parse(body[field] as string);
-      } catch {
+      } catch (e) {
+        // If parsing fails, log the error
+        console.error(
+          `Error parsing JSON in field: ${field}, value:`,
+          body[field]
+        );
         throw new Error(`Invalid JSON format in field: ${field}`);
       }
     }
@@ -33,6 +26,10 @@ export function parseJsonAndNumbersFields(
     if (body[field] && typeof body[field] === "string") {
       const parsedNumber = Number(body[field]);
       if (isNaN(parsedNumber)) {
+        console.error(
+          `Invalid number format in field: ${field}, value:`,
+          body[field]
+        );
         throw new Error(`Invalid number format in field: ${field}`);
       }
       body[field] = parsedNumber;
@@ -48,6 +45,10 @@ export function parseJsonAndNumbersFields(
       } else if (value === "false") {
         body[field] = false;
       } else {
+        console.error(
+          `Invalid boolean format in field: ${field}, value:`,
+          body[field]
+        );
         throw new Error(`Invalid boolean format in field: ${field}`);
       }
     }
