@@ -13,20 +13,31 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarDays, Clock, MapPin, ArrowRight } from "lucide-react";
+import { CalendarDays, Clock, MapPin } from "lucide-react";
 import Link from "next/link";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Event } from "@/data/events";
+import type { IEvent } from "@/types/event.types";
 
 interface FeaturedEventsSliderProps {
-  events: Event[];
+  events: IEvent[];
 }
 
 export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
   const featuredRef = useRef(null);
   const isInView = useInView(featuredRef, { once: true });
+
+  if (!events || events.length === 0) {
+    return null;
+  }
+
+  // Filter out events without _id
+  const validEvents = events.filter((event) => event._id);
+
+  if (validEvents.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-12 bg-white">
@@ -35,9 +46,6 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
           <h2 className="text-3xl font-bold text-crimson-800">
             Featured Events
           </h2>
-          {/* <Button variant="link" className="text-crimson-600">
-            View All Featured <ArrowRight className="ml-2 h-4 w-4" />
-          </Button> */}
         </div>
 
         <motion.div
@@ -60,9 +68,9 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
             spaceBetween={30}
             className="pb-12"
           >
-            {events.map((event) => (
-              <SwiperSlide key={event.id}>
-                <Link href={`/programs/events/${event.id}`}>
+            {validEvents.map((event) => (
+              <SwiperSlide key={event._id.toString()}>
+                <Link href={`/programs/events/${event._id}`}>
                   <Card className="overflow-hidden h-full border-none shadow-md hover:shadow-xl transition-shadow duration-300">
                     <div className="aspect-video relative">
                       <img
@@ -78,7 +86,7 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
                         <div className="flex items-center gap-2 text-sm">
                           <CalendarDays className="h-4 w-4" />
                           <span>
-                            {event.date.toLocaleDateString("en-US", {
+                            {new Date(event.date).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
                             })}
@@ -92,16 +100,21 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
                       </CardTitle>
                       <div className="flex items-center mt-1">
                         <Avatar className="h-6 w-6 mr-2">
-                          <AvatarImage src="/avatar.png" />
+                          {event.teacher.image ? (
+                            <AvatarImage
+                              src={event.teacher.image}
+                              alt={event.teacher.name}
+                            />
+                          ) : null}
                           <AvatarFallback className="bg-crimson-100 text-crimson-700 text-xs">
-                            {event.teacher
+                            {event.teacher.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <span className="text-sm text-gray-600">
-                          {event.teacher}
+                          {event.teacher.name}
                         </span>
                       </div>
                     </CardHeader>
@@ -127,7 +140,7 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
                             </Avatar>
                           ))}
                         </div>
-                        <span>{event.attending} attending</span>
+                        <span>{event.attending || 0} attending</span>
                       </div>
                     </CardContent>
                     <CardFooter>

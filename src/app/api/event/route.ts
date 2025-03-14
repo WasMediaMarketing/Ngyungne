@@ -199,9 +199,6 @@ export async function POST(req: NextRequest) {
  *         description: Internal server error
  */
 export async function GET(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
-
   const eventController = createEventController();
 
   return eventController.getEvents();
@@ -271,4 +268,3 @@ export async function DELETE(req: NextRequest) {
   const eventController = createEventController();
   return eventController.deleteEvents(req);
 }
-

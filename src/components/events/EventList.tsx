@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -5,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { EventCard } from "@/components/events/EventsCard";
 import { EventListItem } from "@/components/events/EventListItem";
-import { Event } from "@/data/events";
+import type { IEvent } from "@/types/event.types";
 
 interface EventsListProps {
-  events: Event[];
-  favoriteEvents: number[];
-  toggleFavorite: (eventId: number) => void;
+  events: IEvent[];
+  favoriteEvents: string[];
+  toggleFavorite: (eventId: string) => void;
   selectedDate: Date | null;
 }
 
@@ -53,20 +55,27 @@ export function EventsList({
         <TabsContent value="grid">
           {events.length > 0 ? (
             <div className="grid md:grid-cols-2 gap-6">
-              {events.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <EventCard
-                    event={event}
-                    isFavorite={favoriteEvents.includes(event.id)}
-                    onToggleFavorite={() => toggleFavorite(event.id)}
-                  />
-                </motion.div>
-              ))}
+              {events.map(
+                (event, index) =>
+                  event._id && (
+                    <motion.div
+                      key={event._id.toString()}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                    >
+                      <EventCard
+                        event={event}
+                        isFavorite={favoriteEvents.includes(
+                          event._id.toString()
+                        )}
+                        onToggleFavorite={() =>
+                          toggleFavorite(event._id.toString())
+                        }
+                      />
+                    </motion.div>
+                  )
+              )}
             </div>
           ) : (
             <NoEventsFound />
@@ -76,20 +85,27 @@ export function EventsList({
         <TabsContent value="list">
           {events.length > 0 ? (
             <div className="space-y-4">
-              {events.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                >
-                  <EventListItem
-                    event={event}
-                    isFavorite={favoriteEvents.includes(event.id)}
-                    onToggleFavorite={() => toggleFavorite(event.id)}
-                  />
-                </motion.div>
-              ))}
+              {events.map(
+                (event, index) =>
+                  event._id && (
+                    <motion.div
+                      key={event._id.toString()}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                    >
+                      <EventListItem
+                        event={event}
+                        isFavorite={favoriteEvents.includes(
+                          event._id.toString()
+                        )}
+                        onToggleFavorite={() =>
+                          toggleFavorite(event._id.toString())
+                        }
+                      />
+                    </motion.div>
+                  )
+              )}
             </div>
           ) : (
             <NoEventsFound />
@@ -115,6 +131,7 @@ function NoEventsFound() {
         className="border-crimson-200 text-crimson-600"
         onClick={() => {
           // Reset filters logic here
+          window.location.reload();
         }}
       >
         Reset all filters

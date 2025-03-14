@@ -15,6 +15,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -52,6 +62,7 @@ export default function AdminEventsPage() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -95,7 +106,12 @@ export default function AdminEventsPage() {
     setDeleteConfirmOpen(true);
   };
 
-  const handleDelete = async () => {
+  const handleBulkDeleteClick = () => {
+    if (!selectedIds.length) return;
+    setBulkDeleteConfirmOpen(true);
+  };
+
+  const handleBulkDelete = async () => {
     if (!selectedIds.length) return;
 
     setIsDeleting(true);
@@ -107,7 +123,7 @@ export default function AdminEventsPage() {
         );
         setSelectedIds([]);
         toast.success("Success", {
-          description: "Events deleted successfully",
+          description: `${selectedIds.length} events deleted successfully`,
         });
       }
     } catch (error) {
@@ -117,6 +133,7 @@ export default function AdminEventsPage() {
       });
     } finally {
       setIsDeleting(false);
+      setBulkDeleteConfirmOpen(false);
     }
   };
 
@@ -343,7 +360,7 @@ export default function AdminEventsPage() {
           <Button
             variant="destructive"
             size="sm"
-            onClick={handleDelete}
+            onClick={handleBulkDeleteClick}
             disabled={!selectedIds.length || isDeleting}
           >
             <Trash2 className="h-4 w-4 mr-2" />
@@ -392,7 +409,7 @@ export default function AdminEventsPage() {
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
+      {/* Single Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -421,6 +438,48 @@ export default function AdminEventsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog
+        open={bulkDeleteConfirmOpen}
+        onOpenChange={setBulkDeleteConfirmOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              Delete Multiple Events
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedIds.length} selected
+              events? This action cannot be undone and will permanently remove
+              the selected events.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setBulkDeleteConfirmOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>Delete {selectedIds.length} Events</>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

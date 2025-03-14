@@ -123,6 +123,20 @@ export const siteConfig = {
         icon: "HelpCircle",
       },
     ] as NavSection[],
+    bookings: [
+      {
+        title: "Event Bookings",
+        href: "/bookings/events",
+        description: "View our calendar of upcoming teachings and ceremonies",
+        icon: "Calendar",
+      },
+      {
+        title: "Course Enrollments",
+        href: "/bookings/courses",
+        description: "View our calendar of upcoming teachings and ceremonies",
+        icon: "Calendar",
+      },
+    ],
   },
   links: {
     facebook: "https://facebook.com/ngyungnepractice",

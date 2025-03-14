@@ -23,7 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Dialog,
   DialogContent,
@@ -32,15 +31,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "@/components/ui/use-toast-hook";
-import {
-  AlertCircle,
-  ArrowRight,
-  CalendarDays,
-  MapPin,
-  User,
-} from "lucide-react";
-import { Event } from "@/data/events";
+import { toast } from "sonner";
+import { ArrowRight, CalendarDays, MapPin, User } from "lucide-react";
+import type { IEvent } from "@/types/event.types";
 
 // Form schema
 const registrationSchema = z.object({
@@ -66,7 +59,7 @@ const registrationSchema = z.object({
 });
 
 interface EventRegistrationFormProps {
-  event: Event;
+  event: IEvent;
   isOpen: boolean;
   onClose: () => void;
   onSuccessfulRegistration: () => void;
@@ -99,29 +92,37 @@ export function EventRegistrationForm({
   });
 
   // Calculate available spots
-  const spotsLeft = event.capacity - event.attending;
+  const spotsLeft = (event.capacity || 0) - (event.attending || 0);
   const ticketOptions = Array.from({ length: Math.min(spotsLeft, 5) }, (_, i) =>
     (i + 1).toString()
   );
 
   // Form submission handler
-  function onSubmit(values: z.infer<typeof registrationSchema>) {
+  async function onSubmit(values: z.infer<typeof registrationSchema>) {
     setIsSubmitting(true);
 
-    // Simulate API call with a timeout
-    setTimeout(() => {
+    try {
+      // Simulate API call with a timeout
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       console.log("Registration submitted:", values);
 
       // Show success toast
-      toast({
-        title: "Registration successful!",
+      toast.success("Registration successful!", {
         description: `You have registered for "${event.title}". A confirmation email has been sent to ${values.email}.`,
       });
 
-      setIsSubmitting(false);
       onSuccessfulRegistration();
       onClose();
-    }, 1500);
+    } catch (error) {
+      console.error("Error during registration:", error);
+      toast.error("Registration failed", {
+        description:
+          "There was an error processing your registration. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -141,7 +142,7 @@ export function EventRegistrationForm({
             <div className="flex items-center gap-2 text-gray-600">
               <CalendarDays className="h-4 w-4" />
               <span>
-                {event.date.toLocaleDateString("en-US", {
+                {new Date(event.date).toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
                   day: "numeric",
@@ -157,7 +158,7 @@ export function EventRegistrationForm({
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <User className="h-4 w-4" />
-              <span>{event.teacher}</span>
+              <span>{event.teacher.name}</span>
             </div>
           </div>
         </div>
@@ -246,7 +247,9 @@ export function EventRegistrationForm({
                         {ticketOptions.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}{" "}
-                            {parseInt(option) === 1 ? "ticket" : "tickets"}
+                            {Number.parseInt(option) === 1
+                              ? "ticket"
+                              : "tickets"}
                           </SelectItem>
                         ))}
                       </SelectContent>

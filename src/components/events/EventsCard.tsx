@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Clock, Heart, MapPin } from "lucide-react";
-import { Event } from "@/data/events";
+import type { IEvent } from "@/types/event.types";
 import { useRouter } from "next/navigation";
 
 interface EventCardProps {
-  event: Event;
+  event: IEvent;
   isFavorite: boolean;
   onToggleFavorite: () => void;
 }
@@ -25,7 +25,7 @@ export function EventCard({
   const router = useRouter();
 
   const navigateToEventDetail = () => {
-    router.push(`/programs/events/${event.id}`);
+    router.push(`/programs/events/${event._id}`);
   };
 
   return (
@@ -55,7 +55,7 @@ export function EventCard({
           <div className="flex items-center gap-2 text-sm">
             <CalendarDays className="h-4 w-4" />
             <span>
-              {event.date.toLocaleDateString("en-US", {
+              {new Date(event.date).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
               })}
@@ -69,15 +69,17 @@ export function EventCard({
         </h3>
         <div className="flex items-center mt-1">
           <Avatar className="h-6 w-6 mr-2">
-            <AvatarImage src="/avatar.png" />
+            {event.teacher.image ? (
+              <AvatarImage src={event.teacher.image} alt={event.teacher.name} />
+            ) : null}
             <AvatarFallback className="bg-crimson-100 text-crimson-700 text-xs">
-              {event.teacher
+              {event.teacher.name
                 .split(" ")
                 .map((n) => n[0])
                 .join("")}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm text-gray-600">{event.teacher}</span>
+          <span className="text-sm text-gray-600">{event.teacher.name}</span>
         </div>
       </CardHeader>
       <CardContent className="pb-2" onClick={navigateToEventDetail}>
@@ -100,7 +102,7 @@ export function EventCard({
             ))}
           </div>
           <span>
-            {event.attending} / {event.capacity} registered
+            {event.attending || 0} / {event.capacity || "∞"} registered
           </span>
         </div>
       </CardContent>

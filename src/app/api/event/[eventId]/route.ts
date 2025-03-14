@@ -219,9 +219,6 @@ import { handleMultipartRequest } from "@/lib/utils/multipartHandler";
  *         description: Internal server error.
  */
 export async function GET(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
-
   const eventController = createEventController();
   return eventController.getEventById(req);
 }
@@ -234,10 +231,14 @@ export async function PATCH(req: NextRequest) {
     { fileField: "teacherImage", bodyField: "teacher.image" },
   ];
   const jsonFields = ["tags", "teacher", "schedule"];
+  const numericFields = ["attending", "capacity"];
+  const booleanFields = ["featured"];
   const processedRequest = await handleMultipartRequest(
     req,
     uploadFields,
-    jsonFields
+    jsonFields,
+    numericFields,
+    booleanFields
   );
   if (processedRequest instanceof NextResponse) return processedRequest;
 

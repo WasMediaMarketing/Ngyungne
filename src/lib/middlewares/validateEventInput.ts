@@ -4,12 +4,14 @@ import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
 // Define the schema for a schedule item
-const scheduleItemSchema = z.object({
-  title: z.string().optional(),
-  description: z.string().optional(),
-}).refine(data => data.title || data.description, {
-  message: "At least one of 'title' or 'description' must be provided",
-});
+const scheduleItemSchema = z
+  .object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+  })
+  .refine((data) => data.title || data.description, {
+    message: "At least one of 'title' or 'description' must be provided",
+  });
 const teacherSchema = z.object({
   name: z.string().min(1, { message: "Teacher name is required" }),
   speciality: z.string().optional(),
@@ -20,31 +22,35 @@ const teacherSchema = z.object({
 });
 
 // Main event schema
-const eventSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-  description: z.string().min(1, { message: "Description is required" }),
-  type: z.string().min(1, { message: "Event Type is required" }),
-  date: z
-    .string()
-    .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date format" }),
-  time: z.string().min(1, { message: "Time is required" }),
-  location: z.string().min(1, { message: "Location is required" }),
-  teacher: teacherSchema,
-  image: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  featured: z.boolean().optional(),
-  attending: z
-    .number()
-    .min(0, { message: "Attending count cannot be negative" })
-    .optional(),
-  capacity: z
-    .number()
-    .min(1, { message: "Capacity must be at least 1" })
-    .optional(),
-  schedule: z
-    .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
-    .optional(),
-}).strict();
+const eventSchema = z
+  .object({
+    title: z.string().min(1, { message: "Title is required" }),
+    description: z.string().min(1, { message: "Description is required" }),
+    type: z.string().min(1, { message: "Event Type is required" }),
+    date: z
+      .string()
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: "Invalid date format",
+      }),
+    time: z.string().min(1, { message: "Time is required" }),
+    location: z.string().min(1, { message: "Location is required" }),
+    teacher: teacherSchema,
+    image: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    featured: z.boolean().optional(),
+    attending: z
+      .number()
+      .min(0, { message: "Attending count cannot be negative" })
+      .optional(),
+    capacity: z
+      .number()
+      .min(1, { message: "Capacity must be at least 1" })
+      .optional(),
+    schedule: z
+      .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys
+      .optional(),
+  })
+  .strict();
 
 export const validateEventInput = async (
   req: NextRequest
@@ -59,7 +65,7 @@ export const validateEventInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-        console.log("errorMessage", errorMessages);
+      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

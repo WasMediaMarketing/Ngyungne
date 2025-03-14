@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CalendarDays, Clock, Heart, MapPin, Users } from "lucide-react";
-import { Event } from "@/data/events";
+import type { IEvent } from "@/types/event.types";
 import { useRouter } from "next/navigation";
 
 interface EventListItemProps {
-  event: Event;
+  event: IEvent;
   isFavorite: boolean;
   onToggleFavorite: () => void;
 }
@@ -20,7 +20,7 @@ export function EventListItem({
   const router = useRouter();
 
   const navigateToEventDetail = () => {
-    router.push(`/programs/events/${event.id}`);
+    router.push(`/programs/events/${event._id}`);
   };
 
   return (
@@ -60,20 +60,26 @@ export function EventListItem({
               <div className="flex items-center text-sm text-gray-600">
                 <Avatar className="h-5 w-5 mr-1">
                   <AvatarFallback className="bg-crimson-100 text-crimson-700 text-xs">
-                    {event.teacher
+                    {event.teacher.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </AvatarFallback>
+                  {event.teacher.image && (
+                    <AvatarImage
+                      src={event.teacher.image}
+                      alt={event.teacher.name}
+                    />
+                  )}
                 </Avatar>
-                <span>{event.teacher}</span>
+                <span>{event.teacher.name}</span>
               </div>
             </div>
             <div className="text-right">
               <div className="flex items-center text-sm text-gray-600 mb-1">
                 <CalendarDays className="h-4 w-4 mr-1" />
                 <span>
-                  {event.date.toLocaleDateString("en-US", {
+                  {new Date(event.date).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
@@ -96,7 +102,7 @@ export function EventListItem({
             <div className="flex items-center text-sm text-gray-600">
               <Users className="h-4 w-4 mr-1" />
               <span>
-                {event.attending} / {event.capacity} registered
+                {event.attending || 0} / {event.capacity || "∞"} registered
               </span>
             </div>
           </div>

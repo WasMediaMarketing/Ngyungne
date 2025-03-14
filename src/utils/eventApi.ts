@@ -6,17 +6,13 @@ export const eventApi = {
   // Get all events
   getEvents: async (): Promise<IEvent[]> => {
     try {
-      const response = await fetch("/api/event", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
+      const response = await fetch("/api/event");
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const { data } = await response.json();
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -30,17 +26,13 @@ export const eventApi = {
   // Get event by ID
   getEventById: async (id: string): Promise<IEvent | null> => {
     try {
-      const response = await fetch(`/api/event/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
+      const response = await fetch(`/api/event/${id}`);
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
-      return await response.json();
+      const { data } = await response.json();
+      return data;
     } catch (error) {
       console.error(`Error fetching event ${id}:`, error);
       toast.error("Error", {
@@ -160,10 +152,6 @@ export const eventApi = {
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
-      toast.success("Success", {
-        description: "Events deleted successfully",
-      });
       return true;
     } catch (error) {
       console.error("Error deleting events:", error);

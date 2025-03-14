@@ -76,6 +76,15 @@ const data = {
         url: `/admin/${item.href}`,
       })),
     },
+    {
+      title: "Bookings",
+      url: "/admin/bookings",
+      icon: BookMarked,
+      items: siteConfig.mainNav.bookings.map((item) => ({
+        title: item.title,
+        url: `/admin/${item.href}`,
+      })),
+    },
   ],
 
   navSecondary: [
