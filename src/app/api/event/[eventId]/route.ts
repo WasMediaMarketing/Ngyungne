@@ -247,6 +247,16 @@ export async function PATCH(req: NextRequest) {
   const eventController = createEventController();
   return eventController.updateEvent(processedRequest);
 }
+export async function PUT(req: NextRequest) {
+  const authResult = await isAuthenticated(req);
+  if (authResult) return authResult;
+
+  const validationResponse = await validateEventUpdate(req);
+  if (validationResponse) return validationResponse;
+
+  const eventController = createEventController();
+  return eventController.updateEvent(req);
+}
 
 export async function DELETE(req: NextRequest) {
   const authResult = await isAuthenticated(req);

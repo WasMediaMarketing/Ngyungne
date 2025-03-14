@@ -4,11 +4,12 @@ export interface IUserInput {
   name: string;
   email: string;
   phoneNumber: string;
-  role?: "user" | "admin" | "donator" | "volunteer" |"event-participant";
+  role?: "user" | "admin" | "donator" | "volunteer" | "event-participant";
   password?: string;
   address?: string;
   page?: string;
   pageTitle?: string;
+  pageId: string;
 }
 
 export interface IUserUpdate {
@@ -21,6 +22,7 @@ export interface IUserUpdate {
   page?: string;
   pageTitle?: string;
   jobPostId?: Types.ObjectId;
+  pageId: string;
 }
 
 export interface IUser extends Document {
@@ -34,6 +36,7 @@ export interface IUser extends Document {
   address?: string;
   page: string;
   pageTitle: string;
+  pageId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
