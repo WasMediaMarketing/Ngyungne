@@ -26,7 +26,7 @@ const mapVolunteerToUI = (volunteer: any): VolunteerUI => {
     image: volunteer.image || null,
     reason: volunteer.reason || "",
     socialLinks: volunteer.socialLink || {},
-    isVisible: volunteer.isVisible !== undefined ? volunteer.isVisible : true,
+    isVisible: volunteer.isVisible !== undefined ? volunteer.isVisible : false,
   };
 };
 
