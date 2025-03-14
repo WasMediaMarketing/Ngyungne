@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { bookingApi } from "@/utils/eventBookingsApi";
@@ -43,11 +45,14 @@ import {
   Mail,
   Phone,
   Ticket,
+  Edit,
 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import type { IBookEventData, IEvent, IUser } from "@/types";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import type { IBookEventData, IBookEventupdate, IEvent, IUser } from "@/types";
 
 export default function AdminEventBookingsPage() {
   const [bookings, setBookings] = useState<IBookEventData[]>([]);
@@ -55,9 +60,18 @@ export default function AdminEventBookingsPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewBooking, setViewBooking] = useState<IBookEventData | null>(null);
+  const [editBooking, setEditBooking] = useState<IBookEventData | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [bookingToDelete, setBookingToDelete] = useState<string | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Form state for updating booking
+  const [updateForm, setUpdateForm] = useState<IBookEventupdate>({
+    TicketNumber: 0,
+    dietaryRequirements: "",
+    specialAccomodation: "",
+  });
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -90,6 +104,49 @@ export default function AdminEventBookingsPage() {
 
   const handleViewBooking = (booking: IBookEventData) => {
     setViewBooking(booking);
+  };
+
+  const handleEditBooking = (booking: IBookEventData) => {
+    setEditBooking(booking);
+    setUpdateForm({
+      TicketNumber: booking.TicketNumber,
+      dietaryRequirements: booking.dietaryRequirements || "",
+      specialAccomodation: booking.specialAccomodation || "",
+    });
+  };
+
+  const handleUpdateFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setUpdateForm((prev) => ({
+      ...prev,
+      [name]: name === "TicketNumber" ? Number.parseInt(value) || 0 : value,
+    }));
+  };
+
+  const handleUpdateBooking = async () => {
+    if (!editBooking) return;
+
+    setIsUpdating(true);
+    try {
+      const success = await bookingApi.updateBooking(
+        editBooking._id.toString(),
+        updateForm
+      );
+
+      if (success) {
+        // Fetch the updated booking data to ensure we have the complete object
+        const updatedBookings = await bookingApi.getBookings();
+        setBookings(updatedBookings);
+
+        setEditBooking(null);
+      }
+    } catch (error) {
+      console.error("Error updating booking:", error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleDeleteConfirm = (id: string) => {
@@ -151,6 +208,16 @@ export default function AdminEventBookingsPage() {
     }
   };
 
+  const formatDate = (date: Date | string | undefined) => {
+    if (!date) return "N/A";
+    try {
+      return format(new Date(date), "MMM d, yyyy");
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Invalid date";
+    }
+  };
+
   const columns: ColumnDef<IBookEventData>[] = [
     {
       id: "select",
@@ -175,13 +242,17 @@ export default function AdminEventBookingsPage() {
       enableHiding: false,
     },
     {
-      accessorKey: "eventId",
+      accessorKey: "eventName",
       header: "Event",
       cell: ({ row }) => {
         const event = row.original.eventId as unknown as IEvent;
         return (
           <div className="font-medium">{event?.title || "Unknown Event"}</div>
         );
+      },
+      accessorFn: (row) => {
+        const event = row.eventId as unknown as IEvent;
+        return event?.title || "Unknown Event";
       },
     },
     {
@@ -245,20 +316,19 @@ export default function AdminEventBookingsPage() {
       ),
     },
     {
-      accessorKey: "createdAt",
+      accessorKey: "bookingDate",
       header: "Booking Date",
       cell: ({ row }) => {
-        const user = row.original.userId as unknown as IUser;
+        const date = row.original.createdAt;
         return (
           <div className="flex items-center">
             <Calendar className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-            <span>
-              {user?.createdAt
-                ? format(new Date(user.createdAt), "MMM d, yyyy")
-                : "N/A"}
-            </span>
+            <span>{formatDate(date)}</span>
           </div>
         );
+      },
+      accessorFn: (row) => {
+        return row.createdAt ? new Date(row.createdAt).toISOString() : "";
       },
     },
     {
@@ -281,6 +351,10 @@ export default function AdminEventBookingsPage() {
               <DropdownMenuItem onClick={() => handleViewBooking(booking)}>
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEditBooking(booking)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Booking
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => handleDeleteConfirm(booking._id.toString())}
@@ -332,8 +406,8 @@ export default function AdminEventBookingsPage() {
         <DataTable
           columns={columns}
           data={bookings}
-          filterColumn="userId.name"
-          filterPlaceholder="Filter by name..."
+          filterColumn="eventName"
+          filterPlaceholder="Filter by event name..."
           onRowSelectionChange={handleRowSelectionChange}
         />
       )}
@@ -419,16 +493,7 @@ export default function AdminEventBookingsPage() {
                 <h4 className="text-sm font-medium text-muted-foreground">
                   Booking Date
                 </h4>
-                <p className="text-sm">
-                  {(viewBooking.userId as unknown as IUser)?.createdAt
-                    ? format(
-                        new Date(
-                          (viewBooking.userId as unknown as IUser).createdAt
-                        ),
-                        "MMMM d, yyyy"
-                      )
-                    : "N/A"}
-                </p>
+                <p className="text-sm">{formatDate(viewBooking.createdAt)}</p>
               </div>
             </div>
             <DialogFooter>
@@ -438,35 +503,111 @@ export default function AdminEventBookingsPage() {
         </Dialog>
       )}
 
+      {/* Edit Booking Dialog */}
+      {editBooking && (
+        <Dialog
+          open={!!editBooking}
+          onOpenChange={(open) => {
+            if (!open) setEditBooking(null);
+          }}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Booking</DialogTitle>
+              <DialogDescription>
+                Update the booking information for{" "}
+                {(editBooking.userId as unknown as IUser)?.name || "this user"}.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="TicketNumber">Number of Tickets</Label>
+                <Input
+                  id="TicketNumber"
+                  name="TicketNumber"
+                  type="number"
+                  min="1"
+                  value={updateForm.TicketNumber}
+                  onChange={handleUpdateFormChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dietaryRequirements">
+                  Dietary Requirements
+                </Label>
+                <Textarea
+                  id="dietaryRequirements"
+                  name="dietaryRequirements"
+                  placeholder="Any dietary requirements"
+                  value={updateForm.dietaryRequirements}
+                  onChange={handleUpdateFormChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="specialAccomodation">
+                  Special Accommodations
+                </Label>
+                <Textarea
+                  id="specialAccomodation"
+                  name="specialAccomodation"
+                  placeholder="Any special accommodations needed"
+                  value={updateForm.specialAccomodation}
+                  onChange={handleUpdateFormChange}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditBooking(null)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateBooking} disabled={isUpdating}>
+                {isUpdating ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
       {/* Single Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
               <AlertCircle className="h-5 w-5" />
               Confirm Deletion
-            </DialogTitle>
-            <DialogDescription>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to delete this booking? This action cannot
               be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:justify-end">
-            <Button
-              variant="outline"
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
               onClick={() => {
                 setDeleteConfirmOpen(false);
                 setBookingToDelete(null);
               }}
             >
               Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteSingle}>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteSingle}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Bulk Delete Confirmation Dialog */}
       <AlertDialog

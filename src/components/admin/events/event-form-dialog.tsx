@@ -498,6 +498,7 @@ export default function EventFormDialog({
                       value={attending}
                       onChange={(e) => setAttending(e.target.value)}
                       placeholder="Current number of attendees"
+                      readOnly
                     />
                   </div>
                 </div>
@@ -685,7 +686,7 @@ export default function EventFormDialog({
                           Click to upload or drag and drop
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          PNG, JPG, GIF up to 10MB
+                          PNG, JPG, JPEG up to 2MB
                         </p>
                       </div>
                     )}

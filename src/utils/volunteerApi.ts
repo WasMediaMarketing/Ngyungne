@@ -11,6 +11,7 @@ export interface VolunteerUI {
   image: string | null;
   reason: string;
   socialLinks?: Record<string, string>;
+  isVisible: boolean;
 }
 
 // Helper function to convert API data to UI format
@@ -25,18 +26,41 @@ const mapVolunteerToUI = (volunteer: any): VolunteerUI => {
     image: volunteer.image || null,
     reason: volunteer.reason || "",
     socialLinks: volunteer.socialLink || {},
+    isVisible: volunteer.isVisible !== undefined ? volunteer.isVisible : false,
   };
 };
 
 // Volunteer API functions
 export const volunteerApi = {
-  // Get all volunteers (requires authentication)
+  // Get all volunteers (public endpoint - only visible volunteers)
   getVolunteers: async (): Promise<VolunteerUI[]> => {
     try {
+      const response = await axios.get("/api/volunteer");
+
+      // Extract volunteers from response
+      const volunteers = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || response.data.volunteers || [];
+
+      return Array.isArray(volunteers) ? volunteers.map(mapVolunteerToUI) : [];
+    } catch (error) {
+      toast.error("Error", { description: "Failed to fetch volunteers" });
+      console.error("Error fetching volunteers:", error);
+      return [];
+    }
+  },
+
+  // Get all volunteers for admin (includes hidden volunteers)
+  getAdminVolunteers: async (): Promise<VolunteerUI[]> => {
+    try {
       const token = localStorage.getItem("adminToken");
+      if (!token) {
+        throw new Error("Admin token not found");
+      }
+
       const response = await axios.get("/api/volunteer", {
         headers: {
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -48,7 +72,7 @@ export const volunteerApi = {
       return Array.isArray(volunteers) ? volunteers.map(mapVolunteerToUI) : [];
     } catch (error) {
       toast.error("Error", { description: "Failed to fetch volunteers" });
-      console.error("Error fetching volunteers:", error);
+      console.error("Error fetching admin volunteers:", error);
       return [];
     }
   },
@@ -92,14 +116,10 @@ export const volunteerApi = {
       volunteerData.append("page", "volunteer");
       volunteerData.append("pageTitle", "Volunteer");
 
-      // Get token
-      const token = localStorage.getItem("adminToken");
-
       // Use axios for multipart/form-data
       const response = await axios.post("/api/volunteer", volunteerData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: token ? `Bearer ${token}` : "",
         },
       });
 
@@ -120,9 +140,13 @@ export const volunteerApi = {
   deleteVolunteer: async (id: string): Promise<boolean> => {
     try {
       const token = localStorage.getItem("adminToken");
+      if (!token) {
+        throw new Error("Admin token not found");
+      }
+
       await axios.delete(`/api/volunteer/${id}`, {
         headers: {
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -141,9 +165,13 @@ export const volunteerApi = {
   deleteVolunteers: async (ids: string[]): Promise<boolean> => {
     try {
       const token = localStorage.getItem("adminToken");
+      if (!token) {
+        throw new Error("Admin token not found");
+      }
+
       await axios.delete(`/api/volunteer?volunteerIds=${ids.join(",")}`, {
         headers: {
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -154,6 +182,43 @@ export const volunteerApi = {
     } catch (error) {
       toast.error("Error", { description: "Failed to delete volunteers" });
       console.error("Error deleting volunteers:", error);
+      return false;
+    }
+  },
+
+  // Toggle volunteer visibility (requires authentication)
+  toggleVisibility: async (
+    id: string,
+    isVisible: boolean
+  ): Promise<boolean> => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        throw new Error("Admin token not found");
+      }
+
+      await axios.patch(
+        `/api/volunteer/${id}`,
+        { isVisible },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      toast.success("Success", {
+        description: `Volunteer is now ${
+          isVisible ? "visible" : "hidden"
+        } on the website`,
+      });
+      return true;
+    } catch (error) {
+      toast.error("Error", {
+        description: "Failed to update volunteer visibility",
+      });
+      console.error("Error updating volunteer visibility:", error);
       return false;
     }
   },

@@ -125,6 +125,7 @@ export class BookEventService implements IBookEventService {
 
   async deleteBookEvents(bookEventIds: string[]): Promise<boolean> {
     await this.initializeDbConnection();
+    console.log("book event ids", bookEventIds);
     const bookEvents = await BookEvent.find({ _id: { $in: bookEventIds } });
     for (const bookEvent of bookEvents) {
       const event = await Event.findById(bookEvent.eventId);

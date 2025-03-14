@@ -9,12 +9,12 @@ import { RequestInit as NextRequestInit } from "next/dist/server/web/spec-extens
  * @returns The extended request object
  */
 export class ExtendedNextRequest extends NextRequest {
-  uploadedFiles: Record<string, string>;
+  uploadedFiles: Record<string, string | string[]>;
 
   constructor(
     url: string,
     options: NextRequestInit,
-    uploadedFiles: Record<string, string>
+    uploadedFiles: Record<string, string | string[]>
   ) {
     // const modifiedOptions: NextRequestInit = {
     //   ...options,

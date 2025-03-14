@@ -20,6 +20,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import Spinner from "./spinner";
 
 export function NavUser({
   user,
@@ -63,7 +64,7 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-12 w-12 rounded-full">
+              <Avatar className="h-12 w-auto">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-full">
                   {user.name.charAt(0)}
@@ -84,11 +85,9 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className="h-8 w-auto">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {user.name.charAt(0)}
-                  </AvatarFallback>
+                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
@@ -100,7 +99,7 @@ export function NavUser({
 
             <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>
               <LogOut className="mr-2 h-4 w-4" />
-              {isLoggingOut ? "Logging out..." : "Log out"}
+              {isLoggingOut ? <Spinner text="Logging out..." /> : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

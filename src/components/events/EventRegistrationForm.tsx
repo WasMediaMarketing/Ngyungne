@@ -122,10 +122,6 @@ export function EventRegistrationForm({
       }
     } catch (error) {
       console.error("Error during registration:", error);
-      toast.error("Registration failed", {
-        description:
-          "There was an error processing your registration. Please try again.",
-      });
     } finally {
       setIsSubmitting(false);
     }

@@ -26,4 +26,6 @@ export interface IBookEventData extends Document {
   TicketNumber: number;
   dietaryRequirements?: string;
   specialAccomodation?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

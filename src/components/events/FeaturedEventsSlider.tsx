@@ -128,19 +128,10 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
                         <span>{event.location}</span>
                       </div>
                       <div className="mt-3 flex items-center text-sm text-gray-600">
-                        <div className="flex -space-x-2 mr-2">
-                          {[...Array(3)].map((_, i) => (
-                            <Avatar
-                              key={i}
-                              className="h-6 w-6 border-2 border-white"
-                            >
-                              <AvatarFallback className="bg-gray-200 text-gray-600 text-xs">
-                                {String.fromCharCode(65 + i)}
-                              </AvatarFallback>
-                            </Avatar>
-                          ))}
-                        </div>
-                        <span>{event.attending || 0} attending</span>
+                        <span>
+                          {event.attending || 0} / {event.capacity || "∞"}{" "}
+                          registered
+                        </span>
                       </div>
                     </CardContent>
                     <CardFooter>

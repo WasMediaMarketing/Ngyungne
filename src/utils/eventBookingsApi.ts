@@ -10,7 +10,11 @@ export const bookingApi = {
   // Get all bookings
   getBookings: async (): Promise<IBookEventData[]> => {
     try {
-      const response = await fetch("/api/book-event");
+      const response = await fetch("/api/book-event", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
@@ -30,7 +34,11 @@ export const bookingApi = {
   // Get booking by ID
   getBookingById: async (id: string): Promise<IBookEventData | null> => {
     try {
-      const response = await fetch(`/api/book-event/${id}`);
+      const response = await fetch(`/api/book-event/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
@@ -62,9 +70,6 @@ export const bookingApi = {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Booking created successfully",
-      });
       return true;
     } catch (error: any) {
       console.error("Error creating booking:", error);
@@ -111,7 +116,7 @@ export const bookingApi = {
   // Delete a booking
   deleteBooking: async (id: string): Promise<boolean> => {
     try {
-      const response = await fetch(`/api/bookEvent/${id}`, {
+      const response = await fetch(`/api/book-event/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
@@ -138,12 +143,15 @@ export const bookingApi = {
   // Delete multiple bookings
   deleteBookings: async (ids: string[]): Promise<boolean> => {
     try {
-      const response = await fetch(`/api/booking?bookingIds=${ids.join(",")}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
+      const response = await fetch(
+        `/api/book-event?bookEventIds=${ids.join(",")}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
