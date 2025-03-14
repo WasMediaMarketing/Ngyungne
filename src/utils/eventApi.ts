@@ -112,6 +112,42 @@ export const eventApi = {
     }
   },
 
+  // Toggle event visibility
+  toggleEventVisibility: async (
+    id: string,
+    isVisible: boolean
+  ): Promise<boolean> => {
+    try {
+      const formData = new FormData();
+      formData.append("isVisible", isVisible.toString());
+
+      const response = await fetch(`/api/event/${id}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      toast.success("Success", {
+        description: `Event ${
+          isVisible ? "published" : "unpublished"
+        } successfully`,
+      });
+      return true;
+    } catch (error) {
+      console.error(`Error toggling event visibility ${id}:`, error);
+      toast.error("Error", {
+        description: `Failed to ${isVisible ? "publish" : "unpublish"} event`,
+      });
+      return false;
+    }
+  },
+
   // Delete an event
   deleteEvent: async (id: string): Promise<boolean> => {
     try {

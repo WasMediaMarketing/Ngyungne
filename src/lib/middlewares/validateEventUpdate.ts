@@ -27,8 +27,10 @@ const eventUpdateSchema = z
     description: z.string().min(1).optional(),
     type: z.string().optional(),
     date: z
-      .date()
-      .refine((val) => !isNaN(val.getTime()), { message: "Invalid date" })
+      .string()
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: "Invalid date format",
+      })
       .optional(),
     time: z.string().min(1).optional(),
     location: z.string().min(1).optional(),

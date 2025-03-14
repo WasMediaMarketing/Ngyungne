@@ -53,10 +53,27 @@ export function EventDetail({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Calculate if event is sold out or has limited spots
-  const spotsLeft = (event.capacity || 0) - (event.attending || 0);
-  const isSoldOut = spotsLeft <= 0;
-  const isAlmostSoldOut = spotsLeft <= 5;
+  // Check if event is sold out or has limited spots
+  const isSoldOut = event.availableTickets <= 0;
+  const isAlmostSoldOut = event.availableTickets <= 5;
+
+  // Check if event date has passed
+  const eventDate = new Date(event.date);
+  const currentDate = new Date();
+
+  // Set both dates to midnight for accurate date comparison
+  const eventDateOnly = new Date(
+    eventDate.getFullYear(),
+    eventDate.getMonth(),
+    eventDate.getDate()
+  );
+  const currentDateOnly = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    currentDate.getDate()
+  );
+
+  const isEventPassed = eventDateOnly < currentDateOnly;
 
   const handleSuccessfulRegistration = () => {
     setIsRegistered(true);
@@ -100,7 +117,7 @@ export function EventDetail({
               />
               {isFavorite ? "Saved" : "Save"}
             </Button>
-            {!isSoldOut && (
+            {!isSoldOut && !isEventPassed && (
               <Button
                 size="sm"
                 className="bg-crimson-600 hover:bg-crimson-700"
@@ -362,14 +379,6 @@ export function EventDetail({
                     <div>
                       <div className="font-medium">Location</div>
                       <div className="text-gray-600">{event.location}</div>
-                      {event.location !== "Online" && (
-                        <Button
-                          variant="link"
-                          className="h-auto p-0 text-crimson-600"
-                        >
-                          View on map
-                        </Button>
-                      )}
                     </div>
                   </div>
 
@@ -383,26 +392,27 @@ export function EventDetail({
 
                   <div className="flex items-start gap-3">
                     <Users className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
+                    <div className="w-full">
                       <div className="font-medium">Attendance</div>
                       <div className="text-gray-600">
                         {event.attending || 0} / {event.capacity || "∞"}{" "}
                         registered
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-1 overflow-hidden">
                         <div
                           className="bg-crimson-600 h-2 rounded-full"
                           style={{
-                            width: `${
+                            width: `${Math.min(
                               ((event.attending || 0) / (event.capacity || 1)) *
+                                100,
                               100
-                            }%`,
+                            )}%`,
                           }}
                         ></div>
                       </div>
                       {isAlmostSoldOut && !isSoldOut && (
                         <div className="text-sm text-amber-600 mt-1">
-                          Only {spotsLeft} spots left!
+                          Only {event.availableTickets} tickets left!
                         </div>
                       )}
                     </div>
@@ -415,7 +425,14 @@ export function EventDetail({
                       className="w-full bg-gray-600 hover:bg-gray-700"
                       disabled
                     >
-                      Registration Closed
+                      Sold Out
+                    </Button>
+                  ) : isEventPassed ? (
+                    <Button
+                      className="w-full bg-gray-600 hover:bg-gray-700"
+                      disabled
+                    >
+                      Event Has Passed
                     </Button>
                   ) : isRegistered ? (
                     <Button
