@@ -39,7 +39,6 @@ const eventUpdateSchema = z
     tags: z.array(z.string()).min(1).optional(),
     featured: z.boolean().optional(),
     isVisible: z.boolean().optional(),
-    attending: z.number().min(0).optional(),
     capacity: z.number().min(1).optional(),
     schedule: z
       .record(z.string(), scheduleItemSchema) // Allows an object with dynamic keys

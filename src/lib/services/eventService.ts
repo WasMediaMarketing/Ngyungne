@@ -16,7 +16,10 @@ export class EventService implements IEventService {
    */
   async createEvent(eventData: IEventInput): Promise<IEvent> {
     await this.initializeDbConnection();
-    const event = new Event({...eventData, availableTickets: eventData.capacity});
+    const event = new Event({
+      ...eventData,
+      availableTickets: eventData.capacity - (eventData.attending || 0),
+    });
     await event.save();
     return event;
   }
@@ -27,8 +30,8 @@ export class EventService implements IEventService {
    */
   async getEvents(isVisible?: boolean): Promise<IEvent[]> {
     await this.initializeDbConnection();
-    if(isVisible){
-      return await Event.find({isVisible: true});
+    if (isVisible) {
+      return await Event.find({ isVisible: true });
     }
     return await Event.find();
   }
@@ -57,7 +60,7 @@ export class EventService implements IEventService {
   ): Promise<IEvent | null> {
     await this.initializeDbConnection();
     const existingEvent = await Event.findById(eventId);
-    if(!existingEvent){
+    if (!existingEvent) {
       throw new Error("Event Not Found");
     }
     if (
@@ -74,6 +77,11 @@ export class EventService implements IEventService {
     ) {
       deleteFile(existingEvent.teacher.image);
     }
+    if (eventData.capacity) {
+      eventData.availableTickets =
+        existingEvent.availableTickets +
+        (eventData.capacity - existingEvent.capacity);
+    }
     const event = await Event.findByIdAndUpdate(eventId, eventData, {
       new: true,
     });
@@ -88,7 +96,7 @@ export class EventService implements IEventService {
    */
   async deleteEvent(eventId: Types.ObjectId): Promise<IEvent | null> {
     await this.initializeDbConnection();
-    
+
     // Find the event to get its image path (if exists)
     const event = await Event.findById(eventId);
     if (!event) throw new Error("Event not found");

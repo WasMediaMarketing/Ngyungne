@@ -34,13 +34,10 @@ export interface ICauseUpdate {
   subtitle?: string;
   image?: string;
   tags?: string[];
-  raised?: number;
   goal?: number;
   startDate?: Date;
   endDate?: Date;
-  volunteers?: number;
   location?: string;
-  totalDonors?: number;
   longDescription?: string;
   objectives?: string[];
   impact?: string;

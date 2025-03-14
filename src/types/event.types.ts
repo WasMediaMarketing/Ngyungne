@@ -56,6 +56,7 @@ export interface IEventUpdate {
   isVisible?: boolean;
   attending?: number;
   capacity?: number;
+  availableTickets: number;
   schedule?: { [key: string]: ScheduleItem }; // schedule added here
 }
 
