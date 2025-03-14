@@ -34,7 +34,7 @@ const eventUpdateSchema = z
       .optional(),
     time: z.string().min(1).optional(),
     location: z.string().min(1).optional(),
-    teacher: teacherSchema,
+    teacher: teacherSchema.optional(),
     image: z.string().optional(),
     tags: z.array(z.string()).min(1).optional(),
     featured: z.boolean().optional(),
@@ -60,7 +60,7 @@ export const validateEventUpdate = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-
+      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

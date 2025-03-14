@@ -270,19 +270,6 @@ export function EventDetail({
                           </ul>
                         </div>
                       )}
-
-                    {event.teacher.link && (
-                      <div className="mt-4">
-                        <a
-                          href={event.teacher.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-crimson-600 hover:underline"
-                        >
-                          Visit teacher's profile
-                        </a>
-                      </div>
-                    )}
                   </div>
                 </TabsContent>
 

@@ -1,9 +1,9 @@
 import { toast } from "sonner";
-import type { IEvent, IEventInput, IEventUpdate } from "@/types";
+import type { IEvent } from "@/types";
 
 // Event API functions
 export const eventApi = {
-  // Get all events
+  // Get all events (public - only visible events)
   getEvents: async (): Promise<IEvent[]> => {
     try {
       const response = await fetch("/api/event");
@@ -16,6 +16,30 @@ export const eventApi = {
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error fetching events:", error);
+      toast.error("Error", {
+        description: "Failed to fetch events",
+      });
+      return [];
+    }
+  },
+
+  // Get all events (admin - includes visible and hidden events)
+  getAdminEvents: async (): Promise<IEvent[]> => {
+    try {
+      const response = await fetch("/api/event", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const { data } = await response.json();
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error("Error fetching admin events:", error);
       toast.error("Error", {
         description: "Failed to fetch events",
       });
@@ -112,21 +136,53 @@ export const eventApi = {
     }
   },
 
+  // Update event with JSON data (for simple updates like visibility)
+  updateEventJson: async (
+    id: string,
+    eventData: { isVisible?: boolean }
+  ): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/event/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+        body: JSON.stringify(eventData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error: ${response.status}`);
+      }
+
+      toast.success("Success", {
+        description: "Event updated successfully",
+      });
+      return true;
+    } catch (error: any) {
+      console.error(`Error updating event ${id}:`, error);
+      toast.error("Error", {
+        description: error.message || "Failed to update event",
+      });
+      return false;
+    }
+  },
+
   // Toggle event visibility
   toggleEventVisibility: async (
     id: string,
     isVisible: boolean
   ): Promise<boolean> => {
     try {
-      const formData = new FormData();
-      formData.append("isVisible", isVisible.toString());
-
+      // Using the PUT endpoint for JSON data
       const response = await fetch(`/api/event/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
-        body: formData,
+        body: JSON.stringify({ isVisible }),
       });
 
       if (!response.ok) {

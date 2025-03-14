@@ -6,6 +6,7 @@ import { eventApi } from "@/utils/eventApi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/data-table";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -43,6 +44,8 @@ import {
   Calendar,
   MapPin,
   Users,
+  Globe,
+  EyeOff,
 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
@@ -63,11 +66,15 @@ export default function AdminEventsPage() {
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [isTogglingVisibility, setIsTogglingVisibility] = useState<
+    string | null
+  >(null);
 
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const data = await eventApi.getEvents();
+      // Use the admin endpoint to get all events (visible and hidden)
+      const data = await eventApi.getAdminEvents();
       setEvents(data);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -155,6 +162,32 @@ export default function AdminEventsPage() {
       toast.error("Error", {
         description: "Failed to delete event",
       });
+    }
+  };
+
+  const handleToggleVisibility = async (id: string, isVisible: boolean) => {
+    setIsTogglingVisibility(id);
+    try {
+      const success = await eventApi.toggleEventVisibility(id, isVisible);
+      if (success) {
+        // Update the events array while preserving the IEvent type
+        const updatedEvents = events.map((event) => {
+          if (event._id.toString() === id) {
+            // Create a copy of the event with the updated isVisible property
+            const updatedEvent = event;
+            updatedEvent.isVisible = isVisible;
+            return updatedEvent;
+          }
+          return event;
+        });
+
+        // Set the updated events array
+        setEvents(updatedEvents);
+      }
+    } catch (error) {
+      console.error("Error toggling event visibility:", error);
+    } finally {
+      setIsTogglingVisibility(null);
     }
   };
 
@@ -277,22 +310,37 @@ export default function AdminEventsPage() {
       ),
     },
     {
-      accessorKey: "tags",
-      header: "Tags",
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1">
-          {row.original.tags?.slice(0, 2).map((tag, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
-          {(row.original.tags?.length || 0) > 2 && (
-            <Badge variant="secondary" className="text-xs">
-              +{(row.original.tags?.length || 0) - 2}
-            </Badge>
-          )}
-        </div>
-      ),
+      accessorKey: "isVisible",
+      header: "Published",
+      cell: ({ row }) => {
+        const id = row.original._id.toString();
+        const isVisible = row.original.isVisible;
+        const isLoading = isTogglingVisibility === id;
+
+        return (
+          <div className="flex items-center">
+            <Switch
+              checked={isVisible}
+              onCheckedChange={(checked) => handleToggleVisibility(id, checked)}
+              disabled={isLoading}
+              aria-label={isVisible ? "Published" : "Unpublished"}
+            />
+            <span className="ml-2 text-xs text-muted-foreground">
+              {isVisible ? (
+                <span className="flex items-center text-green-600">
+                  <Globe className="h-3 w-3 mr-1" />
+                  Published
+                </span>
+              ) : (
+                <span className="flex items-center text-amber-600">
+                  <EyeOff className="h-3 w-3 mr-1" />
+                  Draft
+                </span>
+              )}
+            </span>
+          </div>
+        );
+      },
     },
     {
       id: "actions",
@@ -318,6 +366,23 @@ export default function AdminEventsPage() {
               <DropdownMenuItem onClick={() => handleEditEvent(event)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  handleToggleVisibility(event._id.toString(), !event.isVisible)
+                }
+              >
+                {event.isVisible ? (
+                  <>
+                    <EyeOff className="mr-2 h-4 w-4" />
+                    Unpublish
+                  </>
+                ) : (
+                  <>
+                    <Globe className="mr-2 h-4 w-4" />
+                    Publish
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => handleDeleteConfirm(event._id.toString())}
