@@ -15,6 +15,7 @@ export class BookEventController {
   async createBookEvent(req: NextRequest): Promise<NextResponse> {
     try {
       const bookEventData = await req.json();
+      console.log("body in controller", bookEventData);
       const bookEvent = await this.bookEventService.createBookEvent(
         bookEventData
       );
@@ -58,11 +59,16 @@ export class BookEventController {
       const bookEventId = req.nextUrl.pathname.split("/").pop();
 
       if (!bookEventId) {
-        return handleError(httpMessages.BAD_REQUEST("BookEvent ID is required"));
+        return handleError(
+          httpMessages.BAD_REQUEST("BookEvent ID is required")
+        );
       }
 
       const bookEventData = await req.json();
-      const updatedBookEvent = await this.bookEventService.updateBookEvent(bookEventId, bookEventData);
+      const updatedBookEvent = await this.bookEventService.updateBookEvent(
+        bookEventId,
+        bookEventData
+      );
       return handleResponse(updatedBookEvent);
     } catch (error) {
       console.error("updateBookEventController error:", error);

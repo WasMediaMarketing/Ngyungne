@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
   if (valdiatebookEventBody) return valdiatebookEventBody;
 
   const bookEventController = createBookEventController();
-  return bookEventController.createBookEvent;
+  return bookEventController.createBookEvent(req);
 }
 
 export async function GET(req: NextRequest) {

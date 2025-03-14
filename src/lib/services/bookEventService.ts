@@ -16,33 +16,52 @@ export class BookEventService implements IBookEventService {
   async createBookEvent(
     bookEventData: IBookEventInput
   ): Promise<IBookEventData> {
+    console.log("Initializing database connection...");
     await this.initializeDbConnection();
 
+    console.log("Fetching event with ID:", bookEventData.eventId);
     const event = await Event.findById(bookEventData.eventId);
 
     if (!event) {
+      console.error("Event not found!");
       throw new Error("Event not found");
     }
+
+    console.log("Event found:", event);
+    console.log(
+      `Available Tickets: ${event.availableTickets}, Requested Tickets: ${bookEventData.TicketNumber}`
+    );
 
     if (
       event.availableTickets &&
       bookEventData.TicketNumber > event.availableTickets
     ) {
+      console.error(
+        `Booking exceeds event capacity! Capacity: ${event.capacity}, Available: ${event.availableTickets}`
+      );
       throw new Error(
         `Booking exceeds the event's capacity of ${event.capacity}. Only ${event.availableTickets} tickets are available.`
       );
     }
+
+    console.log("Creating user with details:", {
+      name: bookEventData.name,
+      email: bookEventData.email,
+      phoneNumber: bookEventData.phoneNumber,
+    });
 
     const userService = new UserService();
     const user = await userService.createUser({
       name: bookEventData.name,
       email: bookEventData.email,
       phoneNumber: bookEventData.phoneNumber,
-      role: "event-participant",
       page: bookEventData.page,
       pageTitle: bookEventData.pageTitle,
     });
 
+    console.log("User created successfully:", user);
+
+    console.log("Creating booking event...");
     const bookEvent = new BookEvent({
       userId: user.id,
       eventId: bookEventData.eventId,
@@ -51,13 +70,28 @@ export class BookEventService implements IBookEventService {
       specialAccomodation: bookEventData.specialAccomodation,
     });
 
+    console.log("Saving booking event...");
     await bookEvent.save();
+    console.log("Booking event saved successfully:", bookEvent);
+
+    console.log(
+      `Updating event attendance: Previous Attending: ${
+        event.attending
+      }, New Attending: ${
+        (event.attending ? event.attending : 0) + bookEventData.TicketNumber
+      }`
+    );
 
     event.attending =
       (event.attending ? event.attending : 0) + bookEventData.TicketNumber;
-    event.availableTickets =
-      event.availableTickets - bookEventData.TicketNumber;
+    event.availableTickets -= bookEventData.TicketNumber;
+
+    console.log(
+      `Updated Available Tickets: ${event.availableTickets}, Attending: ${event.attending}`
+    );
+
     await event.save();
+    console.log("Event updated successfully:", event);
 
     return bookEvent;
   }
