@@ -43,12 +43,13 @@ export class VolunteerService implements IVolunteerService {
     }
     return await Volunteer.find().populate("userId");
   }
+
   async updateVolunteersToDisplay(
     volunteerId: string,
     volunteerData: { isVisible: boolean }
   ): Promise<boolean> {
     const volunteer = await Volunteer.findById(volunteerId);
-    if (!volunteer) return false;
+    if (!volunteer) throw new Error("Volunteer not Found");
 
     await Volunteer.findByIdAndUpdate(volunteerId, volunteerData, {
       new: true,
