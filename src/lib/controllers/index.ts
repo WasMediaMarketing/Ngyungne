@@ -1,9 +1,10 @@
 import { UserController } from "./userController";
 import { DonationController } from "./donationController";
 import { ContactController } from "./contactController";
-import {EventController} from "./eventController";
-import {VolunteerController} from "./volunteerController";
-import {BookEventController} from "./bookEventController"
+import { EventController } from "./eventController";
+import { VolunteerController } from "./volunteerController";
+import { BookEventController } from "./bookEventController";
+import { CauseController } from "./causeController";
 
 export {
   UserController,
@@ -12,4 +13,5 @@ export {
   EventController,
   VolunteerController,
   BookEventController,
+  CauseController,
 };

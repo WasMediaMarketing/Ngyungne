@@ -3,15 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
-const updateSchema = z.object({
-  date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid date format",
-  }),
-  title: z.string().min(1, { message: "Update title is required" }),
-  content: z.string().min(1, { message: "Update content is required" }),
-  image: z.string().optional(),
-});
-
 const faqSchema = z.object({
   question: z.string().min(1, { message: "FAQ question is required" }),
   answer: z.string().min(1, { message: "FAQ answer is required" }),
@@ -30,6 +21,14 @@ const causeUpdateSchema = z
       .number()
       .min(1, { message: "Goal amount must be at least 1" })
       .optional(),
+    volunteers: z
+      .number()
+      .min(0, { message: "Volunteers count cannot be negative" })
+      .optional(),
+    totalDonors: z
+      .number()
+      .min(0, { message: "Total donors cannot be negative" })
+      .optional(),
     startDate: z
       .string()
       .refine((val) => !isNaN(Date.parse(val)), {
@@ -43,14 +42,18 @@ const causeUpdateSchema = z
       })
       .optional(),
     location: z.string().min(1, { message: "Location is required" }).optional(),
-    longDescription: z.string().optional(),
-    objectives: z.array(z.string()).optional(),
+    about: z
+      .object({
+        longDescription: z.string(),
+        objectives: z.array(z.string()).optional(),
+      })
+      .optional(),
     impact: z
       .string()
       .min(1, { message: "Impact description is required" })
       .optional(),
     isVisible: z.boolean().optional(),
-    updates: z.array(updateSchema).optional(),
+    updates: z.string().optional(),
     faq: z.array(faqSchema).optional(),
     gallery: z.array(z.string()).optional(),
   })

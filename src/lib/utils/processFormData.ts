@@ -12,32 +12,47 @@ import { NextResponse } from "next/server";
  */
 export async function processFormData(
   formData: FormData,
-  uploadFields: { name: string; maxCount: number }[]
+  uploadFields: { name: string; maxCount: number }[] // maxCount now properly used
 ): Promise<NextResponse | Record<string, string>> {
   const fileUrls: Record<string, string> = {};
 
   try {
     for (const field of uploadFields) {
-      const file = formData.get(field.name) as File | null; // Cast to File
+      const files = formData.getAll(field.name) as File[]; // Get all files for this field
 
-      if (file) {
-        // Ensure the file has a valid name and type
-        if (!file.name || !file.type) {
-          return handleError(httpMessages.BAD_REQUEST("Invalid file data"));
+      if (files.length > 0) {
+        if (files.length > field.maxCount) {
+          return handleError(
+            httpMessages.BAD_REQUEST(
+              `Cannot upload more than ${field.maxCount} files for field "${field.name}"`
+            )
+          );
         }
 
-        try {
-          const fileUrl = await handleFileUpload(file);
+        const uploadedFileUrls: string[] = [];
 
-          // If handleFileUpload returned an error response, return it immediately
-          if (fileUrl instanceof NextResponse) {
-            return fileUrl;
+        for (const file of files) {
+          if (!file.name || !file.type) {
+            return handleError(httpMessages.BAD_REQUEST("Invalid file data"));
           }
 
-          fileUrls[field.name] = fileUrl;
-        } catch (uploadError) {
-          console.error("File upload error:", uploadError);
-          return handleError(httpMessages.INTERNAL_SERVER_ERROR);
+          try {
+            const fileUrl = await handleFileUpload(file);
+            if (fileUrl instanceof NextResponse) {
+              return fileUrl;
+            }
+
+            uploadedFileUrls.push(fileUrl);
+          } catch (uploadError) {
+            console.error("File upload error:", uploadError);
+            return handleError(httpMessages.INTERNAL_SERVER_ERROR);
+          }
+        }
+
+        if (uploadedFileUrls.length === 1) {
+          fileUrls[field.name] = uploadedFileUrls[0];
+        } else {
+          fileUrls[field.name] = uploadedFileUrls.join(",");
         }
       }
     }

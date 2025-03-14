@@ -80,6 +80,14 @@ export class CauseService implements ICauseService {
       deleteFile(existingCause.updates[0]?.image);
     }
 
+    if (causeData.gallery) {
+      existingCause.gallery.forEach((image) => {
+        if (!causeData.gallery!.includes(image)) {
+          deleteFile(image);
+        }
+      });
+    }
+
     const updatedCause = await Cause.findByIdAndUpdate(causeId, causeData, {
       new: true,
     });
