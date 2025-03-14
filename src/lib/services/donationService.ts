@@ -1,8 +1,9 @@
 import { IDonationService, IDonationInput, IDonationData } from "@/types";
-import { Donation } from "@/lib/models";
+import { Donation, Cause } from "@/lib/models";
 import { UserService } from "@/lib/services";
 import { connectToDatabase } from "@/lib/utils/mongodb";
 import { deleteFile } from "@/lib/utils/deleteFile";
+
 export class DonationService implements IDonationService {
   private async initializeDbConnection() {
     await connectToDatabase();
@@ -28,9 +29,22 @@ export class DonationService implements IDonationService {
       screenshot: donationData.screenshot,
       donationType: donationData.donationType,
       donationMethod: donationData.donationMethod,
+      donationTypeId: donationData.donationTypeId,
     });
-
     await donation.save();
+
+    if (donationData.donationType === "Cause" && donationData.donationTypeId) {
+      const cause = await Cause.findById(donationData.donationTypeId);
+
+      if (!cause) {
+        throw new Error("Cause not found");
+      }
+
+      cause.raised += donationData.amount;
+      cause.totalDonors += 1;
+
+      await cause.save();
+    }
     return donation;
   }
 
@@ -38,11 +52,13 @@ export class DonationService implements IDonationService {
     await this.initializeDbConnection();
 
     if (donationId) {
-      const donation = await Donation.findById(donationId).populate("userId");
+      const donation = await Donation.findById(donationId)
+        .populate("userId")
+        .populate("donationTypeId");
       return donation ? [donation] : [];
     }
 
-    return await Donation.find().populate("userId");
+    return await Donation.find().populate("userId").populate("donationTypeId");
   }
 
   async deleteDonation(donationId: string): Promise<boolean> {

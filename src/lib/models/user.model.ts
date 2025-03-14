@@ -33,10 +33,6 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
       },
       default: "",
     },
-    pageId: {
-      type: mongoose.Schema.Types.ObjectId,
-      refPath: "page",
-    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

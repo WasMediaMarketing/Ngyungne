@@ -10,6 +10,7 @@ export interface IDonationInput
   screenshot: string;
   donationType: string;
   donationMethod: string;
+  donationTypeId?: string;
 }
 
 export interface IDonationData extends Document {
@@ -20,4 +21,5 @@ export interface IDonationData extends Document {
   screenshot: string;
   donationType: string;
   donationMethod: string;
+  donationTypeId?: string;
 }
