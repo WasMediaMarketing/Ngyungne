@@ -7,6 +7,9 @@ import { BookEventController } from "./bookEventController";
 import { CauseController } from "./causeController";
 import { RetreatController } from "./retreatController";
 import { RegisterRetreatController } from "./registerRetreatController";
+import { PhilosophyTopicController } from "./philosophyTopicController";
+import { CourseController } from "./courseController";
+import { JoinCourseController } from "./joinCourseController";
 
 export {
   UserController,
@@ -18,4 +21,7 @@ export {
   CauseController,
   RetreatController,
   RegisterRetreatController,
+  PhilosophyTopicController,
+  CourseController,
+  JoinCourseController,
 };

@@ -1058,6 +1058,706 @@
         }
       }
     },
+    "/api/course/{courseId}": {
+      "get": {
+        "summary": "Get course by ID",
+        "description": "Fetch course details by its course ID.",
+        "tags": [
+          "Course"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the course to fetch."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The course's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The course's title."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The course's description."
+                    },
+                    "level": {
+                      "type": "string",
+                      "description": "The course's difficulty level (e.g., Beginner, Intermediate)."
+                    },
+                    "duration": {
+                      "type": "string",
+                      "description": "The course's duration."
+                    },
+                    "lessons": {
+                      "type": "integer",
+                      "description": "The total number of lessons in the course."
+                    },
+                    "instructor": {
+                      "type": "object",
+                      "description": "Instructor information for the course.",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "image": {
+                          "type": "string"
+                        },
+                        "position": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "image": {
+                      "type": "string",
+                      "description": "The course's image URL."
+                    },
+                    "featured": {
+                      "type": "boolean",
+                      "description": "Whether the course is featured."
+                    },
+                    "students": {
+                      "type": "integer",
+                      "description": "Number of students enrolled in the course."
+                    },
+                    "modules": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "List of course modules."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Course not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update course by ID",
+        "description": "Update the course's details based on its course ID.",
+        "tags": [
+          "Course"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the course to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Course image (optional, processed later, required only if you want to change the image, otherwise send the string itself or not)"
+                  },
+                  "instructorImage": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Instructor's image (optional, processed later, required only if you want to change the image,otherwise send the string itself or not)"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "overView": {
+                    "type": "string"
+                  },
+                  "outcomes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "prerequisites": {
+                    "type": "string"
+                  },
+                  "targetAudience": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "string"
+                  },
+                  "lessons": {
+                    "type": "integer"
+                  },
+                  "level": {
+                    "type": "string"
+                  },
+                  "featured": {
+                    "type": "boolean"
+                  },
+                  "students": {
+                    "type": "integer"
+                  },
+                  "modules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "instructor": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "position": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "isVisible": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Course details updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid or incomplete data."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Course not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update course visibility by ID",
+        "description": "Update only the visibility of the course based on its course ID.",
+        "tags": [
+          "Course"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the course to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the course is visible."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Course visibility updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "isVisible": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid or incomplete data."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Course not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete course by ID",
+        "description": "Delete a course based on its course ID.",
+        "tags": [
+          "Course"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the course to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Course not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/course": {
+      "post": {
+        "summary": "Create a new course",
+        "description": "This endpoint creates a new course with images, instructor data, modules, and other required information.",
+        "operationId": "createCourse",
+        "tags": [
+          "Course"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Course image (optional, processed later)"
+                  },
+                  "instructorImage": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Instructor's image (optional, processed later)"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the course",
+                    "example": "Advanced JavaScript",
+                    "required": true
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Detailed description of the course",
+                    "example": "This course covers advanced topics in JavaScript.",
+                    "required": true
+                  },
+                  "overView": {
+                    "type": "string",
+                    "description": "Overview of the course",
+                    "example": "Learn advanced JavaScript concepts.",
+                    "required": true
+                  },
+                  "outcomes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Learning outcomes from the course",
+                    "example": [
+                      "Understand closures",
+                      "Master asynchronous JavaScript"
+                    ],
+                    "required": true
+                  },
+                  "prerequisites": {
+                    "type": "string",
+                    "description": "Prerequisites for the course",
+                    "example": "Basic knowledge of JavaScript",
+                    "required": true
+                  },
+                  "targetAudience": {
+                    "type": "string",
+                    "description": "Who the course is intended for",
+                    "example": "Intermediate developers",
+                    "required": true
+                  },
+                  "duration": {
+                    "type": "string",
+                    "description": "Duration of the course",
+                    "example": "3 hours",
+                    "required": true
+                  },
+                  "lessons": {
+                    "type": "integer",
+                    "description": "Number of lessons in the course",
+                    "example": 15,
+                    "required": true
+                  },
+                  "level": {
+                    "type": "string",
+                    "description": "Difficulty level of the course (e.g., Beginner, Intermediate, Advanced)",
+                    "example": "Advanced",
+                    "required": true
+                  },
+                  "featured": {
+                    "type": "boolean",
+                    "description": "Whether the course is featured",
+                    "example": true,
+                    "required": true
+                  },
+                  "students": {
+                    "type": "integer",
+                    "description": "Number of students enrolled",
+                    "example": 200
+                  },
+                  "modules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Module title",
+                          "example": "Module 1: JavaScript Basics"
+                        },
+                        "lessons": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "List of lessons in the module",
+                          "example": [
+                            "Lesson 1: Introduction to JS",
+                            "Lesson 2: Functions"
+                          ]
+                        }
+                      }
+                    },
+                    "required": true
+                  },
+                  "instructor": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Instructor's name",
+                        "example": "John Doe",
+                        "required": true
+                      },
+                      "position": {
+                        "type": "string",
+                        "description": "Instructor's job title",
+                        "example": "Senior JavaScript Developer",
+                        "required": true
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Short description about the instructor",
+                        "example": "John has 10 years of experience in JavaScript.",
+                        "required": true
+                      }
+                    }
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the course is visible to students",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Course created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve all courses or published courses",
+        "description": "Fetches all courses for authenticated users, or only published courses for unauthenticated users.",
+        "operationId": "getCourses",
+        "tags": [
+          "Course"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of courses (all courses for authenticated users, only published courses for unauthenticated)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "duration": {
+                        "type": "string",
+                        "example": "3 hours"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple courses",
+        "description": "This endpoint deletes multiple courses by their IDs, which are passed in the query parameters.",
+        "operationId": "deleteCourses",
+        "tags": [
+          "Course"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "courseIds",
+            "required": true,
+            "description": "Comma-separated list of course IDs to be deleted.",
+            "schema": {
+              "type": "string",
+              "example": "1,2,3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Courses deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message indicating the deletion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing courseIds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/donation/{id}": {
       "delete": {
         "summary": "Delete a donation by its ID",
@@ -2032,6 +2732,833 @@
         }
       }
     },
+    "/api/join-course/{joinCourseId}": {
+      "patch": {
+        "summary": "Update a course registration",
+        "description": "Update details of an existing course registration, such as experience level or special requirements.",
+        "tags": [
+          "Join Course"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "joinCourseId",
+            "required": true,
+            "description": "The ID of the course registration to update.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "educationalLevel": {
+                    "type": "string",
+                    "description": "Updated educational level of the applicator.",
+                    "example": "Bachelors degree"
+                  },
+                  "experience": {
+                    "type": "string",
+                    "description": "Updated experience level related to the course.",
+                    "example": "Advanced"
+                  },
+                  "specialRequirement": {
+                    "type": "string",
+                    "description": "Any updated special requirements.",
+                    "example": "Need a sign language interpreter"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Updated reason for joining the course.",
+                    "example": "To gain expertise in data science"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated the course registration."
+          },
+          "400": {
+            "description": "Invalid input data."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "404": {
+            "description": "Course registration not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a specific course registration",
+        "description": "Retrieve details of a specific course registration.",
+        "tags": [
+          "Join Course"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "joinCourseId",
+            "required": true,
+            "description": "The ID of the course registration to retrieve.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the course registration."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "404": {
+            "description": "Course registration not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a course registration",
+        "description": "Remove a specific course registration from the system.",
+        "tags": [
+          "Join Course"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "joinCourseId",
+            "required": true,
+            "description": "The ID of the course registration to delete.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted the course registration."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "404": {
+            "description": "Course registration not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/join-course": {
+      "post": {
+        "summary": "Register for a course",
+        "description": "This endpoint allows a user to register for a course.",
+        "tags": [
+          "JoinCourse"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the registrant.",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "The email of the registrant.",
+                    "example": "john.doe@example.com"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "The phone number of the registrant.",
+                    "example": "+123456789"
+                  },
+                  "page": {
+                    "type": "string",
+                    "description": "The page associated with the course (optional).",
+                    "example": "course123"
+                  },
+                  "pageTitle": {
+                    "type": "string",
+                    "description": "The title of the page associated with the course (optional).",
+                    "example": "Advanced Coding Course"
+                  },
+                  "address": {
+                    "type": "string",
+                    "description": "Address of the registrant.",
+                    "example": "123 Main St, City, Country"
+                  },
+                  "courseId": {
+                    "type": "string",
+                    "description": "The ID of the course to register for.",
+                    "example": "60b8c6b0f1f1a51a6d5a7a6e"
+                  },
+                  "educationalLevel": {
+                    "type": "string",
+                    "description": "educational level of the applicator.",
+                    "example": "High school"
+                  },
+                  "experience": {
+                    "type": "string",
+                    "description": "Relevant experience for the course (optional).",
+                    "example": "Intermediate Level"
+                  },
+                  "specialRequirement": {
+                    "type": "string",
+                    "description": "Special requests or accommodations (optional).",
+                    "example": "Need a wheelchair-accessible room"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for joining the course.",
+                    "example": "To improve my programming skills"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully registered for the course."
+          },
+          "400": {
+            "description": "Bad request if input is invalid."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all course registrations",
+        "description": "Retrieves all course registrations.",
+        "tags": [
+          "JoinCourse"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of course registrations retrieved successfully."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete course registrations by their IDs",
+        "description": "Delete multiple course registrations based on their IDs.",
+        "tags": [
+          "JoinCourse"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "joinCourseIds",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1,2,3,4"
+            },
+            "description": "A comma-separated list of course registration IDs to delete."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course registrations successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "No registrations found for the given IDs."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/philosophy/{topicId}": {
+      "get": {
+        "summary": "Get philosophy topic by ID",
+        "description": "Fetch philosophy topic details by its ID.",
+        "tags": [
+          "Philosophy"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topicId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the philosophy topic to fetch."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Philosophy topic details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The topic's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The title of the philosophy topic."
+                    },
+                    "icon": {
+                      "type": "string",
+                      "description": "The icon of the philosophy topic."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "A brief description of the philosophy topic."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "The full content of the philosophy topic."
+                    },
+                    "quotes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string"
+                          },
+                          "author": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "practices": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "isVisible": {
+                      "type": "boolean",
+                      "description": "Whether the topic is visible or not."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Topic not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update philosophy topic by ID",
+        "description": "Update the philosophy topic's details based on its ID.",
+        "tags": [
+          "Philosophy"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topicId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the philosophy topic to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart-form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The updated title of the topic."
+                  },
+                  "icon": {
+                    "type": "string",
+                    "description": "The updated icon of the topic."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The updated description of the topic."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "The updated content of the topic."
+                  },
+                  "quotes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "text": {
+                          "type": "string"
+                        },
+                        "author": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "practices": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the topic should be visible."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Philosophy topic details updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The topic's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The updated title of the topic."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The updated description of the topic."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid or incomplete data."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Topic not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete philosophy topic by ID",
+        "description": "Delete a philosophy topic based on its ID.",
+        "tags": [
+          "Philosophy"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topicId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the philosophy topic to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Philosophy topic successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Topic not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/philosophy": {
+      "post": {
+        "summary": "Create a new philosophy topic",
+        "description": "This endpoint creates a new philosophy topic with necessary details like title, content, quotes, and practices.",
+        "operationId": "createPhilosophyTopic",
+        "tags": [
+          "PhilosophyTopic"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the philosophy topic"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "description": "Icon URL for the philosophy topic"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description of the philosophy topic"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Content or details of the philosophy topic"
+                  },
+                  "quotes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "text": {
+                          "type": "string",
+                          "description": "Quote text"
+                        },
+                        "author": {
+                          "type": "string",
+                          "description": "Author of the quote"
+                        }
+                      }
+                    }
+                  },
+                  "practices": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "List of practices related to the philosophy topic"
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Flag to determine if the topic is visible to the public (defaults to true)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Philosophy topic created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve all philosophy topics or only visible ones",
+        "description": "Fetches all philosophy topics for authenticated users or only visible ones for unauthenticated users.",
+        "operationId": "getPhilosophyTopics",
+        "tags": [
+          "PhilosophyTopic"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of philosophy topics (all topics for authenticated users, only visible ones for unauthenticated)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "icon": {
+                        "type": "string"
+                      },
+                      "isVisible": {
+                        "type": "boolean"
+                      },
+                      "quotes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string"
+                            },
+                            "author": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "practices": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple philosophy topics",
+        "description": "This endpoint deletes multiple philosophy topics by their IDs, which are passed in the query parameters.",
+        "operationId": "deletePhilosophyTopics",
+        "tags": [
+          "PhilosophyTopic"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "philosophyTopicIds",
+            "required": true,
+            "description": "Comma-separated list of philosophy topic IDs to be deleted.",
+            "schema": {
+              "type": "string",
+              "example": "1,2,3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Philosophy topics deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message indicating the deletion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing philosophyTopicIds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/register-retreat/{registerRetreatId}": {
       "patch": {
         "summary": "Update a retreat registration",
@@ -2703,6 +4230,10 @@
                       "type": "string",
                       "description": "The user's email."
                     },
+                    "phoneNumber": {
+                      "type": "string",
+                      "description": "The user's phone number."
+                    },
                     "role": {
                       "type": "string",
                       "description": "The user's role (e.g., user, admin)."
@@ -2722,136 +4253,157 @@
             "description": "Internal server error."
           }
         }
-      }
-    },
-    "patch": {
-      "summary": "Update user by ID",
-      "description": "Update the user's details based on their user ID.",
-      "tags": [
-        "User"
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "userId",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "description": "The ID of the user to update."
-        }
-      ],
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "The updated name of the user."
-                },
-                "email": {
-                  "type": "string",
-                  "format": "email",
-                  "description": "The updated email of the user."
-                },
-                "phoneNumber": {
-                  "type": "string",
-                  "description": "The updated phone number of the user."
-                },
-                "role": {
-                  "type": "string",
-                  "enum": [
-                    "user",
-                    "admin",
-                    "volunteer",
-                    "donator"
-                  ],
-                  "description": "The updated role of the user."
-                },
-                "password": {
-                  "type": "string",
-                  "description": "The updated password of the user (if provided)."
-                }
-              }
-            }
-          }
-        }
       },
-      "responses": {
-        "200": {
-          "description": "User details updated successfully.",
+      "patch": {
+        "summary": "Update user by ID",
+        "description": "Update the user's details based on their user ID.",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the user to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "id": {
-                    "type": "string",
-                    "description": "The user's ID."
-                  },
                   "name": {
                     "type": "string",
                     "description": "The updated name of the user."
                   },
                   "email": {
                     "type": "string",
+                    "format": "email",
                     "description": "The updated email of the user."
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "The updated phone number of the user."
                   },
                   "role": {
                     "type": "string",
+                    "enum": [
+                      "user",
+                      "admin",
+                      "donator",
+                      "volunteer",
+                      "event-participant"
+                    ],
                     "description": "The updated role of the user."
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The updated password of the user (if provided)."
+                  },
+                  "address": {
+                    "type": "string",
+                    "description": "The updated address of the user."
+                  },
+                  "page": {
+                    "type": "string",
+                    "description": "The updated page URL."
+                  },
+                  "pageTitle": {
+                    "type": "string",
+                    "description": "The updated page title."
+                  },
+                  "jobPostId": {
+                    "type": "string",
+                    "description": "The job post ID associated with the user."
                   }
                 }
               }
             }
           }
         },
-        "400": {
-          "description": "Bad request - Invalid or incomplete data."
-        },
-        "401": {
-          "description": "Unauthorized - The request is not authenticated."
-        },
-        "404": {
-          "description": "User not found for the given ID."
-        },
-        "500": {
-          "description": "Internal server error."
-        }
-      }
-    },
-    "delete": {
-      "summary": "Delete user by ID",
-      "description": "Delete a user based on their user ID.",
-      "tags": [
-        "User"
-      ],
-      "parameters": [
-        {
-          "in": "path",
-          "name": "userId",
-          "required": true,
-          "schema": {
-            "type": "string"
+        "responses": {
+          "200": {
+            "description": "User details updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The user's ID."
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "The updated name of the user."
+                    },
+                    "email": {
+                      "type": "string",
+                      "description": "The updated email of the user."
+                    },
+                    "phoneNumber": {
+                      "type": "string",
+                      "description": "The updated phone number of the user."
+                    },
+                    "role": {
+                      "type": "string",
+                      "description": "The updated role of the user."
+                    }
+                  }
+                }
+              }
+            }
           },
-          "description": "The ID of the user to delete."
+          "400": {
+            "description": "Bad request - Invalid or incomplete data."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "User not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
         }
-      ],
-      "responses": {
-        "200": {
-          "description": "User successfully deleted."
-        },
-        "401": {
-          "description": "Unauthorized - The request is not authenticated."
-        },
-        "404": {
-          "description": "User not found for the given ID."
-        },
-        "500": {
-          "description": "Internal server error."
+      },
+      "delete": {
+        "summary": "Delete user by ID",
+        "description": "Delete a user based on their user ID.",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the user to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "User not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
         }
       }
     },

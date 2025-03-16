@@ -24,6 +24,20 @@ import {
   IRegisterRetreatUpdate,
 } from "./registerRetreat.types";
 import { IRegisterRetreatService } from "./registerRetreatService.interface";
+import {
+  IPhilosophyTopic,
+  IPhilosophyTopicInput,
+  IPhilosophyTopicUpdate,
+} from "./philosophyTopic.types";
+import { IPhilosophyTopicService } from "./philosophyTopicService.interface";
+import { ICourse, ICourseInput, ICourseUpdate } from "./course.types";
+import { ICourseService } from "./courseService.interface";
+import {
+  IJoinCourseData,
+  IJoinCourseInput,
+  IJoinCourseUpdate,
+} from "./joinCourse.types";
+import { IJoinCourseService } from "./joinCourseService.interface";
 
 export type {
   IUser,
@@ -60,4 +74,16 @@ export type {
   IRegisterRetreatInput,
   IRegisterRetreatUpdate,
   IRegisterRetreatService,
+  IPhilosophyTopic,
+  IPhilosophyTopicInput,
+  IPhilosophyTopicUpdate,
+  IPhilosophyTopicService,
+  ICourse,
+  ICourseInput,
+  ICourseUpdate,
+  ICourseService,
+  IJoinCourseData,
+  IJoinCourseInput,
+  IJoinCourseUpdate,
+  IJoinCourseService,
 };

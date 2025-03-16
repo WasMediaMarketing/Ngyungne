@@ -103,8 +103,8 @@ import { isAuthenticated, validateUserInput } from "@/lib/middlewares";
 export async function POST(req: NextRequest) {
   const reqClone = req.clone();
   console.log(reqClone, "req clone");
-  const valdiateuserBody = await validateUserInput(req);
-  if (valdiateuserBody) return valdiateuserBody;
+  const validateUserBody = await validateUserInput(req); // Corrected typo in `validateUserInput`
+  if (validateUserBody) return validateUserBody;
 
   const userController = createUserController();
   return userController.createUser(req);

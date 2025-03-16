@@ -27,14 +27,14 @@ const EventSchema: Schema<IEvent> = new mongoose.Schema(
     featured: { type: Boolean, required: false },
     attending: { type: Number, required: false },
     capacity: { type: Number, required: true },
-    availableTickets:{type:Number, required: true},
-    isVisible:{type:Boolean, default: false},
+    availableTickets: { type: Number, required: true },
+    isVisible: { type: Boolean, default: true },
     schedule: {
       type: Map,
       of: {
         title: { type: String, required: false },
         description: { type: String, required: false },
-      }, 
+      },
       required: false,
     },
   },
