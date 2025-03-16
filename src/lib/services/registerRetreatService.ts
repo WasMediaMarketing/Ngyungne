@@ -39,7 +39,7 @@ export class RegisterRetreatService implements IRegisterRetreatService {
       MeditationExperience: registerRetreatData.MeditationExperience,
       dietaryRestriction: registerRetreatData.dietaryRestriction,
       specialRequest: registerRetreatData.specialRequest,
-      AccomodationType: registerRetreatData.AccomodationType,
+      accommodationType: registerRetreatData.accommodationType,
       emergencyContactName: registerRetreatData.emergencyContactName,
       emergencyContactNumber: registerRetreatData.emergencyContactNumber,
     });
