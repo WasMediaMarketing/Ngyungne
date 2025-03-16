@@ -5,6 +5,11 @@ import { httpMessages } from "@/lib/utils/HttpMessage";
 
 export const joinCourseUpdateSchema = z
   .object({
+    educationalLevel: z
+      .string()
+      .min(1, { message: "EducationalLevel is required" })
+      .optional(),
+
     experience: z
       .string()
       .min(1, { message: "Experience is required" })

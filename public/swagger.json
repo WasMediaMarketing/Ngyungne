@@ -2767,6 +2767,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "educationalLevel": {
+                    "type": "string",
+                    "description": "Updated educational level of the applicator.",
+                    "example": "Bachelors degree"
+                  },
                   "experience": {
                     "type": "string",
                     "description": "Updated experience level related to the course.",
@@ -2938,6 +2943,11 @@
                     "type": "string",
                     "description": "The ID of the course to register for.",
                     "example": "60b8c6b0f1f1a51a6d5a7a6e"
+                  },
+                  "educationalLevel": {
+                    "type": "string",
+                    "description": "educational level of the applicator.",
+                    "example": "High school"
                   },
                   "experience": {
                     "type": "string",

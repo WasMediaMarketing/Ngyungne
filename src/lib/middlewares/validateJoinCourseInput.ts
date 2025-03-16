@@ -26,6 +26,10 @@ export const joinCourseSchema = z
       .string()
       .refine((id) => isValidObjectId(id), { message: "Invalid course ID" }),
 
+    educationalLevel: z
+      .string()
+      .min(1, { message: "EducationalLevel is required" }),
+
     experience: z
       .string()
       .min(1, { message: "Experience is required" })

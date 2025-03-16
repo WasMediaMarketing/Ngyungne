@@ -6,6 +6,7 @@ export interface IJoinCourseInput
     IUserInput,
     "name" | "email" | "phoneNumber" | "page" | "pageTitle" | "address"
   > {
+  educationalLevel: string;
   courseId: Types.ObjectId;
   experience?: string;
   specialRequirement?: string;
@@ -13,6 +14,7 @@ export interface IJoinCourseInput
 }
 
 export interface IJoinCourseUpdate {
+  educationalLevel?: string;
   experience?: string;
   specialRequirement?: string;
   reason?: string;
@@ -23,6 +25,7 @@ export interface IJoinCourseData extends Document {
   id: string;
   userId: Types.ObjectId | IUser;
   courseId: Types.ObjectId | ICourse;
+  educationalLevel: string;
   experience: string;
   specialRequirement?: string;
   reason: string;

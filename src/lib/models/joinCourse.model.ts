@@ -16,6 +16,9 @@ const JoinCourseSchema: Schema<IJoinCourseData> = new Schema<IJoinCourseData>(
     experience: {
       type: String,
     },
+    educationalLevel: {
+      type: String,
+    },
     specialRequirement: {
       type: String,
     },

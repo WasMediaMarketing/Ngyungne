@@ -32,6 +32,10 @@ import { isAuthenticated, validateJoinCourseUpdate } from "@/lib/middlewares";
  *             schema:
  *               type: object
  *               properties:
+ *                 educationalLevel:
+ *                   type: string
+ *                   description: Updated educational level of the applicator.
+ *                   example: "Bachelors degree"
  *                 experience:
  *                   type: string
  *                   description: Updated experience level related to the course.

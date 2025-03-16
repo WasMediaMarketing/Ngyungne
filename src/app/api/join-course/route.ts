@@ -46,6 +46,10 @@ import { isAuthenticated, validateJoinCourseInput } from "@/lib/middlewares";
  *                   type: string
  *                   description: The ID of the course to register for.
  *                   example: "60b8c6b0f1f1a51a6d5a7a6e"
+ *                 educationalLevel:
+ *                   type: string
+ *                   description: educational level of the applicator.
+ *                   example: "High school"
  *                 experience:
  *                   type: string
  *                   description: Relevant experience for the course (optional).
