@@ -7,6 +7,8 @@ import { BookEventService } from "./bookEventService";
 import { CauseService } from "./causeService";
 import { RetreatService } from "./retreatService";
 import { RegisterRetreatService } from "./registerRetreatService";
+import { PhilosophyTopicService } from "./philosophyService";
+import { CourseService } from "./courseService";
 
 export {
   UserService,
@@ -18,4 +20,6 @@ export {
   CauseService,
   RetreatService,
   RegisterRetreatService,
+  PhilosophyTopicService,
+  CourseService,
 };

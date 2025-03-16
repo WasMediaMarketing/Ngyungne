@@ -7,6 +7,8 @@ import { BookEvent } from "./bookEvent.model";
 import { Cause } from "./cause.model";
 import { Retreat } from "./retreat.model";
 import { RegisterRetreat } from "./registerRetreat.model";
+import { PhilosophyTopic } from "./philosophyTopic.model";
+import { Course } from "./course.model";
 
 export {
   User,
@@ -18,4 +20,6 @@ export {
   Cause,
   Retreat,
   RegisterRetreat,
+  PhilosophyTopic,
+  Course,
 };

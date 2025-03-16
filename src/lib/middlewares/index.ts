@@ -14,6 +14,10 @@ import { validateRetreatInput } from "./validateRetreatInput";
 import { validateRetreatUpdate } from "./validateRetreatUpdate";
 import { validateRegisterRetreatInput } from "./validateRegisterRetreatInput";
 import { validateRegisterRetreatUpdate } from "./validateRegisterRetreatUpdate";
+import { validatePhilosophyTopicInput } from "./validatePhilosophyTopicInput";
+import { validatePhilosophyTopicUpdate } from "./validatePhilosophyTopicUpdate";
+import { validateCourseInput } from "./validateCourseInput";
+import { validateCourseUpdate } from "./validateCourseUpdate";
 
 export {
   isAuthenticated,
@@ -32,4 +36,8 @@ export {
   validateRetreatUpdate,
   validateRegisterRetreatInput,
   validateRegisterRetreatUpdate,
+  validatePhilosophyTopicInput,
+  validatePhilosophyTopicUpdate,
+  validateCourseInput,
+  validateCourseUpdate,
 };

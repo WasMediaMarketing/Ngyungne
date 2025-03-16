@@ -24,6 +24,14 @@ import {
   IRegisterRetreatUpdate,
 } from "./registerRetreat.types";
 import { IRegisterRetreatService } from "./registerRetreatService.interface";
+import {
+  IPhilosophyTopic,
+  IPhilosophyTopicInput,
+  IPhilosophyTopicUpdate,
+} from "./philosophyTopic.types";
+import { IPhilosophyTopicService } from "./philosophyTopicService.interface";
+import { ICourse, ICourseInput, ICourseUpdate } from "./course.types";
+import { ICourseService } from "./courseService.interface";
 
 export type {
   IUser,
@@ -60,4 +68,12 @@ export type {
   IRegisterRetreatInput,
   IRegisterRetreatUpdate,
   IRegisterRetreatService,
+  IPhilosophyTopic,
+  IPhilosophyTopicInput,
+  IPhilosophyTopicUpdate,
+  IPhilosophyTopicService,
+  ICourse,
+  ICourseInput,
+  ICourseUpdate,
+  ICourseService,
 };
