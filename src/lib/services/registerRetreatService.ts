@@ -73,12 +73,30 @@ export class RegisterRetreatService implements IRegisterRetreatService {
     const registerRetreat = await RegisterRetreat.findById(registerRetreatId);
     if (!registerRetreat) return false;
 
+    const retreat = await Retreat.findById(registerRetreat.retreatId);
+    if (retreat) {
+      retreat.participants -= 1;
+      await retreat.save();
+    }
+
     const result = await RegisterRetreat.findByIdAndDelete(registerRetreatId);
     return !!result;
   }
 
   async deleteRegisterRetreats(registerRetreatIds: string[]): Promise<boolean> {
     await this.initializeDbConnection();
+
+    const registerRetreats = await RegisterRetreat.find({
+      _id: { $in: registerRetreatIds },
+    });
+
+    for (const registerRetreat of registerRetreats) {
+      const retreat = await Retreat.findById(registerRetreat.retreatId);
+      if (retreat) {
+        retreat.participants -= 1;
+        await retreat.save();
+      }
+    }
 
     const result = await RegisterRetreat.deleteMany({
       _id: { $in: registerRetreatIds },
