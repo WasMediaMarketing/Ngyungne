@@ -4,6 +4,7 @@ import type {
   IRegisterRetreatUpdate,
   IRegisterRetreatData,
 } from "@/types";
+import { Types } from "mongoose";
 
 // Retreat Registration API functions
 export const retreatRegisterApi = {
@@ -58,9 +59,15 @@ export const retreatRegisterApi = {
 
   // Create a new retreat registration
   registerForRetreat: async (
-    registrationData: IRegisterRetreatInput
+    formData: Omit<IRegisterRetreatInput, "retreatId"> & { retreatId: string }
   ): Promise<boolean> => {
     try {
+      // Convert string retreatId to ObjectId format for the API
+      const registrationData: IRegisterRetreatInput = {
+        ...formData,
+        retreatId: new Types.ObjectId(formData.retreatId),
+      };
+
       const response = await fetch("/api/register-retreat", {
         method: "POST",
         headers: {

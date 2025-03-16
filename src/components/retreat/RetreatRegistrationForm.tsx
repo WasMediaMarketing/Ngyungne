@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -26,10 +25,10 @@ import {
 } from "@/components/ui/select";
 import { retreatRegisterApi } from "@/utils/retreatRegisterApi";
 import { toast } from "sonner";
-import type { Types } from "mongoose";
-import { IRegisterRetreatInput } from "@/types";
-import { IRetreat } from "@/types/retreat.types";
+import type { IRetreat } from "@/types";
 import Spinner from "../spinner";
+
+// Form validation schema
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
@@ -88,7 +87,7 @@ export function RetreatRegistrationForm({
     setIsSubmitting(true);
 
     try {
-      // Get the retreat ID
+      // Get the retreat ID as a string
       const retreatId = retreat._id
         ? retreat._id.toString()
         : retreat.id.toString();
@@ -101,7 +100,7 @@ export function RetreatRegistrationForm({
         pageTitle: retreat.title,
       };
 
-      // Submit the registration
+      // Submit the registration - the API will handle converting the string to ObjectId
       const success = await retreatRegisterApi.registerForRetreat(
         registrationData
       );
@@ -138,7 +137,7 @@ export function RetreatRegistrationForm({
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input placeholder="Your Name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -279,7 +278,7 @@ export function RetreatRegistrationForm({
               <FormItem>
                 <FormLabel>Emergency Contact Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Jane Doe" {...field} />
+                  <Input placeholder="Your Name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
