@@ -11,7 +11,6 @@ interface CauseHeaderProps {
     subtitle: string;
     categories?: string[];
     tags?: string[];
-    daysLeft: number;
     taxDeductible?: boolean;
     verified?: boolean;
     gallery?: string[];

@@ -5,9 +5,11 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CausesSection } from "@/components/sections/causes-section";
 import { CausesSidebar } from "@/components/causes/CauseSidebar";
 import { Button } from "@/components/ui/button";
-import { Search, Calendar, Users, HeartHandshake, Loader2 } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { causeApi, type CauseUI } from "@/utils/causeApi";
+import { Loader } from "@/components/common/loader";
+import Link from "next/link";
 
 export default function Causes() {
   const [activeTab, setActiveTab] = useState("all");
@@ -15,13 +17,6 @@ export default function Causes() {
   const [causes, setCauses] = useState<CauseUI[]>([]);
   const [filteredCauses, setFilteredCauses] = useState<CauseUI[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Categories for filtering causes
-  const categories = [
-    { id: "all", name: "All Causes", icon: HeartHandshake },
-    { id: "temple", name: "Temple", icon: Calendar },
-    { id: "education", name: "Education", icon: Users },
-  ];
 
   // Fetch causes on component mount
   useEffect(() => {
@@ -117,9 +112,8 @@ export default function Causes() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <Breadcrumbs />
 
-        <div className="grid lg:grid-cols-5 gap-8 mb-12">
+        <div className="flex  justify-center mx-auto w-[70%] sm:w-[80%]">
           <CausesSidebar
-            categories={categories}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             searchQuery={searchQuery}
@@ -128,48 +122,7 @@ export default function Causes() {
 
           {/* Main content */}
           <div className="lg:col-span-4">
-            {/* Mobile filter tabs */}
-            <motion.div
-              className="lg:hidden mb-6 overflow-x-auto scrollbar-hide flex space-x-2"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={activeTab === category.id ? "default" : "outline"}
-                  onClick={() => setActiveTab(category.id)}
-                  className="whitespace-nowrap rounded-full"
-                >
-                  <category.icon size={16} className="mr-2" />
-                  {category.name}
-                </Button>
-              ))}
-            </motion.div>
-
             <motion.div variants={fadeIn} initial="hidden" animate="visible">
-              <motion.h1
-                className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-crimson-800 leading-tight"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                Support Our <span className="text-saffron-600">Dharma</span>{" "}
-                Causes
-              </motion.h1>
-
-              <motion.p
-                className="text-lg mb-6 text-maroon-700 max-w-3xl"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                Explore the various causes we support and how you can contribute
-                to making a difference in preserving Dharma traditions and
-                supporting spiritual communities around the world.
-              </motion.p>
-
               <motion.div
                 className="flex flex-col sm:flex-row gap-4 mb-10"
                 initial={{ opacity: 0, y: 20 }}
@@ -203,12 +156,7 @@ export default function Causes() {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-10 w-10 text-crimson-600 animate-spin" />
-            <span className="ml-4 text-lg text-maroon-700">
-              Loading causes...
-            </span>
-          </div>
+          <Loader />
         ) : (
           <CausesSection causes={filteredCauses} showAll={true} />
         )}
@@ -227,7 +175,7 @@ export default function Causes() {
             would like to make a general donation, please reach out to us.
           </p>
           <Button className="bg-crimson-600 text-white hover:bg-crimson-700">
-            Contact Our Team
+            <Link href="/contact">Contact Us</Link>
           </Button>
         </motion.div>
       </div>

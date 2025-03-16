@@ -112,11 +112,7 @@ export function CausesSection({
                   transition={{ duration: 0.4 }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-70"></div>
-                <div className="absolute bottom-3 left-3 right-3">
-                  <div className="px-3 py-1 bg-crimson-600 text-white text-xs font-medium rounded-full inline-block">
-                    {cause.daysLeft} days left
-                  </div>
-                </div>
+                <div className="absolute bottom-3 left-3 right-3"></div>
               </div>
 
               <CardHeader className="pb-2">

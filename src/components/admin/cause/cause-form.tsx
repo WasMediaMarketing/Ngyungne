@@ -75,6 +75,7 @@ export default function CauseForm({
     title: "",
     subtitle: "",
     location: "",
+    volunteers: 0,
     goal: 0,
     startDate: new Date(),
     endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
@@ -96,6 +97,7 @@ export default function CauseForm({
         subtitle: cause.subtitle,
         location: cause.location,
         goal: cause.goal,
+        volunteers: cause.volunteers,
         startDate: new Date(cause.startDate),
         endDate: new Date(cause.endDate),
         tags: cause.tags,
@@ -344,6 +346,7 @@ export default function CauseForm({
       formDataObj.append("title", formData.title);
       formDataObj.append("subtitle", formData.subtitle);
       formDataObj.append("location", formData.location);
+      formDataObj.append("volunteers", formData.volunteers.toString());
       formDataObj.append("goal", formData.goal.toString());
       formDataObj.append("startDate", formData.startDate.toISOString());
       formDataObj.append("endDate", formData.endDate.toISOString());
@@ -473,36 +476,49 @@ export default function CauseForm({
               />
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="tags">Tags</Label>
-            <div className="flex items-center">
-              <div className="relative flex-1">
-                <Tag className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="tags"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleAddTag}
-                  placeholder="Add tags and press Enter"
-                  className="pl-10"
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="volunteers">Volunteers *</Label>
+              <Input
+                id="volunteers"
+                name="volunteers"
+                type="number"
+                value={formData.volunteers}
+                onChange={handleInputChange}
+                placeholder="Enter volunteer count"
+                required
+              />
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.tags.map((tag, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="flex items-center gap-1"
-                >
-                  {tag}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleRemoveTag(tag)}
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags</Label>
+              <div className="flex items-center">
+                <div className="relative flex-1">
+                  <Tag className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="tags"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleAddTag}
+                    placeholder="Add tags and press Enter"
+                    className="pl-10"
                   />
-                </Badge>
-              ))}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.tags.map((tag, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {tag}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleRemoveTag(tag)}
+                    />
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
 

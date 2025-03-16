@@ -279,9 +279,6 @@ export default function AdminCauseList() {
                 {startDate} - {endDate}
               </span>
             </div>
-            <div className="text-xs mt-1">
-              {cause.daysLeft > 0 ? `${cause.daysLeft} days left` : "Ended"}
-            </div>
           </div>
         );
       },
@@ -539,11 +536,6 @@ export default function AdminCauseList() {
                   <Progress value={viewCause.progress} className="h-2" />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>{viewCause.progress}% funded</span>
-                    <span>
-                      {viewCause.daysLeft > 0
-                        ? `${viewCause.daysLeft} days left`
-                        : "Ended"}
-                    </span>
                   </div>
                 </div>
               </div>

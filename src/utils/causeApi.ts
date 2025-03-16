@@ -26,7 +26,6 @@ export interface CauseUI {
   faq: { question: string; answer: string; _id?: string; id?: string }[];
   gallery: string[];
   progress: number; // Calculated field
-  daysLeft: number; // Calculated field
   categories?: string[]; // Added for category filtering
 }
 
@@ -110,7 +109,6 @@ const mapCauseToUI = (cause: any): CauseUI => {
     faq: faq,
     gallery: gallery,
     progress: progress,
-    daysLeft: daysLeft,
     categories: cause.categories || tags, // Use tags as categories if not provided
   };
 };
