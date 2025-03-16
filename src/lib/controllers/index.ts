@@ -5,6 +5,8 @@ import { EventController } from "./eventController";
 import { VolunteerController } from "./volunteerController";
 import { BookEventController } from "./bookEventController";
 import { CauseController } from "./causeController";
+import { RetreatController } from "./retreatController";
+import { RegisterRetreatController } from "./registerRetreatController";
 
 export {
   UserController,
@@ -14,4 +16,6 @@ export {
   VolunteerController,
   BookEventController,
   CauseController,
+  RetreatController,
+  RegisterRetreatController,
 };

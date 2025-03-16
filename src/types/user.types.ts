@@ -9,7 +9,6 @@ export interface IUserInput {
   address?: string;
   page?: string;
   pageTitle?: string;
-  pageId?: string;
 }
 
 export interface IUserUpdate {
@@ -22,7 +21,6 @@ export interface IUserUpdate {
   page?: string;
   pageTitle?: string;
   jobPostId?: Types.ObjectId;
-  pageId: string;
 }
 
 export interface IUser extends Document {
@@ -36,7 +34,6 @@ export interface IUser extends Document {
   address?: string;
   page: string;
   pageTitle: string;
-  pageId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
