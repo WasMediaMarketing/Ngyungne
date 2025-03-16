@@ -32,7 +32,7 @@ export interface IRegisterRetreatData extends Document {
   MeditationExperience: string;
   dietaryRestriction?: string;
   specialRequest?: string;
-  accomodationType: string;
+  accommodationType: string;
   emergencyContactName: string;
   emergencyContactNumber: string;
   createdAt?: Date;
