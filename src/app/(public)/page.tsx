@@ -12,6 +12,10 @@ import { FeaturedEventsSlider } from "@/components/events/FeaturedEventsSlider";
 import { events } from "@/data/events";
 import { TeachingsSection } from "@/components/sections/teachings-section";
 import VolunteerCTA from "@/components/volunteer/volunteerCTA";
+import { causeApi, CauseUI } from "@/utils/causeApi";
+import { Loader } from "@/components/common/loader";
+import { eventApi } from "@/utils/eventApi";
+import { IEvent } from "@/types/event.types";
 export default function Home() {
   const apiCallDone = useRef(false); // useRef to track whether API has been called
   const [readingProgress, setReadingProgress] = useState(0);
@@ -22,7 +26,42 @@ export default function Home() {
       apiCallDone.current = true;
     }
   }, []);
+  const [causes, setCauses] = useState<CauseUI[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [events, setEvents] = useState<IEvent[]>([]);
 
+  // Fetch causes on component mount
+  useEffect(() => {
+    const fetchCauses = async () => {
+      setIsLoading(true);
+      try {
+        const data = await causeApi.getCauses();
+        console.log("Causes data:", data); // Add this log
+        setCauses(data);
+      } catch (error) {
+        console.error("Failed to fetch causes:", error);
+        setCauses([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCauses();
+  }, []);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const data = await eventApi.getEvents();
+        console.log("Events data:", data); // Add this log
+        setEvents(data);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -46,8 +85,27 @@ export default function Home() {
       <AboutSection />
       {/* <ProgramsSection /> */}
       <TeachingsSection />
-      <FeaturedEventsSlider events={events.filter((event) => event.featured)} />
-      <CausesSection />
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8">
+        {events && events.length > 0 ? (
+          <FeaturedEventsSlider events={events} />
+        ) : (
+          <div className=" mx-auto py-12 text-center">
+            <p className="text-maroon-600">
+              No events available at the moment.
+            </p>
+          </div>
+        )}
+      </div>
+      {isLoading ? (
+        <Loader />
+      ) : causes && causes.length > 0 ? (
+        <CausesSection causes={causes} showAll={false} />
+      ) : (
+        <div className="container mx-auto py-12 text-center">
+          <p className="text-maroon-600">No causes available at the moment.</p>
+        </div>
+      )}
+
       <TestimonialsSection />
       <ImpactSection />
       <div className="max-w-7xl mx-auto">

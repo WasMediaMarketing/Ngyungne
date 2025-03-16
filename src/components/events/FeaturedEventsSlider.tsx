@@ -40,10 +40,13 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
   }
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-12 ">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-crimson-800">
+        <div className="flex flex-col justify-between items-center mb-8">
+          <span className="inline-block px-4 py-1 rounded-full bg-saffron-100 text-crimson-700 text-sm font-medium mb-4">
+            Our Upcoming Events
+          </span>
+          <h2 className="text-3xl font-bold text-crimson-800 text-center mx-auto">
             Featured Events
           </h2>
         </div>

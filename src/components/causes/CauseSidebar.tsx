@@ -1,6 +1,10 @@
+"use client";
+
+import type React from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 
 interface Category {
   id: string;
@@ -12,13 +16,38 @@ interface CausesSidebarProps {
   categories: Category[];
   activeTab: string;
   setActiveTab: (id: string) => void;
+  searchQuery?: string;
+  onSearch?: (query: string) => void;
 }
 
 export function CausesSidebar({
   categories,
   activeTab,
   setActiveTab,
+  searchQuery = "",
+  onSearch,
 }: CausesSidebarProps) {
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+
+  // Update local state when prop changes
+  useEffect(() => {
+    setLocalSearchQuery(searchQuery);
+  }, [searchQuery]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocalSearchQuery(value);
+
+    // Debounce search to avoid too many API calls
+    const timeoutId = setTimeout(() => {
+      if (onSearch) {
+        onSearch(value);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  };
+
   return (
     <motion.div
       className="hidden lg:block lg:col-span-1"
@@ -57,6 +86,8 @@ export function CausesSidebar({
               type="text"
               placeholder="Search causes..."
               className="w-full pl-10 pr-4 py-2 border border-saffron-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-crimson-500"
+              value={localSearchQuery}
+              onChange={handleSearchChange}
             />
             <Search
               size={18}

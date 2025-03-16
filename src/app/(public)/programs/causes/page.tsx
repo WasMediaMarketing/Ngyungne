@@ -5,11 +5,103 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CausesSection } from "@/components/sections/causes-section";
 import { CausesSidebar } from "@/components/causes/CauseSidebar";
 import { Button } from "@/components/ui/button";
-import { Search, Calendar, Users, HeartHandshake } from "lucide-react";
-import { useState } from "react";
+import { Search, Calendar, Users, HeartHandshake, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { causeApi, type CauseUI } from "@/utils/causeApi";
 
 export default function Causes() {
   const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [causes, setCauses] = useState<CauseUI[]>([]);
+  const [filteredCauses, setFilteredCauses] = useState<CauseUI[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Categories for filtering causes
+  const categories = [
+    { id: "all", name: "All Causes", icon: HeartHandshake },
+    { id: "temple", name: "Temple", icon: Calendar },
+    { id: "education", name: "Education", icon: Users },
+  ];
+
+  // Fetch causes on component mount
+  useEffect(() => {
+    const fetchCauses = async () => {
+      setIsLoading(true);
+      try {
+        const data = await causeApi.getCauses();
+        setCauses(data);
+        setFilteredCauses(data);
+      } catch (error) {
+        console.error("Failed to fetch causes:", error);
+        // Initialize with empty arrays on error
+        setCauses([]);
+        setFilteredCauses([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCauses();
+  }, []);
+
+  // Handle category filter changes
+  useEffect(() => {
+    const filterCauses = async () => {
+      setIsLoading(true);
+      try {
+        const filtered = await causeApi.filterCausesByCategory(activeTab);
+        setFilteredCauses(filtered);
+      } catch (error) {
+        console.error("Failed to filter causes:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    filterCauses();
+  }, [activeTab]);
+
+  // Handle search input changes
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+
+    if (!query.trim()) {
+      // If search is cleared, reapply the current category filter
+      const filtered = await causeApi.filterCausesByCategory(activeTab);
+      setFilteredCauses(filtered);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // First filter by category
+      const categoryFiltered =
+        activeTab === "all"
+          ? causes
+          : causes.filter(
+              (cause) =>
+                cause.categories?.includes(activeTab) ||
+                cause.tags.includes(activeTab)
+            );
+
+      // Then search within the category filtered results
+      const searchResults = categoryFiltered.filter(
+        (cause) =>
+          cause.title.toLowerCase().includes(query.toLowerCase()) ||
+          cause.subtitle.toLowerCase().includes(query.toLowerCase()) ||
+          cause.location.toLowerCase().includes(query.toLowerCase()) ||
+          cause.tags.some((tag) =>
+            tag.toLowerCase().includes(query.toLowerCase())
+          )
+      );
+
+      setFilteredCauses(searchResults);
+    } catch (error) {
+      console.error("Failed to search causes:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -19,13 +111,6 @@ export default function Causes() {
       transition: { duration: 0.6 },
     },
   };
-
-  // Categories for filtering causes
-  const categories = [
-    { id: "all", name: "All Causes", icon: HeartHandshake },
-    { id: "temple", name: "Temple", icon: Calendar },
-    { id: "education", name: "Education", icon: Users },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-saffron-50/50 to-white">
@@ -37,6 +122,8 @@ export default function Causes() {
             categories={categories}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            searchQuery={searchQuery}
+            onSearch={handleSearch}
           />
 
           {/* Main content */}
@@ -102,6 +189,8 @@ export default function Causes() {
                     type="text"
                     placeholder="Search causes..."
                     className="w-full pl-10 pr-4 py-3 border border-saffron-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-crimson-500"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
                   />
                   <Search
                     size={18}
@@ -113,7 +202,16 @@ export default function Causes() {
           </div>
         </div>
 
-        <CausesSection />
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="h-10 w-10 text-crimson-600 animate-spin" />
+            <span className="ml-4 text-lg text-maroon-700">
+              Loading causes...
+            </span>
+          </div>
+        ) : (
+          <CausesSection causes={filteredCauses} showAll={true} />
+        )}
 
         <motion.div
           className="mt-16 text-center"
