@@ -23,6 +23,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import type { IRegisterRetreatData, IRetreat, IUser } from "@/types";
 
 interface RegistrationViewDialogProps {
@@ -124,6 +125,25 @@ export default function RegistrationViewDialog({
     return "Unknown Location";
   };
 
+  // Helper function to get badge variant based on experience level
+  const getExperienceBadgeVariant = ():
+    | "default"
+    | "outline"
+    | "secondary"
+    | "destructive" => {
+    const experience = registration.MeditationExperience?.toLowerCase();
+
+    if (experience === "beginner") {
+      return "secondary";
+    } else if (experience === "intermediate") {
+      return "default";
+    } else if (experience === "advanced") {
+      return "destructive";
+    }
+
+    return "outline";
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -212,12 +232,15 @@ export default function RegistrationViewDialog({
               <h3 className="text-sm font-medium text-muted-foreground">
                 Meditation Experience
               </h3>
-              <p className="text-sm flex items-center">
+              <div className="flex items-center">
                 <HeartPulse className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="capitalize">
-                  {registration.MeditationExperience}
-                </span>
-              </p>
+                <Badge
+                  variant={getExperienceBadgeVariant()}
+                  className="capitalize"
+                >
+                  {registration.MeditationExperience || "Unknown"}
+                </Badge>
+              </div>
             </div>
 
             <div className="space-y-1">

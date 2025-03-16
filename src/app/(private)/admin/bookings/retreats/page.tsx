@@ -1,5 +1,7 @@
 "use client";
 
+import { AlertDialogFooter } from "@/components/ui/alert-dialog";
+
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { retreatRegisterApi } from "@/utils/retreatRegisterApi";
@@ -20,7 +22,6 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -89,7 +90,6 @@ export default function AdminRetreatsRegistrationsPage() {
   useEffect(() => {
     fetchRegistrations();
   }, []);
-  console.log("Registrations:", registrations);
 
   const handleRowSelectionChange = (rowSelection: Record<string, boolean>) => {
     const selectedRows = Object.keys(rowSelection).filter(
@@ -304,11 +304,25 @@ export default function AdminRetreatsRegistrationsPage() {
     {
       accessorKey: "MeditationExperience",
       header: "Experience",
-      cell: ({ row }) => (
-        <Badge variant="outline" className="capitalize">
-          {row.original.MeditationExperience}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const experience = row.original.MeditationExperience?.toLowerCase();
+        let badgeVariant: "default" | "outline" | "secondary" | "destructive" =
+          "outline";
+
+        if (experience === "beginner") {
+          badgeVariant = "secondary";
+        } else if (experience === "intermediate") {
+          badgeVariant = "default";
+        } else if (experience === "advanced") {
+          badgeVariant = "destructive";
+        }
+
+        return (
+          <Badge variant={badgeVariant} className="capitalize">
+            {row.original.MeditationExperience || "Unknown"}
+          </Badge>
+        );
+      },
     },
     {
       accessorKey: "accommodationType",
