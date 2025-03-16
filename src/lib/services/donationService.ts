@@ -53,12 +53,15 @@ export class DonationService implements IDonationService {
 
     if (donationId) {
       const donation = await Donation.findById(donationId)
-        .populate("userId")
-        .populate("donationTypeId");
+        .populate({ path: "userId", strictPopulate: false }) // Set strictPopulate: false
+        .populate({ path: "donationTypeId", strictPopulate: false });
+
       return donation ? [donation] : [];
     }
 
-    return await Donation.find().populate("userId").populate("donationTypeId");
+    return await Donation.find()
+      .populate({ path: "userId", strictPopulate: false })
+      .populate({ path: "donationTypeId", strictPopulate: false });
   }
 
   async deleteDonation(donationId: string): Promise<boolean> {

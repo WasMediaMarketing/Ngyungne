@@ -53,22 +53,22 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
-import CauseForm from "@/components/admin/cause/cause-form";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AdminCauseList() {
+  const router = useRouter();
   const [causes, setCauses] = useState<CauseUI[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewCause, setViewCause] = useState<CauseUI | null>(null);
-  const [editCause, setEditCause] = useState<CauseUI | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [causeToDelete, setCauseToDelete] = useState<string | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const [isUpdatingVisibility, setIsUpdatingVisibility] = useState<
     string | null
   >(null);
-  const [isAddCauseOpen, setIsAddCauseOpen] = useState(false);
 
   const fetchCauses = async () => {
     setLoading(true);
@@ -105,7 +105,8 @@ export default function AdminCauseList() {
   };
 
   const handleEditCause = (cause: CauseUI) => {
-    setEditCause(cause);
+    // Redirect to the edit page with the cause ID
+    router.push(`/admin/programs/causes/edit/${cause.id}`);
   };
 
   const handleDeleteConfirm = (id: string) => {
@@ -184,16 +185,6 @@ export default function AdminCauseList() {
     } finally {
       setIsUpdatingVisibility(null);
     }
-  };
-
-  const handleCauseCreated = () => {
-    setIsAddCauseOpen(false);
-    fetchCauses();
-  };
-
-  const handleCauseUpdated = () => {
-    setEditCause(null);
-    fetchCauses();
   };
 
   const columns: ColumnDef<CauseUI>[] = [
@@ -287,9 +278,6 @@ export default function AdminCauseList() {
               <span className="text-xs">
                 {startDate} - {endDate}
               </span>
-            </div>
-            <div className="text-xs mt-1">
-              {cause.daysLeft > 0 ? `${cause.daysLeft} days left` : "Ended"}
             </div>
           </div>
         );
@@ -424,14 +412,12 @@ export default function AdminCauseList() {
             />
             Refresh
           </Button>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => setIsAddCauseOpen(true)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Cause
-          </Button>
+          <Link href="/admin/programs/causes/new">
+            <Button variant="default" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              New Cause
+            </Button>
+          </Link>
           <Button
             variant="destructive"
             size="sm"
@@ -456,44 +442,6 @@ export default function AdminCauseList() {
           filterPlaceholder="Filter by title..."
           onRowSelectionChange={handleRowSelectionChange}
         />
-      )}
-
-      {/* Add Cause Dialog */}
-      <Dialog open={isAddCauseOpen} onOpenChange={setIsAddCauseOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add New Cause</DialogTitle>
-            <DialogDescription>
-              Create a new fundraising cause with all required details.
-            </DialogDescription>
-          </DialogHeader>
-          <CauseForm
-            onSuccess={handleCauseCreated}
-            onCancel={() => setIsAddCauseOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Cause Dialog */}
-      {editCause && (
-        <Dialog
-          open={!!editCause}
-          onOpenChange={(open) => !open && setEditCause(null)}
-        >
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Edit Cause</DialogTitle>
-              <DialogDescription>
-                Update the details for {editCause.title}.
-              </DialogDescription>
-            </DialogHeader>
-            <CauseForm
-              cause={editCause}
-              onSuccess={handleCauseUpdated}
-              onCancel={() => setEditCause(null)}
-            />
-          </DialogContent>
-        </Dialog>
       )}
 
       {/* View Cause Dialog */}
@@ -588,11 +536,6 @@ export default function AdminCauseList() {
                   <Progress value={viewCause.progress} className="h-2" />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>{viewCause.progress}% funded</span>
-                    <span>
-                      {viewCause.daysLeft > 0
-                        ? `${viewCause.daysLeft} days left`
-                        : "Ended"}
-                    </span>
                   </div>
                 </div>
               </div>

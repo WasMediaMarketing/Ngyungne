@@ -78,6 +78,7 @@
     "formidable": "^2.0.1",
     "framer-motion": "^12.4.7",
     "input-otp": "1.4.1",
+    "jodit-react": "^5.2.15",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.0",
     "jspdf-autotable": "^5.0.2",

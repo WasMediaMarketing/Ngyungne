@@ -110,3 +110,62 @@
     @apply bg-background text-foreground;
   }
 }
+/* Custom styles for Jodit Editor to ensure proper display */
+.jodit-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+}
+
+.jodit-workplace {
+  max-height: 800px !important;
+  min-height: 300px !important;
+}
+
+.jodit-wysiwyg {
+  padding: 1rem !important;
+  min-height: 300px !important;
+  font-family: inherit !important;
+}
+
+.jodit-toolbar {
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.jodit-toolbar__box {
+  flex-wrap: wrap !important;
+}
+
+/* Ensure editor content is displayed properly */
+.jodit-wysiwyg p {
+  margin-bottom: 1em !important;
+}
+
+.jodit-wysiwyg img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.jodit-wysiwyg table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.jodit-wysiwyg table td,
+.jodit-wysiwyg table th {
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.5rem !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .jodit-toolbar__box {
+    justify-content: center !important;
+  }
+
+  .jodit-toolbar-button {
+    margin: 2px !important;
+  }
+}

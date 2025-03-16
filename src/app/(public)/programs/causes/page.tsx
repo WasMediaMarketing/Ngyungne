@@ -5,11 +5,98 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CausesSection } from "@/components/sections/causes-section";
 import { CausesSidebar } from "@/components/causes/CauseSidebar";
 import { Button } from "@/components/ui/button";
-import { Search, Calendar, Users, HeartHandshake } from "lucide-react";
-import { useState } from "react";
+import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { causeApi, type CauseUI } from "@/utils/causeApi";
+import { Loader } from "@/components/common/loader";
+import Link from "next/link";
 
 export default function Causes() {
   const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [causes, setCauses] = useState<CauseUI[]>([]);
+  const [filteredCauses, setFilteredCauses] = useState<CauseUI[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch causes on component mount
+  useEffect(() => {
+    const fetchCauses = async () => {
+      setIsLoading(true);
+      try {
+        const data = await causeApi.getCauses();
+        setCauses(data);
+        setFilteredCauses(data);
+      } catch (error) {
+        console.error("Failed to fetch causes:", error);
+        // Initialize with empty arrays on error
+        setCauses([]);
+        setFilteredCauses([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCauses();
+  }, []);
+
+  // Handle category filter changes
+  useEffect(() => {
+    const filterCauses = async () => {
+      setIsLoading(true);
+      try {
+        const filtered = await causeApi.filterCausesByCategory(activeTab);
+        setFilteredCauses(filtered);
+      } catch (error) {
+        console.error("Failed to filter causes:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    filterCauses();
+  }, [activeTab]);
+
+  // Handle search input changes
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+
+    if (!query.trim()) {
+      // If search is cleared, reapply the current category filter
+      const filtered = await causeApi.filterCausesByCategory(activeTab);
+      setFilteredCauses(filtered);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // First filter by category
+      const categoryFiltered =
+        activeTab === "all"
+          ? causes
+          : causes.filter(
+              (cause) =>
+                cause.categories?.includes(activeTab) ||
+                cause.tags.includes(activeTab)
+            );
+
+      // Then search within the category filtered results
+      const searchResults = categoryFiltered.filter(
+        (cause) =>
+          cause.title.toLowerCase().includes(query.toLowerCase()) ||
+          cause.subtitle.toLowerCase().includes(query.toLowerCase()) ||
+          cause.location.toLowerCase().includes(query.toLowerCase()) ||
+          cause.tags.some((tag) =>
+            tag.toLowerCase().includes(query.toLowerCase())
+          )
+      );
+
+      setFilteredCauses(searchResults);
+    } catch (error) {
+      console.error("Failed to search causes:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -20,69 +107,22 @@ export default function Causes() {
     },
   };
 
-  // Categories for filtering causes
-  const categories = [
-    { id: "all", name: "All Causes", icon: HeartHandshake },
-    { id: "temple", name: "Temple", icon: Calendar },
-    { id: "education", name: "Education", icon: Users },
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-saffron-50/50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <Breadcrumbs />
 
-        <div className="grid lg:grid-cols-5 gap-8 mb-12">
+        <div className="flex  justify-center mx-auto w-[70%] sm:w-[80%]">
           <CausesSidebar
-            categories={categories}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            searchQuery={searchQuery}
+            onSearch={handleSearch}
           />
 
           {/* Main content */}
           <div className="lg:col-span-4">
-            {/* Mobile filter tabs */}
-            <motion.div
-              className="lg:hidden mb-6 overflow-x-auto scrollbar-hide flex space-x-2"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={activeTab === category.id ? "default" : "outline"}
-                  onClick={() => setActiveTab(category.id)}
-                  className="whitespace-nowrap rounded-full"
-                >
-                  <category.icon size={16} className="mr-2" />
-                  {category.name}
-                </Button>
-              ))}
-            </motion.div>
-
             <motion.div variants={fadeIn} initial="hidden" animate="visible">
-              <motion.h1
-                className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-crimson-800 leading-tight"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                Support Our <span className="text-saffron-600">Dharma</span>{" "}
-                Causes
-              </motion.h1>
-
-              <motion.p
-                className="text-lg mb-6 text-maroon-700 max-w-3xl"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                Explore the various causes we support and how you can contribute
-                to making a difference in preserving Dharma traditions and
-                supporting spiritual communities around the world.
-              </motion.p>
-
               <motion.div
                 className="flex flex-col sm:flex-row gap-4 mb-10"
                 initial={{ opacity: 0, y: 20 }}
@@ -102,6 +142,8 @@ export default function Causes() {
                     type="text"
                     placeholder="Search causes..."
                     className="w-full pl-10 pr-4 py-3 border border-saffron-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-crimson-500"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
                   />
                   <Search
                     size={18}
@@ -113,7 +155,11 @@ export default function Causes() {
           </div>
         </div>
 
-        <CausesSection />
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <CausesSection causes={filteredCauses} showAll={true} />
+        )}
 
         <motion.div
           className="mt-16 text-center"
@@ -129,7 +175,7 @@ export default function Causes() {
             would like to make a general donation, please reach out to us.
           </p>
           <Button className="bg-crimson-600 text-white hover:bg-crimson-700">
-            Contact Our Team
+            <Link href="/contact">Contact Us</Link>
           </Button>
         </motion.div>
       </div>

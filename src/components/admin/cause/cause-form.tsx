@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import type React from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 
 import { causeApi, type CauseUI } from "@/utils/causeApi";
 import { Button } from "@/components/ui/button";
@@ -14,18 +15,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RefreshCw, Plus, X, Tag, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DatePicker } from "@/components/ui/date-picker";
-import TextEditor from "@/components/common/TextEditor";
+
+// Dynamically import JoditEditor to avoid SSR issues
+const JoditEditor = dynamic(() => import("jodit-react"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[600px] w-full bg-muted/20 animate-pulse rounded-md"></div>
+  ),
+});
 
 interface CauseFormProps {
   cause?: CauseUI;
   onSuccess: () => void;
   onCancel: () => void;
+  placeholder?: string;
 }
 
 export default function CauseForm({
   cause,
   onSuccess,
   onCancel,
+  placeholder,
 }: CauseFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
@@ -43,11 +53,29 @@ export default function CauseForm({
   const [galleryImages, setGalleryImages] = useState<File[]>([]);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
 
+  // Editor refs and content
+  const impactEditorRef = useRef(null);
+  const updatesEditorRef = useRef(null);
+  const [impactContent, setImpactContent] = useState("");
+  const [updatesContent, setUpdatesContent] = useState("");
+
+  // Jodit Editor configuration
+  const [content, setContent] = useState("");
+
+  const config = useMemo(
+    () => ({
+      readonly: false, // all options from https://xdsoft.net/jodit/docs/,
+      placeholder: placeholder || "Start typings...",
+    }),
+    [placeholder]
+  );
+
   // Form state
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
     location: "",
+    volunteers: 0,
     goal: 0,
     startDate: new Date(),
     endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
@@ -69,6 +97,7 @@ export default function CauseForm({
         subtitle: cause.subtitle,
         location: cause.location,
         goal: cause.goal,
+        volunteers: cause.volunteers,
         startDate: new Date(cause.startDate),
         endDate: new Date(cause.endDate),
         tags: cause.tags,
@@ -83,6 +112,8 @@ export default function CauseForm({
       setMainImagePreview(cause.image);
       setGalleryPreviews(cause.gallery);
       setFaqItems(cause.faq);
+      setImpactContent(cause.impact);
+      setUpdatesContent(cause.updates);
     }
   }, [cause]);
 
@@ -115,6 +146,7 @@ export default function CauseForm({
   };
 
   const handleImpactChange = (content: string) => {
+    setImpactContent(content);
     setFormData((prev) => ({
       ...prev,
       impact: content,
@@ -122,6 +154,7 @@ export default function CauseForm({
   };
 
   const handleUpdatesChange = (content: string) => {
+    setUpdatesContent(content);
     setFormData((prev) => ({
       ...prev,
       updates: content,
@@ -313,6 +346,7 @@ export default function CauseForm({
       formDataObj.append("title", formData.title);
       formDataObj.append("subtitle", formData.subtitle);
       formDataObj.append("location", formData.location);
+      formDataObj.append("volunteers", formData.volunteers.toString());
       formDataObj.append("goal", formData.goal.toString());
       formDataObj.append("startDate", formData.startDate.toISOString());
       formDataObj.append("endDate", formData.endDate.toISOString());
@@ -324,9 +358,9 @@ export default function CauseForm({
       // Add about section
       formDataObj.append("about", JSON.stringify(formData.about));
 
-      // Add impact and updates
-      formDataObj.append("impact", formData.impact);
-      formDataObj.append("updates", formData.updates);
+      // Add impact and updates - use the content directly from state
+      formDataObj.append("impact", impactContent);
+      formDataObj.append("updates", updatesContent);
 
       // Add FAQ
       formDataObj.append("faq", JSON.stringify(faqItems));
@@ -361,9 +395,9 @@ export default function CauseForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full">
+    <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 w-full">
           <TabsTrigger value="basic">Basic Info</TabsTrigger>
           <TabsTrigger value="about">About</TabsTrigger>
           <TabsTrigger value="impact">Impact</TabsTrigger>
@@ -442,36 +476,49 @@ export default function CauseForm({
               />
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="tags">Tags</Label>
-            <div className="flex items-center">
-              <div className="relative flex-1">
-                <Tag className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="tags"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleAddTag}
-                  placeholder="Add tags and press Enter"
-                  className="pl-10"
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="volunteers">Volunteers *</Label>
+              <Input
+                id="volunteers"
+                name="volunteers"
+                type="number"
+                value={formData.volunteers}
+                onChange={handleInputChange}
+                placeholder="Enter volunteer count"
+                required
+              />
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.tags.map((tag, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="flex items-center gap-1"
-                >
-                  {tag}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleRemoveTag(tag)}
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags</Label>
+              <div className="flex items-center">
+                <div className="relative flex-1">
+                  <Tag className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="tags"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleAddTag}
+                    placeholder="Add tags and press Enter"
+                    className="pl-10"
                   />
-                </Badge>
-              ))}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.tags.map((tag, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {tag}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleRemoveTag(tag)}
+                    />
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -640,15 +687,38 @@ export default function CauseForm({
         <TabsContent value="impact" className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="impact">Impact Description *</Label>
-            <TextEditor
-              value={formData.impact}
-              onChange={handleImpactChange}
-              height={500}
-            />
-            <p className="text-xs text-muted-foreground">
-              Describe the impact this cause will have. You can add images and
-              videos to enhance your description.
-            </p>
+            <div className="w-full border rounded-md overflow-hidden">
+              {typeof window !== "undefined" && (
+                <JoditEditor
+                  ref={impactEditorRef}
+                  config={config}
+                  value={impactContent}
+                  onChange={handleImpactChange}
+                />
+              )}
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                type="file"
+                id="impact-image"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && impactEditorRef.current) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      const img = `<img src="${reader.result}" alt="Uploaded image" style="max-width: 100%; height: auto;" />`;
+                      // @ts-ignore - accessing editor instance
+                      impactEditorRef.current?.editor?.selection.insertHTML(
+                        img
+                      );
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </div>
           </div>
         </TabsContent>
 
@@ -656,15 +726,52 @@ export default function CauseForm({
         <TabsContent value="updates" className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="updates">Updates</Label>
-            <TextEditor
-              value={formData.updates}
-              onChange={handleUpdatesChange}
-              height={500}
-            />
-            <p className="text-xs text-muted-foreground">
-              Provide updates about the cause's progress. You can add images and
-              videos to enhance your updates.
-            </p>
+            <div className="w-full border rounded-md overflow-hidden">
+              {typeof window !== "undefined" && (
+                <JoditEditor
+                  ref={updatesEditorRef}
+                  config={config}
+                  value={updatesContent}
+                  onChange={handleUpdatesChange}
+                />
+              )}
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                type="file"
+                id="updates-image"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && updatesEditorRef.current) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      const img = `<img src="${reader.result}" alt="Uploaded image" style="max-width: 100%; height: auto;" />`;
+                      // @ts-ignore - accessing editor instance
+                      updatesEditorRef.current?.editor?.selection.insertHTML(
+                        img
+                      );
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  document.getElementById("updates-image")?.click()
+                }
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Add Image
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                You can also drag and drop images directly into the editor.
+              </p>
+            </div>
           </div>
         </TabsContent>
 
