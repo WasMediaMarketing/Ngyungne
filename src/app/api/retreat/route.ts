@@ -140,9 +140,9 @@ export async function GET(req: NextRequest) {
   const authResult = await isAuthenticated(req);
   const retreatController = createRetreatController();
   if (authResult) {
-    return retreatController.getRetreats();
+    return retreatController.getPublishedRetreats();
   }
-  return retreatController.getPublishedRetreats();
+  return retreatController.getRetreats();
 }
 
 export async function DELETE(req: NextRequest) {
