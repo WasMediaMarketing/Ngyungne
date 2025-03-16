@@ -10,7 +10,7 @@ export interface IRegisterRetreatInput
   MeditationExperience: string;
   dietaryRestriction?: string;
   specialRequest?: string;
-  accomodationType: string;
+  accommodationType: string;
   emergencyContactName: string;
   emergencyContactNumber: string;
 }
@@ -19,7 +19,7 @@ export interface IRegisterRetreatUpdate {
   MeditationExperience?: string;
   dietaryRestriction?: string;
   specialRequest?: string;
-  accomodationType?: string;
+  accommodationType?: string;
   emergencyContactName?: string;
   emergencyContactNumber?: string;
 }

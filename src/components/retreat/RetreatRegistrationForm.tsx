@@ -45,8 +45,8 @@ const formSchema = z.object({
   }),
   dietaryRestriction: z.string().optional(),
   specialRequest: z.string().optional(),
-  AccomodationType: z.string().min(1, {
-    message: "Please select an accommodation type.",
+  accommodationType: z.string().min(1, {
+    message: "Please select an accomodation type.",
   }),
   emergencyContactName: z.string().min(2, {
     message: "Emergency contact name must be at least 2 characters.",
@@ -75,7 +75,7 @@ export function RetreatRegistrationForm({
       MeditationExperience: "beginner",
       dietaryRestriction: "",
       specialRequest: "",
-      AccomodationType: "shared",
+      accommodationType: "shared",
       emergencyContactName: "",
       emergencyContactNumber: "",
     },
@@ -233,14 +233,14 @@ export function RetreatRegistrationForm({
 
         <FormField
           control={form.control}
-          name="AccomodationType"
+          name="accommodationType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Accommodation Type</FormLabel>
+              <FormLabel>Accomodation Type</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select accommodation type" />
+                    <SelectValue placeholder="Select accomodation type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -261,7 +261,7 @@ export function RetreatRegistrationForm({
               <FormLabel>Special Requests</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Any special requests or accommodations"
+                  placeholder="Any special requests or accomodations"
                   {...field}
                 />
               </FormControl>
