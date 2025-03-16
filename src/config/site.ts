@@ -15,6 +15,7 @@ import {
   Image,
   HelpCircle,
   BookMarked,
+  Mountain,
 } from "lucide-react";
 
 export const siteConfig = {
@@ -127,14 +128,22 @@ export const siteConfig = {
       {
         title: "Event Bookings",
         href: "/bookings/events",
-        description: "View our calendar of upcoming teachings and ceremonies",
-        icon: "Calendar",
+        description:
+          "Reserve your spot for upcoming events, teachings, and ceremonies.",
+        icon: CalendarDays, // More suitable for scheduling events
       },
       {
         title: "Course Enrollments",
         href: "/bookings/courses",
-        description: "View our calendar of upcoming teachings and ceremonies",
-        icon: "Calendar",
+        description:
+          "Enroll in our upcoming courses and expand your knowledge.",
+        icon: GraduationCap, // Represents education and learning
+      },
+      {
+        title: "Retreat Bookings",
+        href: "/bookings/retreats",
+        description: "Book your place for peaceful and rejuvenating retreats.",
+        icon: Mountain, // Symbolizes retreats, nature, and relaxation
       },
     ],
   },

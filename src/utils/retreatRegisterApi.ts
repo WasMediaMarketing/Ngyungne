@@ -81,15 +81,10 @@ export const retreatRegisterApi = {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Registration submitted successfully",
-      });
       return true;
     } catch (error: any) {
       console.error("Error registering for retreat:", error);
-      toast.error("Error", {
-        description: error.message || "Failed to submit registration",
-      });
+
       return false;
     }
   },
@@ -114,15 +109,10 @@ export const retreatRegisterApi = {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Registration updated successfully",
-      });
       return true;
     } catch (error: any) {
       console.error(`Error updating registration ${id}:`, error);
-      toast.error("Error", {
-        description: error.message || "Failed to update registration",
-      });
+
       return false;
     }
   },
@@ -141,15 +131,10 @@ export const retreatRegisterApi = {
         throw new Error(`Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Registration deleted successfully",
-      });
       return true;
     } catch (error) {
       console.error(`Error deleting registration ${id}:`, error);
-      toast.error("Error", {
-        description: "Failed to delete registration",
-      });
+
       return false;
     }
   },
@@ -171,15 +156,10 @@ export const retreatRegisterApi = {
         throw new Error(`Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: `${ids.length} registrations deleted successfully`,
-      });
       return true;
     } catch (error) {
       console.error("Error deleting registrations:", error);
-      toast.error("Error", {
-        description: "Failed to delete registrations",
-      });
+
       return false;
     }
   },
