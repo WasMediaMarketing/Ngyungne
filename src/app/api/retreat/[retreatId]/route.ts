@@ -37,7 +37,6 @@ import { isAuthenticated } from "@/lib/middlewares";
  *           description: Retreat not found for the given ID
  *         500:
  *           description: Internal server error
- *   /api/retreat/{retreatId}:
  *     patch:
  *       summary: Update retreat information by its ID
  *       description: This endpoint updates the retreat details based on the provided retreat ID.

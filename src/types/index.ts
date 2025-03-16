@@ -18,6 +18,12 @@ import { ICause, ICauseInput, ICauseUpdate } from "./cause.types";
 import { ICauseService } from "./causeService.interface";
 import { IRetreat, IRetreatInput, IRetreatUpdate } from "./retreat.types";
 import { IRetreatService } from "./retreatService.interface";
+import {
+  IRegisterRetreatData,
+  IRegisterRetreatInput,
+  IRegisterRetreatUpdate,
+} from "./registerRetreat.types";
+import { IRegisterRetreatService } from "./registerRetreatService.interface";
 
 export type {
   IUser,
@@ -50,4 +56,8 @@ export type {
   IRetreatInput,
   IRetreatUpdate,
   IRetreatService,
+  IRegisterRetreatData,
+  IRegisterRetreatInput,
+  IRegisterRetreatUpdate,
+  IRegisterRetreatService,
 };

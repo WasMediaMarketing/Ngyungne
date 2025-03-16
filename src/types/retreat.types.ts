@@ -8,7 +8,7 @@ export interface IRetreat extends Document {
   date: string;
   duration: string;
   location: string;
-  participants: string;
+  participants: number;
   isVisible: boolean;
   price: string;
   type: string;
@@ -21,7 +21,7 @@ export interface IRetreatInput {
   date: string;
   duration: string;
   location: string;
-  participants: string;
+  participants: number;
   isVisible?: boolean;
   price: string;
   type: string;

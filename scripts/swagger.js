@@ -24,24 +24,7 @@ const options = {
   swaggerDefinition,
   apis: [
     // Add paths to your API files
-    path.join(__dirname, "../src/app/api/user/route.ts"),
-    path.join(__dirname, "../src/app/api/user/[userId]/route.ts"),
-    path.join(__dirname, "../src/app/api/user/login/route.ts"),
-    path.join(__dirname, "../src/app/api/user/admin-init/route.ts"),
-    path.join(__dirname, "../src/app/api/donation/route.ts"),
-    path.join(__dirname, "../src/app/api/donation/[donationId]/route.ts"),
-    path.join(__dirname, "../src/app/api/contact/route.ts"),
-    path.join(__dirname, "../src/app/api/contact/[contactId]/route.ts"),
-    path.join(__dirname, "../src/app/api/event/route.ts"),
-    path.join(__dirname, "../src/app/api/event/[eventId]/route.ts"),
-    path.join(__dirname, "../src/app/api/volunteer/route.ts"),
-    path.join(__dirname, "../src/app/api/volunteer/[volunteerId]/route.ts"),
-    path.join(__dirname, "../src/app/api/book-event/route.ts"),
-    path.join(__dirname, "../src/app/api/book-event/[bookEventId]/route.ts"),
-    path.join(__dirname, "../src/app/api/cause/route.ts"),
-    path.join(__dirname, "../src/app/api/cause/[causeId]/route.ts"),
-    path.join(__dirname, "../src/app/api/retreat/route.ts"),
-    path.join(__dirname, "../src/app/api/retreat/[retreatId]/route.ts"),
+    path.join(__dirname, "../src/app/api/**/route.ts"),
   ],
 };
 console.log("Swagger API files being considered:");

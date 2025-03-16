@@ -6,6 +6,7 @@ import { VolunteerService } from "./volunteerService";
 import { BookEventService } from "./bookEventService";
 import { CauseService } from "./causeService";
 import { RetreatService } from "./retreatService";
+import { RegisterRetreatService } from "./registerRetreatService";
 
 export {
   UserService,
@@ -16,4 +17,5 @@ export {
   BookEventService,
   CauseService,
   RetreatService,
+  RegisterRetreatService,
 };

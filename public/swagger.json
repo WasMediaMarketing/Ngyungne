@@ -11,12 +11,33 @@
     }
   ],
   "paths": {
-    "/api/user": {
-      "post": {
-        "summary": "Create a new user",
-        "description": "This endpoint creates a new user in the system.",
+    "/api/book-event/{bookEventId}": {
+      "patch": {
+        "summary": "Update a booked event",
+        "description": "This endpoint allows you to update an existing booked event, including ticket number and accommodation details.",
         "tags": [
-          "User"
+          "Book Event"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookEventId",
+            "required": true,
+            "description": "The ID of the booked event to update",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
         ],
         "requestBody": {
           "required": true,
@@ -25,39 +46,20 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "Name of the user"
+                  "TicketNumber": {
+                    "type": "integer",
+                    "description": "The number of tickets to update",
+                    "example": 5
                   },
-                  "email": {
+                  "dietaryRequirements": {
                     "type": "string",
-                    "description": "Email of the user"
+                    "description": "Special dietary requirements for the booking",
+                    "example": "Vegetarian"
                   },
-                  "phoneNumber": {
+                  "specialAccomodation": {
                     "type": "string",
-                    "description": "Phone number of the user"
-                  },
-                  "role": {
-                    "type": "string",
-                    "enum": [
-                      "user",
-                      "admin",
-                      "volunteer",
-                      "donator"
-                    ],
-                    "description": "Role of the user"
-                  },
-                  "password": {
-                    "type": "string",
-                    "description": "Password of the user (only required for creating new admin)"
-                  },
-                  "page": {
-                    "type": "string",
-                    "description": "Page for the user (required for non-admin users)"
-                  },
-                  "pageTitle": {
-                    "type": "string",
-                    "description": "Page title for the user (required for non-admin users)"
+                    "description": "Special accommodation needs",
+                    "example": "Wheelchair access"
                   }
                 }
               }
@@ -65,14 +67,17 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "User created successfully"
+          "200": {
+            "description": "Successfully updated the booking event"
           },
           "400": {
-            "description": "Bad request if input validation fails"
+            "description": "Invalid input data, such as invalid ticket number"
           },
           "401": {
-            "description": "Unauthorized if token is invalid or missing"
+            "description": "Unauthorized access, authentication token missing or invalid"
+          },
+          "404": {
+            "description": "Booking event not found"
           },
           "500": {
             "description": "Internal server error"
@@ -80,10 +85,10 @@
         }
       },
       "get": {
-        "summary": "Get all users",
-        "description": "This endpoint retrieves all users in the system.",
+        "summary": "Get all booked events",
+        "description": "Retrieve all booked events.",
         "tags": [
-          "User"
+          "Book Event"
         ],
         "parameters": [
           {
@@ -99,10 +104,10 @@
         ],
         "responses": {
           "200": {
-            "description": "List of users retrieved successfully"
+            "description": "Successfully retrieved all booked events"
           },
           "401": {
-            "description": "Unauthorized if token is invalid or missing"
+            "description": "Unauthorized access"
           },
           "500": {
             "description": "Internal server error"
@@ -110,21 +115,164 @@
         }
       },
       "delete": {
-        "summary": "Delete users by their IDs",
-        "description": "Delete multiple users based on their user IDs.",
+        "summary": "Delete a booked event",
+        "description": "Delete a booked event based on its ID.",
+        "tags": [
+          "Book Event"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookEventId",
+            "required": true,
+            "description": "The ID of the booked event to delete",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted the booked event"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          },
+          "404": {
+            "description": "Booking event not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/book-event": {
+      "post": {
+        "summary": "Create a new event booking",
+        "description": "This endpoint allows the bookEvent to create a new event booking.",
+        "tags": [
+          "BookEvent"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the person booking the event.",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "The email of the person booking the event.",
+                    "example": "john.doe@example.com"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "The phone number of the person booking the event.",
+                    "example": "+123456789"
+                  },
+                  "page": {
+                    "type": "string",
+                    "description": "The page associated with the event (optional).",
+                    "example": "event123"
+                  },
+                  "pageTitle": {
+                    "type": "string",
+                    "description": "The title of the page associated with the event (optional).",
+                    "example": "Annual Charity Event"
+                  },
+                  "TicketNumber": {
+                    "type": "integer",
+                    "description": "The ticket number for the event.",
+                    "example": 1
+                  },
+                  "dietaryRequirements": {
+                    "type": "string",
+                    "description": "Any dietary requirements for the attendee (optional).",
+                    "example": "Vegetarian"
+                  },
+                  "specialAccomodation": {
+                    "type": "string",
+                    "description": "Special accommodation needs for the attendee (optional).",
+                    "example": "Wheelchair access"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event booking successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The ID of the newly created event booking.",
+                      "example": "60b8c6b0f1f1a51a6d5a7a6e"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request if the input is invalid"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all event bookings",
+        "description": "This endpoint retrieves all event bookings in the system.",
+        "tags": [
+          "BookEvent"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of event bookings retrieved successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete book-events by their IDs",
+        "description": "Delete multiple book-events based on their book-event IDs.",
         "tags": [
           "User"
         ],
         "parameters": [
           {
             "in": "query",
-            "name": "userIds",
+            "name": "book-eventIds",
             "required": true,
             "schema": {
               "type": "string",
               "example": "1,2,3,4"
             },
-            "description": "A comma-separated list of user IDs to delete."
+            "description": "A comma-separated list of book-event IDs to delete."
           },
           {
             "in": "header",
@@ -145,7 +293,7 @@
             "description": "Unauthorized - The request is not authenticated."
           },
           "404": {
-            "description": "No users found for the given IDs."
+            "description": "No book-events found for the given IDs."
           },
           "500": {
             "description": "Internal server error."
@@ -153,28 +301,183 @@
         }
       }
     },
-    "/api/user/login": {
-      "post": {
-        "summary": "Login user and return JWT token",
-        "description": "This endpoint allows a user to log in by providing their email and password. On successful login, a JWT token is returned.",
+    "/api/cause/{causeId}": {
+      "get": {
+        "summary": "Get cause by ID",
+        "description": "Fetch cause details by its cause ID.",
         "tags": [
-          "User"
+          "Cause"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "causeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the cause to fetch."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cause details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The cause's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The cause's title."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The cause's description."
+                    },
+                    "goal": {
+                      "type": "integer",
+                      "description": "The financial goal of the cause."
+                    },
+                    "raised": {
+                      "type": "integer",
+                      "description": "The amount raised for the cause."
+                    },
+                    "volunteers": {
+                      "type": "integer",
+                      "description": "Number of volunteers for the cause."
+                    },
+                    "totalDonors": {
+                      "type": "integer",
+                      "description": "Number of total donors."
+                    },
+                    "isVisible": {
+                      "type": "boolean",
+                      "description": "Whether the cause is visible or not."
+                    },
+                    "image": {
+                      "type": "string",
+                      "description": "The URL of the cause image."
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "faq": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "about": {
+                      "type": "string",
+                      "description": "Additional information about the cause."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Cause not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update cause by ID",
+        "description": "Update the cause's details based on its cause ID.",
+        "tags": [
+          "Cause"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "causeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the cause to update."
+          }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart-form data": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "title": {
                     "type": "string",
-                    "format": "email",
-                    "description": "The user's email address."
+                    "description": "The updated title of the cause."
                   },
-                  "password": {
+                  "description": {
                     "type": "string",
-                    "description": "The user's password."
+                    "description": "The updated description of the cause."
+                  },
+                  "goal": {
+                    "type": "integer",
+                    "description": "The updated goal for the cause."
+                  },
+                  "raised": {
+                    "type": "integer",
+                    "description": "The updated amount raised for the cause."
+                  },
+                  "volunteers": {
+                    "type": "integer",
+                    "description": "The updated number of volunteers for the cause."
+                  },
+                  "totalDonors": {
+                    "type": "integer",
+                    "description": "The updated number of total donors."
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the cause is visible."
+                  },
+                  "image": {
+                    "type": "string",
+                    "description": "The updated image URL for the cause."
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "gallery": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "faq": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "about": {
+                    "type": "string",
+                    "description": "Additional information about the cause."
                   }
                 }
               }
@@ -183,46 +486,165 @@
         },
         "responses": {
           "200": {
-            "description": "User logged in successfully, returns the user details and JWT token.",
+            "description": "Cause details updated successfully.",
             "content": {
-              "application/json": null,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "description": "The user ID."
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "The user's name."
-                      },
-                      "email": {
-                        "type": "string",
-                        "description": "The user's email address."
-                      },
-                      "role": {
-                        "type": "string",
-                        "description": "The user's role (e.g., admin, user, etc.)."
-                      }
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The cause's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The updated title of the cause."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The updated description of the cause."
                     }
-                  },
-                  "token": {
-                    "type": "string",
-                    "description": "The JWT token for authenticated requests."
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid credentials or bad request."
+            "description": "Bad request - Invalid or incomplete data."
           },
           "401": {
-            "description": "Unauthorized if the login credentials are invalid."
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Cause not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update cause by ID (non-file related updates)",
+        "description": "Update cause details (only handles non-file related updates).",
+        "tags": [
+          "Cause"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "causeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the cause to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The updated title of the cause."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The updated description of the cause."
+                  },
+                  "goal": {
+                    "type": "integer",
+                    "description": "The updated goal for the cause."
+                  },
+                  "raised": {
+                    "type": "integer",
+                    "description": "The updated amount raised for the cause."
+                  },
+                  "volunteers": {
+                    "type": "integer",
+                    "description": "The updated number of volunteers for the cause."
+                  },
+                  "totalDonors": {
+                    "type": "integer",
+                    "description": "The updated number of total donors."
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the cause is visible."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cause details updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The cause's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The updated title of the cause."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The updated description of the cause."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid or incomplete data."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Cause not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete cause by ID",
+        "description": "Delete a cause based on its cause ID.",
+        "tags": [
+          "Cause"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "causeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the cause to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cause successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Cause not found for the given ID."
           },
           "500": {
             "description": "Internal server error."
@@ -230,45 +652,456 @@
         }
       }
     },
-    "/api/user/init-admin": {
-      "get": {
-        "summary": "Initializes the admin user if it doesn't exist",
-        "description": "Checks if an admin user exists in the database, and if not, creates one with the email and password specified in environment variables.",
+    "/api/cause": {
+      "post": {
+        "summary": "Create a new cause",
+        "description": "This endpoint creates a new cause with images, updates, goals, and other required information.",
+        "operationId": "createCause",
         "tags": [
-          "Admin"
+          "Cause"
         ],
-        "responses": {
-          "200": {
-            "description": "Admin check complete. Admin user exists or has been created successfully.",
-            "content": {
-              "application/json": null,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "message": {
+                  "image": {
                     "type": "string",
-                    "description": "Message indicating the status of the admin user creation.",
-                    "example": "Admin check complete"
+                    "format": "binary",
+                    "description": "Main image for the cause"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the cause"
+                  },
+                  "subtitle": {
+                    "type": "string",
+                    "description": "Subtitle of the cause"
+                  },
+                  "goal": {
+                    "type": "integer",
+                    "description": "Goal amount for the cause"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Start date of the cause"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "End date of the cause"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Location of the cause"
+                  },
+                  "impact": {
+                    "type": "string",
+                    "description": "Expected impact of the cause"
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the cause is visible"
+                  },
+                  "gallery": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of image URLs for the cause gallery"
+                  },
+                  "updates": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Update date"
+                        },
+                        "title": {
+                          "type": "string",
+                          "description": "Title of the update"
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "Content of the update"
+                        },
+                        "image": {
+                          "type": "string",
+                          "format": "binary",
+                          "description": "Image for the update (optional)"
+                        }
+                      }
+                    }
+                  },
+                  "faq": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "question": {
+                          "type": "string",
+                          "description": "The question for FAQ"
+                        },
+                        "answer": {
+                          "type": "string",
+                          "description": "The answer for FAQ"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cause created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
           },
+          "400": {
+            "description": "Invalid input or validation error"
+          },
+          "401": {
+            "description": "Unauthorized or invalid token"
+          },
           "500": {
-            "description": "Internal server error. Could not initialize the admin user.",
+            "description": "Internal server error",
             "content": {
-              "application/json": null,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "error": {
-                    "type": "string",
-                    "description": "Error message indicating the failure reason.",
-                    "example": "Failed to initialize admin user"
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve all causes or published causes",
+        "description": "Fetches all causes for authenticated users, or only published causes for unauthenticated users.",
+        "operationId": "getCauses",
+        "tags": [
+          "Cause"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of causes (all causes for authenticated users, only published causes for unauthenticated)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "goal": {
+                        "type": "integer"
+                      },
+                      "startDate": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "endDate": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple causes",
+        "description": "This endpoint deletes multiple causes by their IDs, which are passed in the query parameters.",
+        "operationId": "deleteCauses",
+        "tags": [
+          "Cause"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "causeIds",
+            "required": true,
+            "description": "Comma-separated list of cause IDs to be deleted.",
+            "schema": {
+              "type": "string",
+              "example": "1,2,3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Causes deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message indicating the deletion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing causeIds"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contact": {
+      "delete": {
+        "summary": "Delete multiple contacts by their IDs",
+        "description": "This endpoint deletes multiple contact entries based on the provided comma-separated list of contact IDs.",
+        "tags": [
+          "Contact"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "contactIds",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "123,456,789"
+            },
+            "description": "A comma-separated list of contact IDs to delete."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contacts successfully deleted."
+          },
+          "400": {
+            "description": "Bad request if the IDs are invalid or improperly formatted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated or the token is invalid."
+          },
+          "404": {
+            "description": "No contacts found for the provided IDs."
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all contacts",
+        "description": "This endpoint retrieves all the contact entries in the system.",
+        "tags": [
+          "Contact"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of contacts retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized if token is invalid or missing"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new contact",
+        "description": "This endpoint allows you to create a new contact entry in the system.",
+        "tags": [
+          "Contact"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the contact."
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "The email of the contact."
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "The phone number of the contact."
+                  },
+                  "page": {
+                    "type": "string",
+                    "description": "(Optional) The page associated with the contact."
+                  },
+                  "pageTitle": {
+                    "type": "string",
+                    "description": "(Optional) The page title associated with the contact."
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "The subject of the contact message."
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "The content of the contact message."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Contact created successfully"
+          },
+          "400": {
+            "description": "Bad request if input validation fails"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/donation/{id}": {
+      "delete": {
+        "summary": "Delete a donation by its ID",
+        "description": "This endpoint deletes a donation from the system based on the provided donation ID.",
+        "tags": [
+          "Donation"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "12345"
+            },
+            "description": "The unique ID of the donation to be deleted."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Donation successfully deleted"
+          },
+          "400": {
+            "description": "Bad request if the donation ID is invalid"
+          },
+          "401": {
+            "description": "Unauthorized if the request is not authenticated"
+          },
+          "404": {
+            "description": "Donation not found for the given ID"
+          },
+          "500": {
+            "description": "Internal server error"
           }
         }
       }
@@ -407,88 +1240,298 @@
         }
       }
     },
-    "/api/contact": {
-      "delete": {
-        "summary": "Delete multiple contacts by their IDs",
-        "description": "This endpoint deletes multiple contact entries based on the provided comma-separated list of contact IDs.",
+    "/api/event/{eventId}": {
+      "get": {
+        "summary": "Get event by ID",
+        "description": "Fetch event details by its event ID.",
         "tags": [
-          "Contact"
+          "Event"
         ],
         "parameters": [
           {
-            "in": "query",
-            "name": "contactIds",
+            "in": "path",
+            "name": "eventId",
             "required": true,
             "schema": {
-              "type": "string",
-              "example": "123,456,789"
+              "type": "string"
             },
-            "description": "A comma-separated list of contact IDs to delete."
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "Bearer <your_token_here>"
-            },
-            "description": "Authorization token required to access this endpoint."
+            "description": "The ID of the event to fetch."
           }
         ],
         "responses": {
           "200": {
-            "description": "Contacts successfully deleted."
-          },
-          "400": {
-            "description": "Bad request if the IDs are invalid or improperly formatted."
+            "description": "Event details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The event's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The event's title."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The event's description."
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "The event's type (e.g., seminar, workshop)."
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "The event's date."
+                    },
+                    "time": {
+                      "type": "string",
+                      "description": "The event's start time."
+                    },
+                    "location": {
+                      "type": "string",
+                      "description": "The event's location."
+                    },
+                    "teacher": {
+                      "type": "object",
+                      "description": "Teacher's information for the event.",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "speciality": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "image": {
+                          "type": "string"
+                        },
+                        "link": {
+                          "type": "string"
+                        },
+                        "credentials": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "image": {
+                      "type": "string",
+                      "description": "The URL of the event image."
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "featured": {
+                      "type": "boolean",
+                      "description": "Whether the event is featured."
+                    },
+                    "attending": {
+                      "type": "integer",
+                      "description": "Number of attendees for the event."
+                    },
+                    "capacity": {
+                      "type": "integer",
+                      "description": "Maximum capacity of the event."
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized - The request is not authenticated or the token is invalid."
+            "description": "Unauthorized - The request is not authenticated."
           },
           "404": {
-            "description": "No contacts found for the provided IDs."
+            "description": "Event not found for the given ID."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error."
           }
         }
       },
-      "get": {
-        "summary": "Get all contacts",
-        "description": "This endpoint retrieves all the contact entries in the system.",
+      "patch": {
+        "summary": "Update event by ID",
+        "description": "Update the event's details based on its event ID.",
         "tags": [
-          "Contact"
+          "Event"
         ],
         "parameters": [
           {
-            "in": "header",
-            "name": "Authorization",
+            "in": "path",
+            "name": "eventId",
             "required": true,
             "schema": {
-              "type": "string",
-              "example": "Bearer <your_token_here>"
+              "type": "string"
             },
-            "description": "Authorization token required to access this endpoint."
+            "description": "The ID of the event to update."
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart-form data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The updated title of the event."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The updated description of the event."
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "The updated type of the event."
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The updated date of the event."
+                  },
+                  "time": {
+                    "type": "string",
+                    "description": "The updated time of the event."
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "The updated location of the event."
+                  },
+                  "teacher": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "speciality": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "link": {
+                        "type": "string"
+                      },
+                      "credentials": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "image": {
+                    "type": "string",
+                    "description": "The updated image URL for the event."
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "featured": {
+                    "type": "boolean",
+                    "description": "Whether the event should be featured."
+                  },
+                  "attending": {
+                    "type": "integer",
+                    "description": "The updated number of attendees."
+                  },
+                  "capacity": {
+                    "type": "integer",
+                    "description": "The updated capacity of the event."
+                  },
+                  "schedule": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "description": "The updated event schedule."
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "List of contacts retrieved successfully"
+            "description": "Event details updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The event's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The updated title of the event."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The updated description of the event."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid or incomplete data."
           },
           "401": {
-            "description": "Unauthorized if token is invalid or missing"
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Event not found for the given ID."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error."
           }
         }
       },
-      "post": {
-        "summary": "Create a new contact",
-        "description": "This endpoint allows you to create a new contact entry in the system.",
+      "put": {
+        "summary": "Update event by ID(only for no file related updates, epcifically made for isvisible update)",
+        "description": "Update the event's details based on its event ID, does not havndle any files",
         "tags": [
-          "Contact"
+          "Event"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the event to update."
+          }
         ],
         "requestBody": {
           "required": true,
@@ -497,33 +1540,93 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
+                  "title": {
                     "type": "string",
-                    "description": "The name of the contact."
+                    "description": "The updated title of the event."
                   },
-                  "email": {
+                  "description": {
                     "type": "string",
-                    "description": "The email of the contact."
+                    "description": "The updated description of the event."
                   },
-                  "phoneNumber": {
+                  "type": {
                     "type": "string",
-                    "description": "The phone number of the contact."
+                    "description": "The updated type of the event."
                   },
-                  "page": {
+                  "date": {
                     "type": "string",
-                    "description": "(Optional) The page associated with the contact."
+                    "format": "date",
+                    "description": "The updated date of the event."
                   },
-                  "pageTitle": {
+                  "time": {
                     "type": "string",
-                    "description": "(Optional) The page title associated with the contact."
+                    "description": "The updated time of the event."
                   },
-                  "subject": {
+                  "location": {
                     "type": "string",
-                    "description": "The subject of the contact message."
+                    "description": "The updated location of the event."
                   },
-                  "message": {
+                  "teacher": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "speciality": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "link": {
+                        "type": "string"
+                      },
+                      "credentials": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "image": {
                     "type": "string",
-                    "description": "The content of the contact message."
+                    "description": "The updated image URL for the event."
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "featured": {
+                    "type": "boolean",
+                    "description": "Whether the event should be featured."
+                  },
+                  "attending": {
+                    "type": "integer",
+                    "description": "The updated number of attendees."
+                  },
+                  "capacity": {
+                    "type": "integer",
+                    "description": "The updated capacity of the event."
+                  },
+                  "schedule": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "description": "The updated event schedule."
                   }
                 }
               }
@@ -531,14 +1634,73 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Contact created successfully"
+          "200": {
+            "description": "Event details updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The event's ID."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The updated title of the event."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The updated description of the event."
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "Bad request if input validation fails"
+            "description": "Bad request - Invalid or incomplete data."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Event not found for the given ID."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete event by ID",
+        "description": "Delete an event based on its event ID.",
+        "tags": [
+          "Event"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the event to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "Event not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
           }
         }
       }
@@ -870,55 +2032,70 @@
         }
       }
     },
-    "/api/volunteer": {
-      "post": {
-        "summary": "Create a new volunteer",
-        "description": "This endpoint allows the user to create a new volunteer.",
+    "/api/register-retreat/{registerRetreatId}": {
+      "patch": {
+        "summary": "Update a retreat registration",
+        "description": "Update details of an existing retreat registration, such as accommodation type or dietary restrictions.",
         "tags": [
-          "Volunteer"
+          "Register Retreat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "registerRetreatId",
+            "required": true,
+            "description": "The ID of the retreat registration to update.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
+                  "MeditationExperience": {
                     "type": "string",
-                    "description": "Volunteer’s name."
+                    "description": "Updated meditation experience level.",
+                    "example": "Intermediate"
                   },
-                  "email": {
+                  "dietaryRestriction": {
                     "type": "string",
-                    "description": "Volunteer’s email."
+                    "description": "Any updated dietary restrictions.",
+                    "example": "Gluten-free"
                   },
-                  "phoneNumber": {
+                  "specialRequest": {
                     "type": "string",
-                    "description": "Volunteer’s phone number."
+                    "description": "Special requests or accommodations.",
+                    "example": "Need a ground-floor room"
                   },
-                  "image": {
+                  "AccomodationType": {
                     "type": "string",
-                    "format": "uri",
-                    "description": "A URL for the volunteer’s image."
+                    "description": "Updated accommodation type.",
+                    "example": "Shared Dormitory"
                   },
-                  "reason": {
+                  "emergencyContactName": {
                     "type": "string",
-                    "description": "Reason for volunteering."
+                    "description": "Updated emergency contact name.",
+                    "example": "Mary Smith"
                   },
-                  "socialLink": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "description": "Social media links of the volunteer."
-                  },
-                  "page": {
+                  "emergencyContactNumber": {
                     "type": "string",
-                    "description": "Page related to the volunteer."
-                  },
-                  "pageTitle": {
-                    "type": "string",
-                    "description": "Title for the page related to the volunteer."
+                    "description": "Updated emergency contact number.",
+                    "example": "+1122334455"
                   }
                 }
               }
@@ -927,59 +2104,37 @@
         },
         "responses": {
           "200": {
-            "description": "Volunteer successfully created"
+            "description": "Successfully updated the retreat registration."
           },
           "400": {
-            "description": "Bad request if the input is invalid"
+            "description": "Invalid input data."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "404": {
+            "description": "Retreat registration not found."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error."
           }
         }
       },
       "get": {
-        "summary": "Get all volunteers",
-        "description": "This endpoint retrieves all volunteers in the system.",
+        "summary": "Get a specific retreat registration",
+        "description": "Retrieve details of a specific retreat registration.",
         "tags": [
-          "Volunteer"
+          "Register Retreat"
         ],
         "parameters": [
           {
-            "in": "header",
-            "name": "Authorization",
-            "required": "conditional",
-            "schema": {
-              "type": "string",
-              "example": "Bearer <your_token_here>"
-            },
-            "description": "Authorization token required to get not visible volunteers, no need authorization token for getting visible volunteers."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of volunteers retrieved successfully"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete volunteers by their IDs",
-        "description": "Delete volunteers based on their volunteer IDs.",
-        "tags": [
-          "Volunteer"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "volunteerIds",
+            "in": "path",
+            "name": "registerRetreatId",
             "required": true,
+            "description": "The ID of the retreat registration to retrieve.",
             "schema": {
-              "type": "string",
-              "example": "1,2,3,4"
-            },
-            "description": "A comma-separated list of volunteer IDs to delete."
+              "type": "string"
+            }
           },
           {
             "in": "header",
@@ -994,26 +2149,68 @@
         ],
         "responses": {
           "200": {
-            "description": "Volunteers successfully deleted"
+            "description": "Successfully retrieved the retreat registration."
           },
           "401": {
-            "description": "Unauthorized - The request is not authenticated"
+            "description": "Unauthorized access."
           },
           "404": {
-            "description": "No volunteers found for the given IDs"
+            "description": "Retreat registration not found."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a retreat registration",
+        "description": "Remove a specific retreat registration from the system.",
+        "tags": [
+          "Register Retreat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "registerRetreatId",
+            "required": true,
+            "description": "The ID of the retreat registration to delete.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted the retreat registration."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "404": {
+            "description": "Retreat registration not found."
+          },
+          "500": {
+            "description": "Internal server error."
           }
         }
       }
     },
-    "/api/book-event": {
+    "/api/register-retreat": {
       "post": {
-        "summary": "Create a new event booking",
-        "description": "This endpoint allows the bookEvent to create a new event booking.",
+        "summary": "Register for a retreat",
+        "description": "This endpoint allows a user to register for a retreat.",
         "tags": [
-          "BookEvent"
+          "RegisterRetreat"
         ],
         "requestBody": {
           "required": true,
@@ -1024,43 +2221,63 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "description": "The name of the person booking the event.",
+                    "description": "The name of the registrant.",
                     "example": "John Doe"
                   },
                   "email": {
                     "type": "string",
-                    "description": "The email of the person booking the event.",
+                    "description": "The email of the registrant.",
                     "example": "john.doe@example.com"
                   },
                   "phoneNumber": {
                     "type": "string",
-                    "description": "The phone number of the person booking the event.",
+                    "description": "The phone number of the registrant.",
                     "example": "+123456789"
                   },
                   "page": {
                     "type": "string",
-                    "description": "The page associated with the event (optional).",
-                    "example": "event123"
+                    "description": "The page associated with the retreat (optional).",
+                    "example": "retreat123"
                   },
                   "pageTitle": {
                     "type": "string",
-                    "description": "The title of the page associated with the event (optional).",
-                    "example": "Annual Charity Event"
+                    "description": "The title of the page associated with the retreat (optional).",
+                    "example": "Meditation Retreat"
                   },
-                  "TicketNumber": {
-                    "type": "integer",
-                    "description": "The ticket number for the event.",
-                    "example": 1
-                  },
-                  "dietaryRequirements": {
+                  "retreatId": {
                     "type": "string",
-                    "description": "Any dietary requirements for the attendee (optional).",
-                    "example": "Vegetarian"
+                    "description": "The ID of the retreat to register for.",
+                    "example": "60b8c6b0f1f1a51a6d5a7a6e"
                   },
-                  "specialAccomodation": {
+                  "MeditationExperience": {
                     "type": "string",
-                    "description": "Special accommodation needs for the attendee (optional).",
-                    "example": "Wheelchair access"
+                    "description": "The level of meditation experience.",
+                    "example": "Beginner"
+                  },
+                  "dietaryRestriction": {
+                    "type": "string",
+                    "description": "Any dietary restrictions (optional).",
+                    "example": "Vegan"
+                  },
+                  "specialRequest": {
+                    "type": "string",
+                    "description": "Special requests or accommodations (optional).",
+                    "example": "Need a quiet room"
+                  },
+                  "AccomodationType": {
+                    "type": "string",
+                    "description": "Type of accommodation requested.",
+                    "example": "Private room"
+                  },
+                  "emergencyContactName": {
+                    "type": "string",
+                    "description": "Emergency contact name.",
+                    "example": "Jane Doe"
+                  },
+                  "emergencyContactNumber": {
+                    "type": "string",
+                    "description": "Emergency contact number.",
+                    "example": "+987654321"
                   }
                 }
               }
@@ -1069,61 +2286,47 @@
         },
         "responses": {
           "200": {
-            "description": "Event booking successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "The ID of the newly created event booking.",
-                      "example": "60b8c6b0f1f1a51a6d5a7a6e"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Successfully registered for the retreat."
           },
           "400": {
-            "description": "Bad request if the input is invalid"
+            "description": "Bad request if input is invalid."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error."
           }
         }
       },
       "get": {
-        "summary": "Get all event bookings",
-        "description": "This endpoint retrieves all event bookings in the system.",
+        "summary": "Get all retreat registrations",
+        "description": "Retrieves all retreat registrations.",
         "tags": [
-          "BookEvent"
+          "RegisterRetreat"
         ],
         "responses": {
           "200": {
-            "description": "List of event bookings retrieved successfully"
+            "description": "List of retreat registrations retrieved successfully."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error."
           }
         }
       },
       "delete": {
-        "summary": "Delete book-events by their IDs",
-        "description": "Delete multiple book-events based on their book-event IDs.",
+        "summary": "Delete retreat registrations by their IDs",
+        "description": "Delete multiple retreat registrations based on their IDs.",
         "tags": [
-          "User"
+          "RegisterRetreat"
         ],
         "parameters": [
           {
             "in": "query",
-            "name": "book-eventIds",
+            "name": "registerRetreatIds",
             "required": true,
             "schema": {
               "type": "string",
               "example": "1,2,3,4"
             },
-            "description": "A comma-separated list of book-event IDs to delete."
+            "description": "A comma-separated list of retreat registration IDs to delete."
           },
           {
             "in": "header",
@@ -1138,13 +2341,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Users successfully deleted."
+            "description": "Retreat registrations successfully deleted."
           },
           "401": {
             "description": "Unauthorized - The request is not authenticated."
           },
           "404": {
-            "description": "No book-events found for the given IDs."
+            "description": "No registrations found for the given IDs."
           },
           "500": {
             "description": "Internal server error."
@@ -1152,113 +2355,117 @@
         }
       }
     },
-    "/api/cause": {
-      "post": {
-        "summary": "Create a new cause",
-        "description": "This endpoint creates a new cause with images, updates, goals, and other required information.",
-        "operationId": "createCause",
+    "/api/retreat/{retreatId}": {
+      "delete": {
+        "summary": "Delete a retreat by its ID",
+        "description": "This endpoint deletes a retreat from the system based on the provided retreat ID.",
         "tags": [
-          "Cause"
+          "Retreat"
         ],
-        "security": [
+        "parameters": [
           {
-            "BearerAuth": []
+            "in": "path",
+            "name": "retreatId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "12345"
+            },
+            "description": "The unique ID of the retreat to be deleted."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retreat successfully deleted"
+          },
+          "400": {
+            "description": "Bad request if the retreat ID is invalid"
+          },
+          "401": {
+            "description": "Unauthorized if the request is not authenticated"
+          },
+          "404": {
+            "description": "Retreat not found for the given ID"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update retreat information by its ID",
+        "description": "This endpoint updates the retreat details based on the provided retreat ID.",
+        "tags": [
+          "Retreat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "retreatId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "12345"
+            },
+            "description": "The unique ID of the retreat to be updated."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "image": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "Main image for the cause"
-                  },
                   "title": {
                     "type": "string",
-                    "description": "Title of the cause"
+                    "description": "The title of the retreat.",
+                    "example": "Mountain Wellness Retreat"
                   },
-                  "subtitle": {
+                  "description": {
                     "type": "string",
-                    "description": "Subtitle of the cause"
+                    "description": "A brief description of the retreat.",
+                    "example": "A weekend retreat focusing on wellness and mindfulness."
                   },
-                  "goal": {
-                    "type": "integer",
-                    "description": "Goal amount for the cause"
-                  },
-                  "startDate": {
+                  "date": {
                     "type": "string",
-                    "format": "date-time",
-                    "description": "Start date of the cause"
-                  },
-                  "endDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "End date of the cause"
+                    "description": "The date of the retreat.",
+                    "example": "2025-07-15"
                   },
                   "location": {
                     "type": "string",
-                    "description": "Location of the cause"
+                    "description": "The location where the retreat will take place.",
+                    "example": "Lake Tahoe, CA"
                   },
-                  "impact": {
+                  "participants": {
+                    "type": "integer",
+                    "description": "The number of participants for the retreat.",
+                    "example": 20
+                  },
+                  "price": {
                     "type": "string",
-                    "description": "Expected impact of the cause"
-                  },
-                  "isVisible": {
-                    "type": "boolean",
-                    "description": "Whether the cause is visible"
-                  },
-                  "gallery": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Array of image URLs for the cause gallery"
-                  },
-                  "updates": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "date": {
-                          "type": "string",
-                          "format": "date-time",
-                          "description": "Update date"
-                        },
-                        "title": {
-                          "type": "string",
-                          "description": "Title of the update"
-                        },
-                        "content": {
-                          "type": "string",
-                          "description": "Content of the update"
-                        },
-                        "image": {
-                          "type": "string",
-                          "format": "binary",
-                          "description": "Image for the update (optional)"
-                        }
-                      }
-                    }
-                  },
-                  "faq": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "question": {
-                          "type": "string",
-                          "description": "The question for FAQ"
-                        },
-                        "answer": {
-                          "type": "string",
-                          "description": "The answer for FAQ"
-                        }
-                      }
-                    }
+                    "description": "The price per participant for the retreat.",
+                    "example": "$500"
                   }
                 }
               }
@@ -1267,157 +2474,19 @@
         },
         "responses": {
           "200": {
-            "description": "Cause created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Retreat successfully updated"
           },
           "400": {
-            "description": "Invalid input or validation error"
+            "description": "Bad request if the retreat ID or input data is invalid"
           },
           "401": {
-            "description": "Unauthorized or invalid token"
+            "description": "Unauthorized if the request is not authenticated"
           },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "Retrieve all causes or published causes",
-        "description": "Fetches all causes for authenticated users, or only published causes for unauthenticated users.",
-        "operationId": "getCauses",
-        "tags": [
-          "Cause"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of causes (all causes for authenticated users, only published causes for unauthenticated)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "title": {
-                        "type": "string"
-                      },
-                      "goal": {
-                        "type": "integer"
-                      },
-                      "startDate": {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      "endDate": {
-                        "type": "string",
-                        "format": "date-time"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
+          "404": {
+            "description": "Retreat not found for the given ID"
           },
           "500": {
             "description": "Internal server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete multiple causes",
-        "description": "This endpoint deletes multiple causes by their IDs, which are passed in the query parameters.",
-        "operationId": "deleteCauses",
-        "tags": [
-          "Cause"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "causeIds",
-            "required": true,
-            "description": "Comma-separated list of cause IDs to be deleted.",
-            "schema": {
-              "type": "string",
-              "example": "1,2,3"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Causes deleted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Success message indicating the deletion"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input or missing causeIds"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
           }
         }
       }
@@ -1592,6 +2661,644 @@
           },
           "500": {
             "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/user/{userId}": {
+      "get": {
+        "summary": "Get user by ID",
+        "description": "Fetch a user's details by their user ID.",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the user to fetch."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The user's ID."
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "The user's name."
+                    },
+                    "email": {
+                      "type": "string",
+                      "description": "The user's email."
+                    },
+                    "role": {
+                      "type": "string",
+                      "description": "The user's role (e.g., user, admin)."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "User not found for the given ID."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "patch": {
+      "summary": "Update user by ID",
+      "description": "Update the user's details based on their user ID.",
+      "tags": [
+        "User"
+      ],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "The ID of the user to update."
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The updated name of the user."
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "description": "The updated email of the user."
+                },
+                "phoneNumber": {
+                  "type": "string",
+                  "description": "The updated phone number of the user."
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "admin",
+                    "volunteer",
+                    "donator"
+                  ],
+                  "description": "The updated role of the user."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The updated password of the user (if provided)."
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "User details updated successfully.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The user's ID."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The updated name of the user."
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "The updated email of the user."
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "The updated role of the user."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Bad request - Invalid or incomplete data."
+        },
+        "401": {
+          "description": "Unauthorized - The request is not authenticated."
+        },
+        "404": {
+          "description": "User not found for the given ID."
+        },
+        "500": {
+          "description": "Internal server error."
+        }
+      }
+    },
+    "delete": {
+      "summary": "Delete user by ID",
+      "description": "Delete a user based on their user ID.",
+      "tags": [
+        "User"
+      ],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "The ID of the user to delete."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "User successfully deleted."
+        },
+        "401": {
+          "description": "Unauthorized - The request is not authenticated."
+        },
+        "404": {
+          "description": "User not found for the given ID."
+        },
+        "500": {
+          "description": "Internal server error."
+        }
+      }
+    },
+    "/api/user/init-admin": {
+      "get": {
+        "summary": "Initializes the admin user if it doesn't exist",
+        "description": "Checks if an admin user exists in the database, and if not, creates one with the email and password specified in environment variables.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin check complete. Admin user exists or has been created successfully.",
+            "content": {
+              "application/json": null,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Message indicating the status of the admin user creation.",
+                    "example": "Admin check complete"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Could not initialize the admin user.",
+            "content": {
+              "application/json": null,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "description": "Error message indicating the failure reason.",
+                    "example": "Failed to initialize admin user"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/login": {
+      "post": {
+        "summary": "Login user and return JWT token",
+        "description": "This endpoint allows a user to log in by providing their email and password. On successful login, a JWT token is returned.",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "The user's email address."
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The user's password."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully, returns the user details and JWT token.",
+            "content": {
+              "application/json": null,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The user ID."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The user's name."
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "The user's email address."
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "The user's role (e.g., admin, user, etc.)."
+                      }
+                    }
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "The JWT token for authenticated requests."
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid credentials or bad request."
+          },
+          "401": {
+            "description": "Unauthorized if the login credentials are invalid."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/user": {
+      "post": {
+        "summary": "Create a new user",
+        "description": "This endpoint creates a new user in the system.",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the user"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Email of the user"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "Phone number of the user"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "user",
+                      "admin",
+                      "volunteer",
+                      "donator"
+                    ],
+                    "description": "Role of the user"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Password of the user (only required for creating new admin)"
+                  },
+                  "page": {
+                    "type": "string",
+                    "description": "Page for the user (required for non-admin users)"
+                  },
+                  "pageTitle": {
+                    "type": "string",
+                    "description": "Page title for the user (required for non-admin users)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Bad request if input validation fails"
+          },
+          "401": {
+            "description": "Unauthorized if token is invalid or missing"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all users",
+        "description": "This endpoint retrieves all users in the system.",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized if token is invalid or missing"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete users by their IDs",
+        "description": "Delete multiple users based on their user IDs.",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userIds",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1,2,3,4"
+            },
+            "description": "A comma-separated list of user IDs to delete."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated."
+          },
+          "404": {
+            "description": "No users found for the given IDs."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/volunteer/{id}": {
+      "delete": {
+        "summary": "Delete a volunteer by its ID",
+        "description": "This endpoint deletes a volunteer from the system based on the provided volunteer ID.",
+        "tags": [
+          "Volunteer"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "12345"
+            },
+            "description": "The unique ID of the volunteer to be deleted."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteer successfully deleted"
+          },
+          "400": {
+            "description": "Bad request if the volunteer ID is invalid"
+          },
+          "401": {
+            "description": "Unauthorized if the request is not authenticated"
+          },
+          "404": {
+            "description": "Volunteer not found for the given ID"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/volunteer": {
+      "post": {
+        "summary": "Create a new volunteer",
+        "description": "This endpoint allows the user to create a new volunteer.",
+        "tags": [
+          "Volunteer"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Volunteer’s name."
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Volunteer’s email."
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "Volunteer’s phone number."
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "A URL for the volunteer’s image."
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for volunteering."
+                  },
+                  "socialLink": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Social media links of the volunteer."
+                  },
+                  "page": {
+                    "type": "string",
+                    "description": "Page related to the volunteer."
+                  },
+                  "pageTitle": {
+                    "type": "string",
+                    "description": "Title for the page related to the volunteer."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Volunteer successfully created"
+          },
+          "400": {
+            "description": "Bad request if the input is invalid"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all volunteers",
+        "description": "This endpoint retrieves all volunteers in the system.",
+        "tags": [
+          "Volunteer"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": "conditional",
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to get not visible volunteers, no need authorization token for getting visible volunteers."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of volunteers retrieved successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete volunteers by their IDs",
+        "description": "Delete volunteers based on their volunteer IDs.",
+        "tags": [
+          "Volunteer"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "volunteerIds",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1,2,3,4"
+            },
+            "description": "A comma-separated list of volunteer IDs to delete."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volunteers successfully deleted"
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated"
+          },
+          "404": {
+            "description": "No volunteers found for the given IDs"
+          },
+          "500": {
+            "description": "Internal server error"
           }
         }
       }

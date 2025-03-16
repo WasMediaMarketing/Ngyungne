@@ -22,7 +22,7 @@ const retreatUpdateSchema = z
       .optional(),
     duration: z.string().optional(),
     location: z.string().optional(),
-    participants: z.string().optional(),
+    participants: z.number().optional(),
     price: z.string().optional(),
     type: z.string().optional(),
     isVisible: z.boolean().optional(),

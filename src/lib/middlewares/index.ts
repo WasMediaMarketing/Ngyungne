@@ -12,6 +12,8 @@ import { validateCauseInput } from "./validateCauseInput";
 import { validateCauseUpdate } from "./validateCauseUpdate";
 import { validateRetreatInput } from "./validateRetreatInput";
 import { validateRetreatUpdate } from "./validateRetreatUpdate";
+import { validateRegisterRetreatInput } from "./validateRegisterRetreatInput";
+import { validateRegisterRetreatUpdate } from "./validateRegisterRetreatUpdate";
 
 export {
   isAuthenticated,
@@ -28,4 +30,6 @@ export {
   validateCauseUpdate,
   validateRetreatInput,
   validateRetreatUpdate,
+  validateRegisterRetreatInput,
+  validateRegisterRetreatUpdate,
 };

@@ -19,7 +19,7 @@ const retreatInputSchema = z
     }),
     duration: z.string().min(1, { message: "Duration is required" }),
     location: z.string().min(1, { message: "Location is required" }),
-    participants: z.string().min(1, { message: "Participants are required" }),
+    participants: z.number().optional(),
     price: z.string().min(1, { message: "Price is required" }),
     type: z.string().min(1, { message: "Retreat Type is required" }),
     isVisible: z.boolean().optional(),

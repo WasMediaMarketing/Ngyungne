@@ -8,7 +8,7 @@ const RetreatSchema: Schema<IRetreat> = new mongoose.Schema(
     date: { type: String, required: true },
     duration: { type: String, required: true },
     location: { type: String, required: true },
-    participants: { type: String, required: true },
+    participants: { type: Number, default: 0 },
     price: { type: String, required: true },
     type: { type: String, required: true },
     isVisible: { type: Boolean, default: true },
