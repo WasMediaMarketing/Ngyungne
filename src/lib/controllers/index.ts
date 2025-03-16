@@ -9,6 +9,7 @@ import { RetreatController } from "./retreatController";
 import { RegisterRetreatController } from "./registerRetreatController";
 import { PhilosophyTopicController } from "./philosophyTopicController";
 import { CourseController } from "./courseController";
+import { JoinCourseController } from "./joinCourseController";
 
 export {
   UserController,
@@ -22,4 +23,5 @@ export {
   RegisterRetreatController,
   PhilosophyTopicController,
   CourseController,
+  JoinCourseController,
 };

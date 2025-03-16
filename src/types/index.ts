@@ -32,6 +32,12 @@ import {
 import { IPhilosophyTopicService } from "./philosophyTopicService.interface";
 import { ICourse, ICourseInput, ICourseUpdate } from "./course.types";
 import { ICourseService } from "./courseService.interface";
+import {
+  IJoinCourseData,
+  IJoinCourseInput,
+  IJoinCourseUpdate,
+} from "./joinCourse.types";
+import { IJoinCourseService } from "./joinCourseService.interface";
 
 export type {
   IUser,
@@ -76,4 +82,8 @@ export type {
   ICourseInput,
   ICourseUpdate,
   ICourseService,
+  IJoinCourseData,
+  IJoinCourseInput,
+  IJoinCourseUpdate,
+  IJoinCourseService,
 };

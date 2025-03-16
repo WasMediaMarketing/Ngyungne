@@ -9,6 +9,7 @@ import { RetreatService } from "./retreatService";
 import { RegisterRetreatService } from "./registerRetreatService";
 import { PhilosophyTopicService } from "./philosophyService";
 import { CourseService } from "./courseService";
+import { JoinCourseService } from "./joinCourseService";
 
 export {
   UserService,
@@ -22,4 +23,5 @@ export {
   RegisterRetreatService,
   PhilosophyTopicService,
   CourseService,
+  JoinCourseService,
 };

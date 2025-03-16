@@ -18,6 +18,8 @@ import { validatePhilosophyTopicInput } from "./validatePhilosophyTopicInput";
 import { validatePhilosophyTopicUpdate } from "./validatePhilosophyTopicUpdate";
 import { validateCourseInput } from "./validateCourseInput";
 import { validateCourseUpdate } from "./validateCourseUpdate";
+import { validateJoinCourseInput } from "./validateJoinCourseInput";
+import { validateJoinCourseUpdate } from "./validateJoinCourseUpdate";
 
 export {
   isAuthenticated,
@@ -40,4 +42,6 @@ export {
   validatePhilosophyTopicUpdate,
   validateCourseInput,
   validateCourseUpdate,
+  validateJoinCourseInput,
+  validateJoinCourseUpdate,
 };
