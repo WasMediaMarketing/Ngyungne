@@ -10,6 +10,7 @@ import { RegisterRetreat } from "./registerRetreat.model";
 import { PhilosophyTopic } from "./philosophyTopic.model";
 import { Course } from "./course.model";
 import { JoinCourse } from "./joinCourse.model";
+import { Faq } from "./faq.model";
 
 export {
   User,
@@ -24,4 +25,5 @@ export {
   PhilosophyTopic,
   Course,
   JoinCourse,
+  Faq,
 };

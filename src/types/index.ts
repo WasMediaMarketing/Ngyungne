@@ -38,6 +38,8 @@ import {
   IJoinCourseUpdate,
 } from "./joinCourse.types";
 import { IJoinCourseService } from "./joinCourseService.interface";
+import { IFaq, IFaqInput, IFaqUpdate } from "./faq.types";
+import { IFaqService } from "./faqService.interface";
 
 export type {
   IUser,
@@ -86,4 +88,8 @@ export type {
   IJoinCourseInput,
   IJoinCourseUpdate,
   IJoinCourseService,
+  IFaq,
+  IFaqInput,
+  IFaqUpdate,
+  IFaqService,
 };
