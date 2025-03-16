@@ -24,7 +24,7 @@ const RegisterRetreatSchema: Schema<IRegisterRetreatData> =
       specialRequest: {
         type: String,
       },
-      AccomodationType: {
+      accomodationType: {
         type: String,
         required: true,
       },

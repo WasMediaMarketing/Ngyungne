@@ -40,7 +40,7 @@ export const registerRetreatSchema = z
       .min(1, { message: "Special request cannot be empty" })
       .optional(),
 
-    AccommodationType: z
+    accommodationType: z
       .string()
       .min(1, { message: "Accommodation type is required" }),
 
