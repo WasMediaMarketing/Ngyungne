@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   Accordion,
   AccordionContent,
@@ -23,43 +22,41 @@ import {
   Clock,
   BookOpen,
   GraduationCap,
-  Star,
   CheckCircle,
-  Lock,
-  Download,
-  Share,
   Heart,
-  MessageSquare,
   User,
+  Share,
+  RefreshCw,
 } from "lucide-react";
 import { Breadcrumbs } from "../breadcrumbs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { courses } from "@/data/courses";
 import { CourseEnrollmentDialog } from "./course-enrollment-form";
-import { toast } from "@/components/ui/use-toast-hook";
+import { courseApi } from "@/utils/courseApi";
+import type { ICourse } from "@/types";
 
 export function CourseDetail({ slug }: { slug: string }) {
-  const [course, setCourse] = useState(courses.find((c) => c.slug === slug));
+  const [course, setCourse] = useState<ICourse | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
-
   useEffect(() => {
-    // In a real application, you would fetch the course data from an API here
-    setCourse(courses.find((c) => c.slug === slug));
+    const fetchCourse = async () => {
+      setLoading(true);
+      try {
+        const data = await courseApi.getCourseById(slug);
+        if (data) {
+          setCourse(data);
+        }
+      } catch (error) {
+        console.error(`Error fetching course ${slug}:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourse();
   }, [slug]);
-
-  const handleEnrollmentSubmit = (data: any) => {
-    console.log("Enrollment submitted:", data);
-    // Here you would typically send the data to your backend
-    toast({
-      title: "Enrollment Submitted",
-      description: "Thank you for enrolling in this course!",
-    });
-  };
-
-  if (!course) {
-    return <div>Course not found</div>;
-  }
+  console.log("course", course);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -76,6 +73,30 @@ export function CourseDetail({ slug }: { slug: string }) {
     visible: { opacity: 1, y: 0 },
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <RefreshCw className="h-8 w-8 animate-spin text-crimson-600" />
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <h2 className="text-2xl font-bold text-crimson-700 mb-4">
+          Course Not Found
+        </h2>
+        <p className="text-maroon-600 mb-6">
+          The course you're looking for could not be found.
+        </p>
+        <Button asChild>
+          <a href="/teachings/courses">Browse All Courses</a>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
       <Breadcrumbs />
@@ -83,7 +104,7 @@ export function CourseDetail({ slug }: { slug: string }) {
       <div className="relative mb-12 rounded-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-crimson-800/90 to-crimson-900/80 z-10"></div>
         <Image
-          src={course.image || "/placeholder.svg"}
+          src={course.image || "/placeholder.svg?height=300&width=1200"}
           alt="Course background"
           width={1200}
           height={300}
@@ -116,7 +137,7 @@ export function CourseDetail({ slug }: { slug: string }) {
               </div>
               <div className="flex items-center">
                 <GraduationCap className="mr-2 h-4 w-4" />
-                {course.students} students
+                {course.students || "500+"} students
               </div>
             </div>
           </motion.div>
@@ -168,11 +189,7 @@ export function CourseDetail({ slug }: { slug: string }) {
                         <AccordionTrigger className="text-slate-800 hover:text-crimson-700 font-medium py-3">
                           <div className="flex items-center justify-between w-full">
                             <div className="flex items-center">
-                              {moduleIndex < course.modules.length / 2 ? (
-                                <CheckCircle className="h-5 w-5 mr-3 text-green-500" />
-                              ) : (
-                                <Lock className="h-5 w-5 mr-3 text-slate-400" />
-                              )}
+                              <CheckCircle className="h-5 w-5 mr-3 text-green-500" />
                               <span>{module.title}</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-slate-500">
@@ -189,20 +206,8 @@ export function CourseDetail({ slug }: { slug: string }) {
                                 className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-md"
                               >
                                 <div className="flex items-center">
-                                  {moduleIndex < course.modules.length / 2 &&
-                                  lessonIndex < module.lessons.length / 2 ? (
-                                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                                  ) : (
-                                    <Lock className="h-4 w-4 mr-2 text-slate-400" />
-                                  )}
-                                  <span
-                                    className={
-                                      moduleIndex < course.modules.length / 2 &&
-                                      lessonIndex < module.lessons.length / 2
-                                        ? "text-slate-700"
-                                        : "text-slate-500"
-                                    }
-                                  >
+                                  <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                                  <span className="text-slate-700">
                                     {lesson}
                                   </span>
                                 </div>
@@ -227,52 +232,70 @@ export function CourseDetail({ slug }: { slug: string }) {
                 <CardContent>
                   <div className="prose max-w-none text-slate-700">
                     <p>
-                      This comprehensive course will take you through all the
-                      essentials of {course.title}. You'll learn through
+                      {course.overView ||
+                        `This comprehensive course will take you through all the
+                      essentials of ${course.title}. You'll learn through
                       hands-on projects and practical examples that reinforce
-                      the theoretical concepts.
+                      the theoretical concepts.`}
                     </p>
 
                     <h3 className="text-xl font-medium text-slate-800 mt-6">
                       What you'll learn
                     </h3>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
-                      <li className="flex items-start">
-                        <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span>Master the fundamentals of {course.title}</span>
-                      </li>
-                      <li className="flex items-start">
-                        <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span>Build real-world projects from scratch</span>
-                      </li>
-                      <li className="flex items-start">
-                        <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span>Understand advanced techniques and patterns</span>
-                      </li>
-                      <li className="flex items-start">
-                        <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span>Apply best practices in your daily work</span>
-                      </li>
+                      {course.outcomes && course.outcomes.length > 0 ? (
+                        course.outcomes.map((outcome, index) => (
+                          <li key={index} className="flex items-start">
+                            <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
+                            <span>{outcome}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <>
+                          <li className="flex items-start">
+                            <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
+                            <span>
+                              Master the fundamentals of {course.title}
+                            </span>
+                          </li>
+                          <li className="flex items-start">
+                            <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
+                            <span>Build real-world projects from scratch</span>
+                          </li>
+                          <li className="flex items-start">
+                            <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
+                            <span>
+                              Understand advanced techniques and patterns
+                            </span>
+                          </li>
+                          <li className="flex items-start">
+                            <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
+                            <span>Apply best practices in your daily work</span>
+                          </li>
+                        </>
+                      )}
                     </ul>
 
                     <h3 className="text-xl font-medium text-slate-800 mt-6">
                       Prerequisites
                     </h3>
                     <p>
-                      Basic understanding of programming concepts is recommended
+                      {course.prerequisites ||
+                        `Basic understanding of programming concepts is recommended
                       but not required. This course is designed to be accessible
                       to beginners while also offering value to intermediate
-                      learners.
+                      learners.`}
                     </p>
 
                     <h3 className="text-xl font-medium text-slate-800 mt-6">
                       Target audience
                     </h3>
                     <p>
-                      This course is perfect for beginners looking to build a
+                      {course.targetAudience ||
+                        `This course is perfect for beginners looking to build a
                       solid foundation, as well as intermediate learners wanting
                       to enhance their skills with real-world applications and
-                      best practices.
+                      best practices.`}
                     </p>
                   </div>
                 </CardContent>
@@ -291,7 +314,7 @@ export function CourseDetail({ slug }: { slug: string }) {
             <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
               <div className="relative">
                 <Image
-                  src={course.image || "/placeholder.svg"}
+                  src={course.image || "/placeholder.svg?height=225&width=400"}
                   alt={course.title}
                   width={400}
                   height={225}
@@ -314,9 +337,9 @@ export function CourseDetail({ slug }: { slug: string }) {
               <CardContent className="p-6">
                 <CourseEnrollmentDialog
                   courseTitle={course.title}
-                  onSubmit={handleEnrollmentSubmit}
+                  courseId={course.id}
                   buttonText="Enroll Now"
-                  buttonClassName="flex-1 bg-crimson-600 hover:bg-crimson-700 text-white"
+                  buttonClassName="w-full bg-crimson-600 hover:bg-crimson-700 text-white"
                 />
               </CardContent>
             </Card>
@@ -330,23 +353,29 @@ export function CourseDetail({ slug }: { slug: string }) {
               <CardContent>
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src="/avatars/instructor.jpg" />
+                    <AvatarImage
+                      src={
+                        course.instructor?.image ||
+                        "/placeholder.svg?height=48&width=48"
+                      }
+                      alt={course.instructor?.name || "Instructor"}
+                    />
                     <AvatarFallback>
                       <User className="h-6 w-6" />
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-medium text-slate-800">
-                      Dr. Emily Chen
+                      {course.instructor?.name || "Instructor Name"}
                     </div>
                     <div className="text-sm text-slate-500">
-                      Senior Instructor
+                      {course.instructor?.position || "Instructor Position"}
                     </div>
                   </div>
                 </div>
                 <p className="text-sm text-slate-600 mb-4">
-                  Dr. Chen has over 10 years of industry experience and has
-                  taught over 50,000 students worldwide.
+                  {course.instructor?.description ||
+                    "Instructor bio not available."}
                 </p>
               </CardContent>
             </Card>
@@ -362,19 +391,23 @@ export function CourseDetail({ slug }: { slug: string }) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 mr-2 border-slate-300 text-slate-700"
+                    className="w-full border-slate-300 text-slate-700"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: course.title,
+                          text: course.description,
+                          url: window.location.href,
+                        });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert("Link copied to clipboard!");
+                      }
+                    }}
                   >
                     <Share className="mr-2 h-4 w-4" />
                     Share
                   </Button>
-                  {/* <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 ml-2 border-slate-300 text-slate-700"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download
-                  </Button> */}
                 </div>
               </CardContent>
             </Card>

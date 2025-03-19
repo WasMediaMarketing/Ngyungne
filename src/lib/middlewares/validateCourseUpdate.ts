@@ -18,7 +18,7 @@ const instructorSchema = z
       .string()
       .min(1, { message: "Instructor name is required" })
       .optional(),
-    image: z.string().url({ message: "Invalid image URL" }).optional(),
+    image: z.string().optional(),
     position: z.string().min(1, { message: "Position is required" }).optional(),
     description: z
       .string()
@@ -71,7 +71,7 @@ const courseUpdateSchema = z
       .number()
       .min(0, { message: "Students count must be a positive number" })
       .optional(),
-    image: z.string().url({ message: "Invalid image URL" }).optional(),
+    image: z.string().optional(),
     modules: z.array(moduleSchema).optional(),
     instructor: instructorSchema.optional(),
   })

@@ -42,7 +42,7 @@ const courseSchema = z
       .number()
       .min(0, { message: "Students must be a positive number" })
       .optional(),
-    image: z.string().url({ message: "Invalid image URL" }),
+    image: z.string().optional(),
     modules: z
       .array(moduleSchema)
       .min(1, { message: "At least one module is required" }),

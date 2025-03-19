@@ -1,10 +1,18 @@
 "use client";
 
-import React from "react";
+import { useState } from "react";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -15,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -23,226 +32,170 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
+import { RefreshCw } from "lucide-react";
+import { joinCourseApi } from "@/utils/joinCourseApi";
+import { toast } from "sonner";
 
-const formSchema = z.object({
-  firstName: z.string().min(2, {
-    message: "First name must be at least 2 characters.",
-  }),
-  lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  phone: z.string().min(10, {
-    message: "Please enter a valid phone number.",
-  }),
-  dateOfBirth: z.string().refine(
-    (date) => {
-      return new Date(date) < new Date();
-    },
-    {
-      message: "Date of birth must be in the past.",
-    }
-  ),
-  address: z.string().min(5, {
-    message: "Please enter your full address.",
-  }),
-  educationLevel: z.enum([
-    "highschool",
-    "bachelors",
-    "masters",
-    "phd",
-    "other",
-  ]),
-  priorExperience: z.string().optional(),
-  reasonForJoining: z.string().min(10, {
-    message: "Please provide a reason for joining the course.",
-  }),
-  specialRequirements: z.string().optional(),
-  agreeToTerms: z.boolean().refine((value) => value === true, {
-    message: "You must agree to the terms and conditions.",
-  }),
+// Define the form schema using Zod - removed agreeToTerms field
+const enrollmentFormSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email("Please enter a valid email address"),
+  phoneNumber: z
+    .string()
+    .min(10, { message: "Please enter a valid phone number" }),
+  address: z.string().min(5, { message: "Please enter your full address" }),
+  educationalLevel: z
+    .string()
+    .min(1, { message: "Please select your educational level" }),
+  experience: z.string().optional(),
+  specialRequirement: z.string().optional(),
+  reason: z
+    .string()
+    .min(10, { message: "Please tell us a bit more about your motivation" }),
 });
+
+type EnrollmentFormValues = z.infer<typeof enrollmentFormSchema>;
 
 interface CourseEnrollmentDialogProps {
   courseTitle: string;
-  onSubmit: (data: z.infer<typeof formSchema>) => void;
+  courseId: string;
+  onSubmit?: (data: EnrollmentFormValues) => void;
   buttonText?: string;
-  buttonVariant?: "default" | "outline" | "secondary" | "ghost" | "link";
   buttonClassName?: string;
 }
 
 export function CourseEnrollmentDialog({
   courseTitle,
+  courseId,
   onSubmit,
   buttonText = "Enroll Now",
-  buttonVariant = "default",
   buttonClassName = "",
 }: CourseEnrollmentDialogProps) {
-  const [open, setOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  // Initialize the form - removed agreeToTerms from defaultValues
+  const form = useForm<EnrollmentFormValues>({
+    resolver: zodResolver(enrollmentFormSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      name: "",
       email: "",
-      phone: "",
-      dateOfBirth: "",
+      phoneNumber: "",
       address: "",
-      educationLevel: "highschool",
-      priorExperience: "",
-      reasonForJoining: "",
-      specialRequirements: "",
-      agreeToTerms: false,
+      educationalLevel: "",
+      experience: "",
+      specialRequirement: "",
+      reason: "",
     },
   });
 
-  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-    await onSubmit(data);
-    setOpen(false);
-    form.reset();
+  // Handle form submission
+  const handleSubmit = async (values: EnrollmentFormValues) => {
+    setIsSubmitting(true);
+    try {
+      // Prepare data for API
+      const enrollmentData = {
+        name: values.name,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        address: values.address,
+        educationalLevel: values.educationalLevel,
+        courseId: courseId,
+        experience: values.experience,
+        specialRequirement: values.specialRequirement,
+        reason: values.reason,
+        page: window.location.pathname,
+        pageTitle: courseTitle,
+      };
+
+      // Submit to API
+      const result = await joinCourseApi.createJoinCourse(enrollmentData);
+
+      if (result) {
+        // Call the onSubmit callback if provided
+        if (onSubmit) {
+          onSubmit(values);
+        }
+
+        form.reset();
+        setIsOpen(false);
+        toast.success("Enrollment Submitted", {
+          description: "Thank you for enrolling in this course!",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting enrollment:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant={buttonVariant as any} className={buttonClassName}>
-          {buttonText}
-        </Button>
+        <Button className={buttonClassName}>{buttonText}</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">
-            Enroll in {courseTitle}
+          <DialogTitle className="text-xl text-crimson-700">
+            Enroll in Course
           </DialogTitle>
+          <DialogDescription>
+            Complete the form below to enroll in{" "}
+            <span className="font-medium">{courseTitle}</span>
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
+            className="space-y-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your full name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="john.doe@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="tel"
-                        placeholder="+1 (555) 123-4567"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="dateOfBirth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date of Birth</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="educationLevel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Education Level</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your education level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="highschool">High School</SelectItem>
-                        <SelectItem value="bachelors">
-                          Bachelor's Degree
-                        </SelectItem>
-                        <SelectItem value="masters">Master's Degree</SelectItem>
-                        <SelectItem value="phd">Ph.D.</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your phone number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -253,6 +206,7 @@ export function CourseEnrollmentDialog({
                   <FormControl>
                     <Textarea
                       placeholder="Enter your full address"
+                      className="resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -263,13 +217,46 @@ export function CourseEnrollmentDialog({
 
             <FormField
               control={form.control}
-              name="priorExperience"
+              name="educationalLevel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Educational Level</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your educational level" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="High school">High School</SelectItem>
+                      <SelectItem value="Bachelors degree">
+                        Bachelor's Degree
+                      </SelectItem>
+                      <SelectItem value="Masters degree">
+                        Master's Degree
+                      </SelectItem>
+                      <SelectItem value="PhD">Ph.D.</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="experience"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Prior Experience (Optional)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Describe any relevant prior experience"
+                      placeholder="Tell us about your prior experience with this subject"
+                      className="resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -280,13 +267,14 @@ export function CourseEnrollmentDialog({
 
             <FormField
               control={form.control}
-              name="reasonForJoining"
+              name="reason"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Reason for Joining</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Why do you want to take this course?"
+                      placeholder="Why are you interested in this course?"
+                      className="resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -297,13 +285,14 @@ export function CourseEnrollmentDialog({
 
             <FormField
               control={form.control}
-              name="specialRequirements"
+              name="specialRequirement"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Special Requirements (Optional)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Any special requirements or accommodations needed?"
+                      placeholder="Any special requests or accommodations needed?"
+                      className="resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -312,47 +301,26 @@ export function CourseEnrollmentDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="agreeToTerms"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>I agree to the terms and conditions</FormLabel>
-                    <FormDescription>
-                      By checking this box, you agree to our{" "}
-                      <a href="/terms" className="text-primary hover:underline">
-                        Terms of Service
-                      </a>{" "}
-                      and{" "}
-                      <a
-                        href="/privacy"
-                        className="text-primary hover:underline"
-                      >
-                        Privacy Policy
-                      </a>
-                      .
-                    </FormDescription>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end gap-4 pt-4">
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button type="submit">Submit Enrollment</Button>
-            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Enrollment"
+                )}
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>
