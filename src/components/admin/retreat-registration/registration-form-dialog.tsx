@@ -41,6 +41,7 @@ import type {
   IRetreat,
   IUser,
 } from "@/types";
+import Spinner from "@/components/spinner";
 
 // Define the form schema with Zod
 const formSchema = z.object({
@@ -284,7 +285,11 @@ export default function RegistrationFormDialog({
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Update Registration"}
+                {isSubmitting ? (
+                  <Spinner text="Saving..." />
+                ) : (
+                  "Update Registration"
+                )}
               </Button>
             </DialogFooter>
           </form>

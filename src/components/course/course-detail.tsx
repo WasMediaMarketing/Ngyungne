@@ -23,7 +23,6 @@ import {
   BookOpen,
   GraduationCap,
   CheckCircle,
-  Heart,
   User,
   Share,
   RefreshCw,
@@ -34,6 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseEnrollmentDialog } from "./course-enrollment-form";
 import { courseApi } from "@/utils/courseApi";
 import type { ICourse } from "@/types";
+import { Loader } from "../common/loader";
 
 export function CourseDetail({ slug }: { slug: string }) {
   const [course, setCourse] = useState<ICourse | null>(null);
@@ -56,7 +56,6 @@ export function CourseDetail({ slug }: { slug: string }) {
 
     fetchCourse();
   }, [slug]);
-  console.log("course", course);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -74,11 +73,7 @@ export function CourseDetail({ slug }: { slug: string }) {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <RefreshCw className="h-8 w-8 animate-spin text-crimson-600" />
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!course) {
@@ -99,7 +94,7 @@ export function CourseDetail({ slug }: { slug: string }) {
 
   return (
     <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
-      <Breadcrumbs />
+      {/* <Breadcrumbs /> */}
 
       <div className="relative mb-12 rounded-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-crimson-800/90 to-crimson-900/80 z-10"></div>
@@ -107,9 +102,10 @@ export function CourseDetail({ slug }: { slug: string }) {
           src={course.image || "/placeholder.svg?height=300&width=1200"}
           alt="Course background"
           width={1200}
-          height={300}
-          className="w-full h-64 object-cover"
+          height={500}
+          className="w-full h-[30rem] object-cover"
         />
+
         <div className="absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-16">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -320,19 +316,6 @@ export function CourseDetail({ slug }: { slug: string }) {
                   height={225}
                   className="w-full h-48 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className={`absolute top-3 right-3 bg-white/90 border-none ${
-                    isFavorite ? "text-red-500" : "text-slate-600"
-                  } hover:bg-white`}
-                  onClick={() => setIsFavorite(!isFavorite)}
-                >
-                  <Heart
-                    className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`}
-                  />
-                </Button>
               </div>
               <CardContent className="p-6">
                 <CourseEnrollmentDialog

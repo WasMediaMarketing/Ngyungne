@@ -34,6 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseEnrollmentDialog } from "./course-enrollment-form";
 import { courseApi } from "@/utils/courseApi";
 import type { ICourse } from "@/types";
+import { Loader } from "../common/loader";
 
 export function CoursesSection() {
   const [ref, inView] = useInView({
@@ -94,11 +95,7 @@ export function CoursesSection() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <RefreshCw className="h-8 w-8 animate-spin text-crimson-600" />
-      </div>
-    );
+    <Loader />;
   }
 
   return (

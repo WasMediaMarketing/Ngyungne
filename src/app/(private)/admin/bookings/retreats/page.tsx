@@ -54,6 +54,8 @@ import { Badge } from "@/components/ui/badge";
 import RegistrationViewDialog from "@/components/admin/retreat-registration/registration-view-dialog";
 import RegistrationFormDialog from "@/components/admin/retreat-registration/registration-form-dialog";
 import type { IRegisterRetreatData, IRetreat, IUser } from "@/types";
+import { Loader } from "@/components/common/loader";
+import Spinner from "@/components/spinner";
 
 export default function AdminRetreatsRegistrationsPage() {
   const [registrations, setRegistrations] = useState<IRegisterRetreatData[]>(
@@ -421,9 +423,7 @@ export default function AdminRetreatsRegistrationsPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <Loader />
       ) : (
         <DataTable
           columns={columns}
@@ -544,10 +544,7 @@ export default function AdminRetreatsRegistrationsPage() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
-                </>
+                <Spinner text="Deleting..." />
               ) : (
                 <>Delete {selectedIds.length} Registrations</>
               )}

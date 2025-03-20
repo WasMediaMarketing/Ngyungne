@@ -43,6 +43,8 @@ import { format } from "date-fns";
 import CourseEnrollmentViewDialog from "@/components/admin/course-enrollment/course-enrollment-view-dialog";
 import CourseEnrollmentFormDialog from "@/components/admin/course-enrollment/course-enrollment-form-dialog";
 import type { IJoinCourseData, ICourse, IUser } from "@/types";
+import Spinner from "@/components/spinner";
+import { Loader } from "@/components/common/loader";
 
 export default function AdminCourseEnrollmentsPage() {
   const [enrollments, setEnrollments] = useState<IJoinCourseData[]>([]);
@@ -376,9 +378,7 @@ export default function AdminCourseEnrollmentsPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <Loader />
       ) : (
         <DataTable
           columns={columns}
@@ -436,14 +436,7 @@ export default function AdminCourseEnrollmentsPage() {
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete"
-              )}
+              {isDeleting ? <Spinner text="Deleting..." /> : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -478,10 +471,7 @@ export default function AdminCourseEnrollmentsPage() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
-                </>
+                <Spinner text="Deleting..." />
               ) : (
                 <>Delete {selectedIds.length} Enrollments</>
               )}

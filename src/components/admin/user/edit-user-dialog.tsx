@@ -33,6 +33,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import type { IUser, IUserUpdate } from "@/types/user.types";
+import Spinner from "@/components/spinner";
 
 const userSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -275,7 +276,7 @@ export function EditUserDialog({
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save Changes"}
+                {isLoading ? <Spinner text="Saving..." /> : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>

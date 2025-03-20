@@ -35,6 +35,7 @@ import {
 import { RefreshCw } from "lucide-react";
 import { joinCourseApi } from "@/utils/joinCourseApi";
 import { toast } from "sonner";
+import Spinner from "../spinner";
 
 // Define the form schema using Zod - removed agreeToTerms field
 const enrollmentFormSchema = z.object({
@@ -312,10 +313,7 @@ export function CourseEnrollmentDialog({
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
+                  <Spinner text="Submitting..." />
                 ) : (
                   "Submit Enrollment"
                 )}
