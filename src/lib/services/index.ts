@@ -10,6 +10,8 @@ import { RegisterRetreatService } from "./registerRetreatService";
 import { PhilosophyTopicService } from "./philosophyService";
 import { CourseService } from "./courseService";
 import { JoinCourseService } from "./joinCourseService";
+import { FaqService } from "./faqService";
+import { NewsletterService } from "./newsletterService";
 
 export {
   UserService,
@@ -24,4 +26,6 @@ export {
   PhilosophyTopicService,
   CourseService,
   JoinCourseService,
+  FaqService,
+  NewsletterService,
 };

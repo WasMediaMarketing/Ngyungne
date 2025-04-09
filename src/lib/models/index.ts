@@ -1,3 +1,4 @@
+import SettingModel from "@/lib/models/setting.model";
 import { User } from "./user.model";
 import { Event } from "./event.model";
 import { Donation } from "./donation.model";
@@ -10,6 +11,8 @@ import { RegisterRetreat } from "./registerRetreat.model";
 import { PhilosophyTopic } from "./philosophyTopic.model";
 import { Course } from "./course.model";
 import { JoinCourse } from "./joinCourse.model";
+import { Faq } from "./faq.model";
+import { Newsletter } from "./newsletter.model";
 
 export {
   User,
@@ -24,4 +27,7 @@ export {
   PhilosophyTopic,
   Course,
   JoinCourse,
+  Faq,
+  Newsletter,
+  SettingModel,
 };

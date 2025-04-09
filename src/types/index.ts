@@ -38,7 +38,22 @@ import {
   IJoinCourseUpdate,
 } from "./joinCourse.types";
 import { IJoinCourseService } from "./joinCourseService.interface";
-
+import { IFaq } from "./faq.types";
+import { IFaqService } from "./faqService.interface";
+import { INewsletter } from "./newsletter.types";
+import { INewsletterService } from "./newsletterService.interface";
+import {
+  BankInfo,
+  DigitalWalletInfo,
+  MetaInfo,
+  OrganizationInfo,
+  OtherPaymentInfo,
+  PaymentInfo,
+  PaymentMethodType,
+  Setting,
+  CreateSettingInput,
+  UpdateSettingInput,
+} from "./setting.types";
 export type {
   IUser,
   IUserInput,
@@ -86,4 +101,18 @@ export type {
   IJoinCourseInput,
   IJoinCourseUpdate,
   IJoinCourseService,
+  IFaq,
+  IFaqService,
+  INewsletter,
+  INewsletterService,
+  BankInfo,
+  DigitalWalletInfo,
+  MetaInfo,
+  OrganizationInfo,
+  OtherPaymentInfo,
+  PaymentInfo,
+  PaymentMethodType,
+  Setting,
+  CreateSettingInput,
+  UpdateSettingInput,
 };
