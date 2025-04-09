@@ -13,7 +13,7 @@ import { Course } from "./course.model";
 import { JoinCourse } from "./joinCourse.model";
 import { Faq } from "./faq.model";
 import { Newsletter } from "./newsletter.model";
-
+import { AmbassadorModel } from "./ambassador.model";
 export {
   User,
   Event,
@@ -30,4 +30,5 @@ export {
   Faq,
   Newsletter,
   SettingModel,
+  AmbassadorModel,
 };

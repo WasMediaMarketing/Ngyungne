@@ -11,6 +11,279 @@
     }
   ],
   "paths": {
+    "/api/ambassador/{id}": {
+      "delete": {
+        "summary": "Delete an ambassador by ID",
+        "description": "This endpoint deletes an ambassador from the system based on the provided ID.",
+        "tags": [
+          "Ambassador"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of the ambassador to be deleted."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ambassador successfully deleted"
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated"
+          },
+          "404": {
+            "description": "Ambassador not found for the given ID"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update an ambassador by ID",
+        "description": "This endpoint updates an ambassador's information based on the provided ID.",
+        "tags": [
+          "Ambassador"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of the ambassador to be updated."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the ambassador should be visible to the public."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ambassador successfully updated"
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated"
+          },
+          "404": {
+            "description": "Ambassador not found for the given ID"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/ambassador": {
+      "post": {
+        "summary": "Create a new ambassador",
+        "description": "This endpoint allows the user to create a new ambassador.",
+        "tags": [
+          "Ambassador"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Ambassador's name."
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "Founder",
+                      "Co-Founder",
+                      "Executive Director",
+                      "Ambassador",
+                      "Program Coordinator",
+                      "Community Liaison",
+                      "Volunteer"
+                    ],
+                    "description": "Ambassador's role."
+                  },
+                  "bio": {
+                    "type": "string",
+                    "description": "Ambassador's bio."
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "A URL for the ambassador's image."
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Ambassador's location."
+                  },
+                  "quote": {
+                    "type": "string",
+                    "description": "Ambassador's quote."
+                  },
+                  "achievements": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Ambassador's achievements."
+                  },
+                  "socialLinks": {
+                    "type": "object",
+                    "properties": {
+                      "linkedin": {
+                        "type": "string"
+                      },
+                      "twitter": {
+                        "type": "string"
+                      },
+                      "instagram": {
+                        "type": "string"
+                      },
+                      "facebook": {
+                        "type": "string"
+                      },
+                      "website": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "Social media links of the ambassador."
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the ambassador should be visible to the public."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ambassador successfully created"
+          },
+          "400": {
+            "description": "Bad request if the input is invalid"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all ambassadors",
+        "description": "This endpoint retrieves all ambassadors in the system. With authentication, it returns all ambassadors; without authentication, it returns only visible ambassadors.",
+        "tags": [
+          "Ambassador"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token to get all ambassadors including non-visible ones."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of ambassadors retrieved successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete ambassadors by their IDs",
+        "description": "Delete ambassadors based on their IDs.",
+        "tags": [
+          "Ambassador"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ambassadorIds",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1,2,3,4"
+            },
+            "description": "A comma-separated list of ambassador IDs to delete."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ambassadors successfully deleted"
+          },
+          "401": {
+            "description": "Unauthorized - The request is not authenticated"
+          },
+          "404": {
+            "description": "No ambassadors found for the given IDs"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/book-event/{bookEventId}": {
       "patch": {
         "summary": "Update a booked event",
@@ -3304,6 +3577,192 @@
         }
       }
     },
+    "/api/newsletter/{subscriberId}": {
+      "get": {
+        "summary": "Get a newsletter subscriber by ID",
+        "description": "Retrieves a specific newsletter subscriber by ID (requires authentication)",
+        "tags": [
+          "Newsletter"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscriberId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the subscriber to retrieve",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscriber retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Subscriber not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a newsletter subscriber",
+        "description": "Deletes a specific newsletter subscriber by ID (requires authentication)",
+        "tags": [
+          "Newsletter"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscriberId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the subscriber to delete",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscriber successfully deleted"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Subscriber not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/newsletter": {
+      "post": {
+        "summary": "Subscribe to newsletter",
+        "description": "Allows users to subscribe to the newsletter with their email",
+        "tags": [
+          "Newsletter"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email address for newsletter subscription",
+                    "example": "user@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully subscribed to newsletter"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "409": {
+            "description": "Conflict - Email already subscribed"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all newsletter subscribers",
+        "description": "Retrieves all newsletter subscribers (requires authentication)",
+        "tags": [
+          "Newsletter"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of subscribers retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple newsletter subscribers",
+        "description": "Deletes multiple newsletter subscribers based on their IDs (requires authentication)",
+        "tags": [
+          "Newsletter"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "subscriberIds",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated list of subscriber IDs to delete",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1,64a1b2c3d4e5f6a7b8c9d0e2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscribers successfully deleted"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Not found - No subscribers found with the provided IDs"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/philosophy/{topicId}": {
       "get": {
         "summary": "Get philosophy topic by ID",
@@ -4452,6 +4911,389 @@
           },
           "500": {
             "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/setting": {
+      "post": {
+        "summary": "Create or update the system settings",
+        "description": "This endpoint allows administrators to create or update the system settings.",
+        "tags": [
+          "Setting"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationInfo": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "Ngyungne Practice"
+                      },
+                      "address": {
+                        "type": "string",
+                        "example": "Jorpati, Gokarneshwor 5, Kathmandu, Nepal"
+                      },
+                      "email": {
+                        "type": "string",
+                        "example": "donation@ngyungne.org"
+                      },
+                      "phone": {
+                        "type": "string",
+                        "example": "+977 9818123174"
+                      },
+                      "socialLinks": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "platform": {
+                              "type": "string",
+                              "example": "Facebook"
+                            },
+                            "url": {
+                              "type": "string",
+                              "example": "https://facebook.com/ngyungnepractice"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "paymentInfo": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "BANK",
+                            "ESEWA",
+                            "KHALTI",
+                            "OTHER"
+                          ],
+                          "example": "BANK"
+                        },
+                        "bank": {
+                          "type": "object",
+                          "properties": {
+                            "accountName": {
+                              "type": "string",
+                              "example": "Ngyungne Practice"
+                            },
+                            "branchName": {
+                              "type": "string",
+                              "example": "Kathmandu Branch"
+                            },
+                            "bankName": {
+                              "type": "string",
+                              "example": "Nepal Bank"
+                            },
+                            "accountNumber": {
+                              "type": "string",
+                              "example": "1234567890"
+                            },
+                            "qrCode": {
+                              "type": "string",
+                              "example": "https://example.com/qr-code.png"
+                            }
+                          }
+                        },
+                        "digitalWallet": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "9812345678"
+                            },
+                            "qrCode": {
+                              "type": "string",
+                              "example": "https://example.com/qr-code.png"
+                            }
+                          }
+                        },
+                        "other": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "example": "Cash on Delivery"
+                            },
+                            "details": {
+                              "type": "string",
+                              "example": "Pay when you arrive at the retreat"
+                            },
+                            "qrCode": {
+                              "type": "string",
+                              "example": "https://example.com/qr-code.png"
+                            }
+                          }
+                        },
+                        "isActive": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  },
+                  "metaInfo": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string",
+                        "example": "Ngyungne Practice"
+                      },
+                      "description": {
+                        "type": "string",
+                        "example": "Ngyungne Practice is a serene space in Nepal dedicated to deepening spiritual practice and meditation, offering a peaceful environment for personal growth and healing through traditional methods."
+                      },
+                      "keywords": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": [
+                          "Ngyungne Practice",
+                          "meditation",
+                          "spiritual growth",
+                          "Nepal retreats"
+                        ]
+                      },
+                      "ogImage": {
+                        "type": "string",
+                        "example": "https://example.com/og-image.jpg"
+                      },
+                      "favicon": {
+                        "type": "string",
+                        "example": "https://example.com/favicon.ico"
+                      },
+                      "twitterHandle": {
+                        "type": "string",
+                        "example": "@ngyungnepractice"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Settings successfully created or updated"
+          },
+          "400": {
+            "description": "Bad request if the input is invalid"
+          },
+          "401": {
+            "description": "Unauthorized if the request is not authenticated"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get the system settings",
+        "description": "This endpoint retrieves the current system settings.",
+        "tags": [
+          "Setting"
+        ],
+        "responses": {
+          "200": {
+            "description": "Settings retrieved successfully"
+          },
+          "404": {
+            "description": "Settings not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update the system settings",
+        "description": "This endpoint allows administrators to update the system settings.",
+        "tags": [
+          "Setting"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationInfo": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      },
+                      "phone": {
+                        "type": "string"
+                      },
+                      "socialLinks": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "platform": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "paymentInfo": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "BANK",
+                            "ESEWA",
+                            "KHALTI",
+                            "OTHER"
+                          ]
+                        },
+                        "bank": {
+                          "type": "object"
+                        },
+                        "digitalWallet": {
+                          "type": "object"
+                        },
+                        "other": {
+                          "type": "object"
+                        },
+                        "isActive": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "metaInfo": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "keywords": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "ogImage": {
+                        "type": "string"
+                      },
+                      "favicon": {
+                        "type": "string"
+                      },
+                      "twitterHandle": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings successfully updated"
+          },
+          "400": {
+            "description": "Bad request if the input is invalid"
+          },
+          "401": {
+            "description": "Unauthorized if the request is not authenticated"
+          },
+          "404": {
+            "description": "Settings not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Reset the system settings to defaults",
+        "description": "This endpoint allows administrators to reset the system settings to default values.",
+        "tags": [
+          "Setting"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token required to access this endpoint."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settings successfully reset to defaults"
+          },
+          "401": {
+            "description": "Unauthorized if the request is not authenticated"
+          },
+          "404": {
+            "description": "Settings not found"
+          },
+          "500": {
+            "description": "Internal server error"
           }
         }
       }

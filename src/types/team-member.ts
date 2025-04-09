@@ -24,4 +24,4 @@ export type TeamMemberRole =
   | "Ambassador"
   | "Program Coordinator"
   | "Community Liaison"
-  | "Volunteer Coordinator";
+  | "Volunteer";
