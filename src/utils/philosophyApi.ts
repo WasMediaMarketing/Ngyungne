@@ -4,6 +4,12 @@ import type {
   IPhilosophyTopicUpdate,
 } from "@/types";
 
+// Response type that matches your API structure
+interface ApiResponse<T> {
+  message: string;
+  data: T;
+}
+
 // Helper function to get the admin token from localStorage
 const getAdminToken = (): string | null => {
   if (typeof window !== "undefined") {
@@ -26,22 +32,37 @@ const createAuthHeaders = (): HeadersInit => {
   return headers;
 };
 
-// Helper function to handle API responses\
+// Helper function to handle API responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || `API error: ${response.status}`);
   }
-  return response.json();
+
+  // Parse the response and extract the data property
+  const result = (await response.json()) as ApiResponse<T>;
+  return result.data;
 };
 
 export const philosophyApi = {
   // Get all philosophy topics
-  getPhilosophyTopics: async (): Promise<IPhilosophyTopic[]> => {
+  getAdminPhilosophyTopics: async (): Promise<IPhilosophyTopic[]> => {
     try {
       const response = await fetch("/api/philosophy", {
         method: "GET",
         headers: createAuthHeaders(),
+      });
+      return handleResponse<IPhilosophyTopic[]>(response);
+    } catch (error) {
+      console.error("Error fetching philosophy topics:", error);
+      throw error;
+    }
+  },
+  getPhilosophyTopics: async (): Promise<IPhilosophyTopic[]> => {
+    try {
+      const response = await fetch("/api/philosophy", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
       });
       return handleResponse<IPhilosophyTopic[]>(response);
     } catch (error) {
@@ -108,6 +129,7 @@ export const philosophyApi = {
       });
 
       if (response.ok) {
+        // For delete operations, we just need to know if it was successful
         return true;
       }
 
@@ -132,6 +154,7 @@ export const philosophyApi = {
       );
 
       if (response.ok) {
+        // For delete operations, we just need to know if it was successful
         return true;
       }
 

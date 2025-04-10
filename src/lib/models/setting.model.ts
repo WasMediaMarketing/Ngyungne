@@ -14,6 +14,7 @@ const SocialLinkSchema = new Schema({
 const BankInfoSchema = new Schema({
   accountName: { type: String, required: true },
   branchName: { type: String, required: true },
+  swiftCode: { type: String, required: true },
   bankName: { type: String, required: true },
   accountNumber: { type: String, required: true },
   qrCode: { type: String },

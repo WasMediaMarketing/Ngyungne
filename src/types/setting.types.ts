@@ -7,6 +7,7 @@ export enum PaymentMethodType {
 
 export interface BankInfo {
   accountName: string;
+  swiftCode: string;
   branchName: string;
   bankName: string;
   accountNumber: string;

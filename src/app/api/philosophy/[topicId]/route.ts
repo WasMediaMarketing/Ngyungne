@@ -1,9 +1,8 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { createPhilosophyTopicController } from "@/lib/factories/philosophyTopicFactory";
-import {
-  isAuthenticated,
-  validatePhilosophyTopicUpdate,
-} from "@/lib/middlewares";
+import { isAuthenticated } from "@/lib/middlewares";
+import { validatePhilosophyTopicUpdate } from "@/lib/middlewares/validatePhilosophyTopicUpdate";
+import { Types } from "mongoose";
 
 /**
  * @openapi
@@ -162,24 +161,61 @@ import {
  *         description: Internal server error.
  */
 export async function GET(req: NextRequest) {
+  console.log("GET /api/philosophy/[topicId] - Request received");
+
   const philosophyController = createPhilosophyTopicController();
+  console.log("GET /api/philosophy/[topicId] - Processing request");
   return philosophyController.getPhilosophyTopicById(req);
 }
 
 export async function PATCH(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
-  const validationResponse = await validatePhilosophyTopicUpdate(req);
-  if (validationResponse) return validationResponse;
+  console.log("PATCH /api/philosophy/[topicId] - Request received");
 
+  // Check authentication
+  const authResult = await isAuthenticated(req);
+  if (authResult) {
+    console.log("PATCH /api/philosophy/[topicId] - Authentication failed");
+    return authResult;
+  }
+
+  // Get the topicId from the URL
+  const topicId = req.nextUrl.pathname.split("/").pop();
+  if (!topicId || !Types.ObjectId.isValid(topicId)) {
+    console.log("PATCH /api/philosophy/[topicId] - Invalid topic ID");
+    return Response.json(
+      {
+        success: false,
+        message: "Philosophy Topic ID is either missing or invalid",
+      },
+      { status: 400 }
+    );
+  }
+
+  // Validate input and get the parsed body
+  const { error, body } = await validatePhilosophyTopicUpdate(req);
+  if (error) {
+    console.log("PATCH /api/philosophy/[topicId] - Validation failed");
+    return error;
+  }
+
+  // Process request with the topicId and body directly
   const philosophyController = createPhilosophyTopicController();
-  return philosophyController.updatePhilosophyTopic(req);
+  console.log("PATCH /api/philosophy/[topicId] - Processing request");
+  return philosophyController.updatePhilosophyTopic(topicId, body);
 }
 
 export async function DELETE(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
+  console.log("DELETE /api/philosophy/[topicId] - Request received");
 
+  // Check authentication
+  const authResult = await isAuthenticated(req);
+  if (authResult) {
+    console.log("DELETE /api/philosophy/[topicId] - Authentication failed");
+    return authResult;
+  }
+
+  // Process request
   const philosophyController = createPhilosophyTopicController();
+  console.log("DELETE /api/philosophy/[topicId] - Processing request");
   return philosophyController.deletePhilosophyTopic(req);
 }

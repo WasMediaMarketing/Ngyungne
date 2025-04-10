@@ -62,7 +62,7 @@ export default function AdminPhilosophyPage() {
   const fetchTopics = async () => {
     setLoading(true);
     try {
-      const data = await philosophyApi.getPhilosophyTopics();
+      const data = await philosophyApi.getAdminPhilosophyTopics();
       setTopics(data);
     } catch (error) {
       console.error("Error fetching philosophy topics:", error);

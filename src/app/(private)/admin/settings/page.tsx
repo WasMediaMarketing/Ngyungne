@@ -61,6 +61,7 @@ const socialLinkSchema = z.object({
 
 const bankInfoSchema = z.object({
   accountName: z.string().min(1, "Account name is required"),
+  swiftCode: z.string().min(1, "Swift code is required"),
   branchName: z.string().min(1, "Branch name is required"),
   bankName: z.string().min(1, "Bank name is required"),
   accountNumber: z.string().min(1, "Account number is required"),
@@ -279,6 +280,7 @@ export default function SettingsPage() {
     if (type === PaymentMethodType.BANK) {
       newPayment.bank = {
         accountName: "",
+        swiftCode: "",
         branchName: "",
         bankName: "",
         accountNumber: "",
@@ -576,6 +578,22 @@ export default function SettingsPage() {
                                   <FormControl>
                                     <Input
                                       placeholder="Enter bank name"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`paymentInfo.${index}.bank.swiftCode`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Swift Code</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Enter swift code"
                                       {...field}
                                     />
                                   </FormControl>

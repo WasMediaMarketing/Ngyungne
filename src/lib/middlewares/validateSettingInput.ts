@@ -60,11 +60,22 @@ export async function validateSettingInput(
                   `Bank info is required for BANK payment method #${index + 1}`
                 );
               } else {
-                const { accountName, branchName, bankName, accountNumber } =
-                  payment.bank;
+                const {
+                  accountName,
+                  swiftCode,
+                  branchName,
+                  bankName,
+                  accountNumber,
+                } = payment.bank;
                 if (!accountName)
                   errors.push(
                     `Account name is required for BANK payment method #${
+                      index + 1
+                    }`
+                  );
+                if (!swiftCode)
+                  errors.push(
+                    `Swift code is required for BANK payment method #${
                       index + 1
                     }`
                   );
