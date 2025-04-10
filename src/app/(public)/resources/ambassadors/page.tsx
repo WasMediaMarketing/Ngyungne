@@ -165,7 +165,7 @@ const AmbassadorsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-maroon-100 py-12">
+      <div className="bg-gradient-to-t from-amber-50 to-orange-100 py-12">
         <div className="container mx-auto px-4 max-w-6xl">
           <Breadcrumbs />
 
@@ -221,7 +221,7 @@ const AmbassadorsPage: React.FC = () => {
                     </div>
 
                     {getRoleDescription(role) && (
-                      <div className="bg-maroon-200 text-accent-foreground p-6 rounded-lg mb-8 border-l-4 border-primary shadow-sm">
+                      <div className="bg-gradient-to-r from-amber-50 to-amber-100 text-accent-foreground p-6 rounded-lg mb-8 border-l-4 border-primary shadow-sm">
                         <p>{getRoleDescription(role)}</p>
                       </div>
                     )}
@@ -247,7 +247,7 @@ const AmbassadorsPage: React.FC = () => {
           {roleOrder.map((role) => (
             <TabsContent key={role} value={role}>
               <section className="mb-12">
-                <div className="bg-maroon-200 text-accent-foreground p-6 rounded-lg mb-8 border-l-4 border-primary shadow-sm">
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 text-accent-foreground p-6 rounded-lg mb-8 border-l-4 border-primary shadow-sm">
                   <h3 className="font-semibold text-primary mb-2">
                     About Our {getRolePlural(role)}
                   </h3>
