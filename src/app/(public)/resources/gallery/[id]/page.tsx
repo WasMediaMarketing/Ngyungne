@@ -20,8 +20,6 @@ import {
   Calendar,
   Clock,
   Download,
-  Bookmark,
-  Play,
   ChevronUp,
   ChevronDown,
   RefreshCw,
@@ -102,6 +100,16 @@ export default function GalleryDetail() {
     }
   };
 
+  // Helper function to extract YouTube video ID
+  const getYouTubeVideoId = (url: string) => {
+    if (!url) return null;
+
+    const regex =
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  };
+
   // Prepare images array for the gallery
   const getAllImages = () => {
     if (!item) return [];
@@ -115,6 +123,12 @@ export default function GalleryDetail() {
 
   const openImagePreview = () => {
     setIsImagePreviewOpen(true);
+  };
+
+  const handleWatchVideo = () => {
+    if (item?.videoUrl) {
+      window.open(item.videoUrl, "_blank");
+    }
   };
 
   if (loading) {
@@ -155,6 +169,10 @@ export default function GalleryDetail() {
   }
 
   const images = getAllImages();
+  const videoId =
+    item.type === GalleryItemType.VIDEO
+      ? getYouTubeVideoId(item.videoUrl || "")
+      : null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -179,42 +197,54 @@ export default function GalleryDetail() {
           transition={{ duration: 0.5 }}
         >
           <Card className="bg-saffron-50 border-saffron-200 overflow-hidden">
-            {/* Main image display */}
+            {/* Main image/video display */}
             <div className="relative">
               <AspectRatio ratio={16 / 9}>
-                <div className="cursor-pointer" onClick={openImagePreview}>
-                  <Image
-                    src={images[activeImageIndex] || "/placeholder.svg"}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
-                  {item.type === GalleryItemType.VIDEO && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
-                      <div className="rounded-full bg-crimson-700 p-6 text-white hover:bg-crimson-800 cursor-pointer transition-all">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className="w-8 h-8"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                          />
-                        </svg>
+                {item.type === GalleryItemType.VIDEO && videoId ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${videoId}`}
+                    title={item.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="absolute inset-0 w-full h-full"
+                  ></iframe>
+                ) : (
+                  <div className="cursor-pointer" onClick={openImagePreview}>
+                    <Image
+                      src={images[activeImageIndex] || "/placeholder.svg"}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                    />
+                    {item.type === GalleryItemType.VIDEO && !videoId && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                        <div className="rounded-full bg-crimson-700 p-6 text-white hover:bg-crimson-800 cursor-pointer transition-all">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="w-8 h-8"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                            />
+                          </svg>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </AspectRatio>
-              <div className="absolute top-2 left-2 bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-sm">
-                {activeImageIndex + 1} / {images.length}
-              </div>
+              {item.type !== GalleryItemType.VIDEO && (
+                <div className="absolute top-2 left-2 bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-sm">
+                  {activeImageIndex + 1} / {images.length}
+                </div>
+              )}
             </div>
 
-            {/* Thumbnails for switching images */}
-            {images.length > 1 && (
+            {/* Thumbnails for switching images - only show for photos */}
+            {item.type !== GalleryItemType.VIDEO && images.length > 1 && (
               <div className="p-4 bg-saffron-100">
                 <div className="flex overflow-x-auto gap-2 pb-2">
                   {images.map((image, idx) => (
@@ -317,24 +347,18 @@ export default function GalleryDetail() {
 
             <CardFooter className="flex justify-between border-t border-saffron-200 pt-6">
               <div className="flex gap-2">
-                <Button className="bg-crimson-700 hover:bg-crimson-800">
-                  {item.type === GalleryItemType.PHOTO ? (
-                    <>
-                      <Download className="mr-2 h-4 w-4" /> Download
-                    </>
-                  ) : (
-                    <>
-                      <Play className="mr-2 h-4 w-4" /> Watch Video
-                    </>
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-crimson-300 text-crimson-700 hover:bg-crimson-50"
-                >
-                  <Bookmark className="mr-2 h-4 w-4" />
-                  Save for Later
-                </Button>
+                {item.type === GalleryItemType.PHOTO ? (
+                  <Button className="bg-crimson-700 hover:bg-crimson-800">
+                    <Download className="mr-2 h-4 w-4" /> Download
+                  </Button>
+                ) : (
+                  <Button
+                    className="bg-crimson-700 hover:bg-crimson-800"
+                    onClick={handleWatchVideo}
+                  >
+                    <span className="mr-2 h-4 w-4">▶</span> Watch Video
+                  </Button>
+                )}
               </div>
             </CardFooter>
           </Card>
@@ -403,7 +427,7 @@ export default function GalleryDetail() {
                 )}
               </div>
             </CardContent>
-            {images.length > 1 && (
+            {item.type !== GalleryItemType.VIDEO && images.length > 1 && (
               <div className="px-6 pb-6">
                 <Button
                   className="w-full bg-saffron-300 hover:bg-saffron-400 text-crimson-800"
@@ -427,50 +451,52 @@ export default function GalleryDetail() {
         </motion.div>
       </div>
 
-      {/* View All Images Grid */}
-      {showAllImages && images.length > 1 && (
-        <motion.div
-          className="mt-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Card className="bg-saffron-50 border-saffron-200 p-6">
-            <CardHeader className="px-0 pt-0">
-              <CardTitle className="text-2xl text-crimson-700">
-                All Images in this Collection
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-0 pb-0">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {images.map((image, idx) => (
-                  <div
-                    key={idx}
-                    className="cursor-pointer relative rounded-md overflow-hidden"
-                    onClick={() => {
-                      handleThumbnailClick(idx);
-                      openImagePreview();
-                    }}
-                  >
-                    <AspectRatio ratio={3 / 2}>
-                      <Image
-                        src={image || "/placeholder.svg"}
-                        alt={`${item.title} - Image ${idx + 1}`}
-                        fill
-                        className={`object-cover transition-all hover:scale-105 ${
-                          activeImageIndex === idx
-                            ? "ring-4 ring-crimson-500"
-                            : ""
-                        }`}
-                      />
-                    </AspectRatio>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+      {/* View All Images Grid - only show for photos */}
+      {item.type !== GalleryItemType.VIDEO &&
+        showAllImages &&
+        images.length > 1 && (
+          <motion.div
+            className="mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="bg-saffron-50 border-saffron-200 p-6">
+              <CardHeader className="px-0 pt-0">
+                <CardTitle className="text-2xl text-crimson-700">
+                  All Images in this Collection
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-0 pb-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {images.map((image, idx) => (
+                    <div
+                      key={idx}
+                      className="cursor-pointer relative rounded-md overflow-hidden"
+                      onClick={() => {
+                        handleThumbnailClick(idx);
+                        openImagePreview();
+                      }}
+                    >
+                      <AspectRatio ratio={3 / 2}>
+                        <Image
+                          src={image || "/placeholder.svg"}
+                          alt={`${item.title} - Image ${idx + 1}`}
+                          fill
+                          className={`object-cover transition-all hover:scale-105 ${
+                            activeImageIndex === idx
+                              ? "ring-4 ring-crimson-500"
+                              : ""
+                          }`}
+                        />
+                      </AspectRatio>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
       {/* Related Items */}
       {relatedItems.length > 0 && (
@@ -483,12 +509,33 @@ export default function GalleryDetail() {
               <Link key={index} href={`/resources/gallery/${relatedItem._id}`}>
                 <Card className="bg-saffron-50 border-saffron-200 transition-all hover:shadow-md hover:-translate-y-1 cursor-pointer h-full">
                   <AspectRatio ratio={16 / 9}>
-                    <Image
-                      src={relatedItem.image || "/placeholder.svg"}
-                      alt={relatedItem.title}
-                      fill
-                      className="rounded-t-md object-cover"
-                    />
+                    {relatedItem.type === GalleryItemType.VIDEO ? (
+                      <div className="relative w-full h-full bg-gray-800">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="rounded-full bg-crimson-700 p-4 text-white">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-6 h-6"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent h-16"></div>
+                      </div>
+                    ) : (
+                      <Image
+                        src={relatedItem.image || "/placeholder.svg"}
+                        alt={relatedItem.title}
+                        fill
+                        className="rounded-t-md object-cover"
+                      />
+                    )}
                   </AspectRatio>
                   <CardHeader className="py-3 px-4">
                     <CardTitle className="text-base text-crimson-700">
@@ -502,14 +549,16 @@ export default function GalleryDetail() {
         </div>
       )}
 
-      {/* Image Preview Dialog */}
-      <ImagePreviewDialog
-        open={isImagePreviewOpen}
-        onOpenChange={setIsImagePreviewOpen}
-        images={images}
-        initialIndex={activeImageIndex}
-        title={item.title}
-      />
+      {/* Image Preview Dialog - only for photos */}
+      {item.type !== GalleryItemType.VIDEO && (
+        <ImagePreviewDialog
+          open={isImagePreviewOpen}
+          onOpenChange={setIsImagePreviewOpen}
+          images={images}
+          initialIndex={activeImageIndex}
+          title={item.title}
+        />
+      )}
     </div>
   );
 }
