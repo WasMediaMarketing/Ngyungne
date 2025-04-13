@@ -24,113 +24,65 @@ import {
   Play,
   ChevronUp,
   ChevronDown,
+  RefreshCw,
+  MapPin,
+  User,
+  Tag,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { galleryItems } from "../page";
-
-// Define type for gallery item images
-type GalleryItemImage = {
-  url: string;
-  alt: string;
-};
-
-// Define types for gallery items
-type BaseGalleryItem = {
-  id: string;
-  title: string;
-  description: string;
-  fullDescription: string;
-  date: string;
-  type: "photo" | "video";
-  images?: GalleryItemImage[];
-};
-
-type PhotoItem = BaseGalleryItem & {
-  type: "photo";
-  image: string;
-};
-
-type VideoItem = BaseGalleryItem & {
-  type: "video";
-  thumbnail: string;
-  duration: string;
-  videoUrl: string;
-};
-
-type GalleryItem = PhotoItem | VideoItem;
-
-// Extended galleryItems with multiple images for each item
-const extendedGalleryItems = {
-  photos: galleryItems.photos.map((item) => ({
-    ...item,
-    images: [
-      {
-        url: item.image || "/placeholder.svg?height=800&width=1200",
-        alt: item.title,
-      },
-      {
-        url: `/placeholder.svg?height=800&width=1200&text=Image+2+for+${item.title}`,
-        alt: `${item.title} - View 2`,
-      },
-      {
-        url: `/placeholder.svg?height=800&width=1200&text=Image+3+for+${item.title}`,
-        alt: `${item.title} - View 3`,
-      },
-      {
-        url: `/placeholder.svg?height=800&width=1200&text=Image+4+for+${item.title}`,
-        alt: `${item.title} - View 4`,
-      },
-    ],
-  })),
-  videos: galleryItems.videos.map((item) => ({
-    ...item,
-    images: [
-      {
-        url: item.thumbnail || "/placeholder.svg?height=800&width=1200",
-        alt: item.title,
-      },
-      {
-        url: `/placeholder.svg?height=800&width=1200&text=Screenshot+2+from+${item.title}`,
-        alt: `${item.title} - Screenshot 2`,
-      },
-      {
-        url: `/placeholder.svg?height=800&width=1200&text=Screenshot+3+from+${item.title}`,
-        alt: `${item.title} - Screenshot 3`,
-      },
-    ],
-  })),
-};
+import { galleryApi, type GalleryItem } from "@/utils/galleryApi";
+import { GalleryItemType } from "@/types/gallery";
+import { format } from "date-fns";
+import { ImagePreviewDialog } from "@/components/gallery/ImagePreviewDialog";
 
 export default function GalleryDetail() {
   const router = useRouter();
   const params = useParams();
-  const [item, setItem] = useState<
-    ((PhotoItem | VideoItem) & { images: GalleryItemImage[] }) | null
-  >(null);
+  const [item, setItem] = useState<GalleryItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showAllImages, setShowAllImages] = useState(false);
+  const [relatedItems, setRelatedItems] = useState<GalleryItem[]>([]);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
 
   useEffect(() => {
-    if (params?.id) {
-      const id = params.id.toString();
-      // Find the item in both photos and videos arrays
-      const photoItem = extendedGalleryItems.photos.find(
-        (item) => item.id === id
-      );
-      const videoItem = extendedGalleryItems.videos.find(
-        (item) => item.id === id
-      );
-      const foundItem = photoItem || videoItem;
+    const fetchGalleryItem = async () => {
+      if (!params?.id) return;
 
-      if (foundItem) {
-        setItem(
-          foundItem as (PhotoItem | VideoItem) & { images: GalleryItemImage[] }
+      try {
+        setLoading(true);
+        // Ensure id is a string and not an array
+        const id = Array.isArray(params.id)
+          ? params.id[0]
+          : params.id.toString();
+
+        console.log("Fetching gallery item with ID:", id);
+
+        const data = await galleryApi.getGalleryItemById(id);
+        setItem(data);
+        setError(null);
+
+        // Fetch related items
+        const allItems = await galleryApi.getGalleryItems();
+        setRelatedItems(
+          allItems
+            .filter(
+              (relatedItem) =>
+                relatedItem._id !== id && relatedItem.type === data.type
+            )
+            .slice(0, 3)
         );
+      } catch (err) {
+        console.error("Error fetching gallery item:", err);
+        setError("Failed to load gallery item. Please try again later.");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }
+    };
+
+    fetchGalleryItem();
   }, [params?.id]);
 
   const handleThumbnailClick = (index: number) => {
@@ -141,17 +93,41 @@ export default function GalleryDetail() {
     setShowAllImages(!showAllImages);
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "Not specified";
+    try {
+      return format(new Date(dateString), "MMMM d, yyyy");
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  // Prepare images array for the gallery
+  const getAllImages = () => {
+    if (!item) return [];
+
+    const images = [item.image];
+    if (item.additionalImages && item.additionalImages.length > 0) {
+      images.push(...item.additionalImages);
+    }
+    return images.filter(Boolean);
+  };
+
+  const openImagePreview = () => {
+    setIsImagePreviewOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center h-64">
-          <div className="text-2xl text-crimson-800">Loading...</div>
+          <RefreshCw className="h-12 w-12 text-crimson-700 animate-spin" />
         </div>
       </div>
     );
   }
 
-  if (!item) {
+  if (error || !item) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Breadcrumbs />
@@ -163,7 +139,7 @@ export default function GalleryDetail() {
           </CardHeader>
           <CardContent>
             <p className="text-maroon-600 mb-4">
-              The requested gallery item could not be found.
+              {error || "The requested gallery item could not be found."}
             </p>
             <Button
               onClick={() => router.push("/resources/gallery")}
@@ -177,6 +153,8 @@ export default function GalleryDetail() {
       </div>
     );
   }
+
+  const images = getAllImages();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -204,55 +182,62 @@ export default function GalleryDetail() {
             {/* Main image display */}
             <div className="relative">
               <AspectRatio ratio={16 / 9}>
-                <Image
-                  src={item.images[activeImageIndex].url}
-                  alt={item.images[activeImageIndex].alt}
-                  fill
-                  className="object-cover"
-                />
-                {item.type === "video" && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
-                    <div className="rounded-full bg-crimson-700 p-6 text-white hover:bg-crimson-800 cursor-pointer transition-all">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-8 h-8"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                        />
-                      </svg>
+                <div className="cursor-pointer" onClick={openImagePreview}>
+                  <Image
+                    src={images[activeImageIndex] || "/placeholder.svg"}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                  />
+                  {item.type === GalleryItemType.VIDEO && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                      <div className="rounded-full bg-crimson-700 p-6 text-white hover:bg-crimson-800 cursor-pointer transition-all">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="w-8 h-8"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </AspectRatio>
+              <div className="absolute top-2 left-2 bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-sm">
+                {activeImageIndex + 1} / {images.length}
+              </div>
             </div>
 
             {/* Thumbnails for switching images */}
-            <div className="p-4 bg-saffron-100">
-              <div className="flex overflow-x-auto gap-2 pb-2">
-                {item.images.map((image, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex-none w-20 h-20 relative rounded-md overflow-hidden cursor-pointer transition-all ${
-                      activeImageIndex === idx
-                        ? "ring-2 ring-crimson-700 ring-offset-2"
-                        : "opacity-80 hover:opacity-100"
-                    }`}
-                    onClick={() => handleThumbnailClick(idx)}
-                  >
-                    <Image
-                      src={image.url}
-                      alt={image.alt}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
+            {images.length > 1 && (
+              <div className="p-4 bg-saffron-100">
+                <div className="flex overflow-x-auto gap-2 pb-2">
+                  {images.map((image, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex-none w-20 h-20 relative rounded-md overflow-hidden cursor-pointer transition-all ${
+                        activeImageIndex === idx
+                          ? "ring-2 ring-crimson-700 ring-offset-2"
+                          : "opacity-80 hover:opacity-100"
+                      }`}
+                      onClick={() => handleThumbnailClick(idx)}
+                    >
+                      <Image
+                        src={image || "/placeholder.svg"}
+                        alt={`${item.title} - Image ${idx + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <CardHeader>
               <div className="flex justify-between items-start">
@@ -278,26 +263,54 @@ export default function GalleryDetail() {
               <div className="flex flex-wrap items-center gap-4 mb-4 text-maroon-600">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  {item.date}
+                  {formatDate(item.date)}
                 </span>
-                {item.type === "video" && (
+                {item.type === GalleryItemType.VIDEO && item.duration && (
                   <span className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
-                    {"duration" in item ? item.duration : ""}
+                    {item.duration}
                   </span>
                 )}
                 <span className="bg-saffron-200 text-crimson-800 px-3 py-1 rounded-full text-sm uppercase">
                   {item.type}
                 </span>
-                <span className="text-maroon-600">
-                  {item.images.length}{" "}
-                  {item.type === "photo" ? "Photos" : "Screenshots"}
-                </span>
+                {item.location && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    {item.location}
+                  </span>
+                )}
+                {item.type === GalleryItemType.PHOTO && item.photographer && (
+                  <span className="flex items-center gap-1">
+                    <User className="h-4 w-4" />
+                    {item.photographer}
+                  </span>
+                )}
+                {item.type === GalleryItemType.VIDEO && item.presenter && (
+                  <span className="flex items-center gap-1">
+                    <User className="h-4 w-4" />
+                    {item.presenter}
+                  </span>
+                )}
               </div>
+
+              {item.tags && item.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <Tag className="h-4 w-4 text-maroon-600" />
+                  {item.tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-saffron-100 text-maroon-700 px-2 py-1 rounded-md text-sm"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <div className="prose prose-crimson max-w-none">
                 <p className="text-maroon-700 text-lg">
-                  {item.fullDescription}
+                  {item.fullDescription || item.description}
                 </p>
               </div>
             </CardContent>
@@ -305,7 +318,7 @@ export default function GalleryDetail() {
             <CardFooter className="flex justify-between border-t border-saffron-200 pt-6">
               <div className="flex gap-2">
                 <Button className="bg-crimson-700 hover:bg-crimson-800">
-                  {item.type === "photo" ? (
+                  {item.type === GalleryItemType.PHOTO ? (
                     <>
                       <Download className="mr-2 h-4 w-4" /> Download
                     </>
@@ -337,81 +350,85 @@ export default function GalleryDetail() {
           <Card className="bg-saffron-50 border-saffron-200 sticky top-4">
             <CardHeader>
               <CardTitle className="text-xl text-crimson-700">
-                About This {item.type === "photo" ? "Collection" : "Video"}
+                About This{" "}
+                {item.type === GalleryItemType.PHOTO ? "Collection" : "Video"}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div>
-                  <h3 className="text-maroon-700 font-medium mb-1">Taken at</h3>
-                  <p className="text-maroon-600">Lotus Meditation Center</p>
-                </div>
-                <div>
-                  <h3 className="text-maroon-700 font-medium mb-1">Event</h3>
-                  <p className="text-maroon-600">
-                    {item.title.includes("Retreat")
-                      ? "Summer Retreat 2024"
-                      : "Weekly Practice Session"}
-                  </p>
-                </div>
-                {item.type === "photo" ? (
+                {item.location && (
+                  <div>
+                    <h3 className="text-maroon-700 font-medium mb-1">
+                      Taken at
+                    </h3>
+                    <p className="text-maroon-600">{item.location}</p>
+                  </div>
+                )}
+                {item.event && (
+                  <div>
+                    <h3 className="text-maroon-700 font-medium mb-1">Event</h3>
+                    <p className="text-maroon-600">{item.event}</p>
+                  </div>
+                )}
+                {item.type === GalleryItemType.PHOTO && item.photographer && (
                   <div>
                     <h3 className="text-maroon-700 font-medium mb-1">
                       Photographer
                     </h3>
-                    <p className="text-maroon-600">David Chen</p>
+                    <p className="text-maroon-600">{item.photographer}</p>
                   </div>
-                ) : (
+                )}
+                {item.type === GalleryItemType.VIDEO && item.presenter && (
                   <div>
                     <h3 className="text-maroon-700 font-medium mb-1">
                       Presenter
                     </h3>
-                    <p className="text-maroon-600">Sensei Melissa Wong</p>
+                    <p className="text-maroon-600">{item.presenter}</p>
                   </div>
                 )}
-                <div>
-                  <h3 className="text-maroon-700 font-medium mb-1">Tags</h3>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    <span className="bg-saffron-100 text-maroon-700 px-2 py-1 rounded-md text-sm">
-                      {item.type === "photo" ? "Photography" : "Video"}
-                    </span>
-                    <span className="bg-saffron-100 text-maroon-700 px-2 py-1 rounded-md text-sm">
-                      {item.title.split(" ")[0]}
-                    </span>
-                    <span className="bg-saffron-100 text-maroon-700 px-2 py-1 rounded-md text-sm">
-                      Buddhism
-                    </span>
-                    <span className="bg-saffron-100 text-maroon-700 px-2 py-1 rounded-md text-sm">
-                      Meditation
-                    </span>
+                {item.tags && item.tags.length > 0 && (
+                  <div>
+                    <h3 className="text-maroon-700 font-medium mb-1">Tags</h3>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {item.tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-saffron-100 text-maroon-700 px-2 py-1 rounded-md text-sm"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </CardContent>
-            <div className="px-6 pb-6">
-              <Button
-                className="w-full bg-saffron-300 hover:bg-saffron-400 text-crimson-800"
-                onClick={toggleShowAllImages}
-              >
-                {showAllImages ? (
-                  <>
-                    Hide All {item.type === "photo" ? "Photos" : "Videos"}
-                    <ChevronUp className="ml-2 h-4 w-4" />
-                  </>
-                ) : (
-                  <>
-                    View All {item.type === "photo" ? "Photos" : "Videos"}
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </div>
+            {images.length > 1 && (
+              <div className="px-6 pb-6">
+                <Button
+                  className="w-full bg-saffron-300 hover:bg-saffron-400 text-crimson-800"
+                  onClick={toggleShowAllImages}
+                >
+                  {showAllImages ? (
+                    <>
+                      Hide All Images
+                      <ChevronUp className="ml-2 h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      View All Images
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </Card>
         </motion.div>
       </div>
 
       {/* View All Images Grid */}
-      {showAllImages && (
+      {showAllImages && images.length > 1 && (
         <motion.div
           className="mt-8"
           initial={{ opacity: 0, y: 20 }}
@@ -421,22 +438,24 @@ export default function GalleryDetail() {
           <Card className="bg-saffron-50 border-saffron-200 p-6">
             <CardHeader className="px-0 pt-0">
               <CardTitle className="text-2xl text-crimson-700">
-                All {item.type === "photo" ? "Photos" : "Screenshots"} in this
-                Collection
+                All Images in this Collection
               </CardTitle>
             </CardHeader>
             <CardContent className="px-0 pb-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {item.images.map((image, idx) => (
+                {images.map((image, idx) => (
                   <div
                     key={idx}
                     className="cursor-pointer relative rounded-md overflow-hidden"
-                    onClick={() => handleThumbnailClick(idx)}
+                    onClick={() => {
+                      handleThumbnailClick(idx);
+                      openImagePreview();
+                    }}
                   >
                     <AspectRatio ratio={3 / 2}>
                       <Image
-                        src={image.url}
-                        alt={image.alt}
+                        src={image || "/placeholder.svg"}
+                        alt={`${item.title} - Image ${idx + 1}`}
                         fill
                         className={`object-cover transition-all hover:scale-105 ${
                           activeImageIndex === idx
@@ -453,26 +472,19 @@ export default function GalleryDetail() {
         </motion.div>
       )}
 
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-6 text-crimson-800">
-          More from the Gallery
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {(item.type === "photo" ? galleryItems.photos : galleryItems.videos)
-            .filter((relatedItem) => relatedItem.id !== item.id)
-            .slice(0, 3)
-            .map((relatedItem, index) => (
-              <Link key={index} href={`/resources/gallery/${relatedItem.id}`}>
+      {/* Related Items */}
+      {relatedItems.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6 text-crimson-800">
+            More from the Gallery
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {relatedItems.map((relatedItem, index) => (
+              <Link key={index} href={`/resources/gallery/${relatedItem._id}`}>
                 <Card className="bg-saffron-50 border-saffron-200 transition-all hover:shadow-md hover:-translate-y-1 cursor-pointer h-full">
                   <AspectRatio ratio={16 / 9}>
                     <Image
-                      src={
-                        "image" in relatedItem
-                          ? relatedItem.image
-                          : "thumbnail" in relatedItem
-                          ? relatedItem.thumbnail
-                          : "/placeholder.svg"
-                      }
+                      src={relatedItem.image || "/placeholder.svg"}
                       alt={relatedItem.title}
                       fill
                       className="rounded-t-md object-cover"
@@ -486,8 +498,18 @@ export default function GalleryDetail() {
                 </Card>
               </Link>
             ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Image Preview Dialog */}
+      <ImagePreviewDialog
+        open={isImagePreviewOpen}
+        onOpenChange={setIsImagePreviewOpen}
+        images={images}
+        initialIndex={activeImageIndex}
+        title={item.title}
+      />
     </div>
   );
 }

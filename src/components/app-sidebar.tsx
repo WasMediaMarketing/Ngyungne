@@ -114,8 +114,8 @@ const data = {
       icon: Mail,
     },
     {
-      title: "Privacy Policy",
-      url: "/admin/privacy-policy",
+      title: "Pages",
+      url: "/admin/pages",
       icon: FileText,
     },
     {

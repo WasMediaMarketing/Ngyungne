@@ -14,6 +14,9 @@ import { JoinCourse } from "./joinCourse.model";
 import { Faq } from "./faq.model";
 import { Newsletter } from "./newsletter.model";
 import { AmbassadorModel } from "./ambassador.model";
+import { PageModel } from "./page.model";
+import { Gallery } from "./gallery.model";
+
 export {
   User,
   Event,
@@ -31,4 +34,5 @@ export {
   Newsletter,
   SettingModel,
   AmbassadorModel,
+  PageModel,
 };

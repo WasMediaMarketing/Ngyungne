@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import {
@@ -13,79 +14,76 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
 import Link from "next/link";
-
-export const galleryItems = {
-  photos: [
-    {
-      id: "1",
-      title: "Meditation Hall",
-      description: "Our serene meditation hall during a group session",
-      image: "/placeholder.svg?height=400&width=600",
-      type: "photo",
-      fullDescription:
-        "Our meditation hall provides a peaceful sanctuary for practitioners of all levels. The spacious room features natural lighting, comfortable cushions, and a calming atmosphere conducive to mindfulness practice.",
-      date: "June 15, 2024",
-    },
-    {
-      id: "2",
-      title: "Zen Garden",
-      description: "The beautiful Zen garden at our retreat center",
-      image: "/placeholder.svg?height=400&width=600",
-      type: "photo",
-      fullDescription:
-        "Our meticulously maintained Zen garden offers a contemplative space for walking meditation and quiet reflection. The arrangement of rocks, sand, and plants embodies the principles of harmony and balance.",
-      date: "July 2, 2024",
-    },
-    {
-      id: "3",
-      title: "Buddha Statue",
-      description: "The centerpiece of our main hall",
-      image: "/placeholder.svg?height=400&width=600",
-      type: "photo",
-      fullDescription:
-        "This hand-carved Buddha statue was created by local artisans and serves as a focal point for meditation and inspiration. Its serene expression reminds us of the peace that comes from mindful awareness.",
-      date: "May 20, 2024",
-    },
-    {
-      id: "4",
-      title: "Group Retreat",
-      description: "Participants during our annual summer retreat",
-      image: "/placeholder.svg?height=400&width=600",
-      type: "photo",
-      fullDescription:
-        "Our annual summer retreat brings together practitioners from around the country for a week of intensive meditation, dharma talks, and community building. This photo captures the closing ceremony.",
-      date: "August 12, 2024",
-    },
-  ],
-  videos: [
-    {
-      id: "5",
-      title: "Guided Meditation",
-      description: "A 10-minute guided meditation session",
-      thumbnail: "/placeholder.svg?height=400&width=600",
-      videoUrl: "#",
-      type: "video",
-      fullDescription:
-        "This guided meditation focuses on breath awareness and is perfect for beginners or as a quick mindfulness break. Our teacher leads you through a gentle practice to center your mind and relax your body.",
-      duration: "10:23",
-      date: "September 5, 2024",
-    },
-    {
-      id: "6",
-      title: "Dharma Talk",
-      description: "Weekly Dharma talk on compassion",
-      thumbnail: "/placeholder.svg?height=400&width=600",
-      videoUrl: "#",
-      type: "video",
-      fullDescription:
-        "In this weekly Dharma talk, our resident teacher explores the concept of compassion in Buddhist practice and daily life. Learn how cultivating compassion can transform your relationships and inner experience.",
-      duration: "45:12",
-      date: "October 1, 2024",
-    },
-  ],
-};
+import { galleryApi, GalleryItem } from "@/utils/galleryApi";
+import { GalleryItemType } from "@/types/gallery";
+import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Gallery() {
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchGalleryItems = async () => {
+      try {
+        setLoading(true);
+        const data = await galleryApi.getGalleryItems();
+        setGalleryItems(data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching gallery items:", err);
+        setError("Failed to load gallery items. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGalleryItems();
+  }, []);
+
+  // Filter items by type
+  const photos = galleryItems.filter(
+    (item) => item.type === GalleryItemType.PHOTO
+  );
+  const videos = galleryItems.filter(
+    (item) => item.type === GalleryItemType.VIDEO
+  );
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <RefreshCw className="h-12 w-12 text-crimson-700 animate-spin mx-auto mb-4" />
+          <p className="text-xl text-maroon-700">Loading gallery items...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumbs />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center max-w-md p-8 bg-white/80 rounded-xl shadow-md">
+            <h2 className="text-2xl font-bold text-crimson-800 mb-4">
+              Something went wrong
+            </h2>
+            <p className="text-maroon-700 mb-6">{error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-crimson-700 hover:bg-crimson-800"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh Page
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Breadcrumbs />
@@ -111,100 +109,116 @@ export default function Gallery() {
             value="photos"
             className="data-[state=active]:bg-saffron-300 data-[state=active]:text-crimson-800"
           >
-            Photos
+            Photos ({photos.length})
           </TabsTrigger>
           <TabsTrigger
             value="videos"
             className="data-[state=active]:bg-saffron-300 data-[state=active]:text-crimson-800"
           >
-            Videos
+            Videos ({videos.length})
           </TabsTrigger>
         </TabsList>
         <TabsContent value="photos">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {galleryItems.photos.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Link href={`/resources/gallery/${item.id}`}>
-                  <Card className="bg-saffron-50 border-saffron-200 transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-crimson-700">
-                        {item.title}
-                      </CardTitle>
-                      <CardDescription className="text-maroon-600">
-                        {item.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <AspectRatio ratio={3 / 2}>
-                        <Image
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.title}
-                          fill
-                          className="rounded-md object-cover"
-                        />
-                      </AspectRatio>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </TabsContent>
-        <TabsContent value="videos">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {galleryItems.videos.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Link href={`/resources/gallery/${item.id}`}>
-                  <Card className="bg-saffron-50 border-saffron-200 transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-crimson-700">
-                        {item.title}
-                      </CardTitle>
-                      <CardDescription className="text-maroon-600">
-                        {item.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <AspectRatio ratio={16 / 9}>
-                        <div className="relative w-full h-full">
+            {photos.length > 0 ? (
+              photos.map((item, index) => (
+                <motion.div
+                  key={item._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Link href={`/resources/gallery/${item._id}`}>
+                    <Card className="bg-saffron-50 border-saffron-200 transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                      <CardHeader>
+                        <CardTitle className="text-lg text-crimson-700">
+                          {item.title}
+                        </CardTitle>
+                        <CardDescription className="text-maroon-600">
+                          {item.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <AspectRatio ratio={3 / 2}>
                           <Image
-                            src={item.thumbnail || "/placeholder.svg"}
+                            src={item.image || "/placeholder.svg"}
                             alt={item.title}
                             fill
                             className="rounded-md object-cover"
                           />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="rounded-full bg-crimson-700 bg-opacity-70 p-4 text-white">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                className="w-6 h-6"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                                />
-                              </svg>
+                        </AspectRatio>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-maroon-600">
+                  No photos available at the moment.
+                </p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+        <TabsContent value="videos">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {videos.length > 0 ? (
+              videos.map((item, index) => (
+                <motion.div
+                  key={item._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Link href={`/resources/gallery/${item._id}`}>
+                    <Card className="bg-saffron-50 border-saffron-200 transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                      <CardHeader>
+                        <CardTitle className="text-lg text-crimson-700">
+                          {item.title}
+                        </CardTitle>
+                        <CardDescription className="text-maroon-600">
+                          {item.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <AspectRatio ratio={16 / 9}>
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={item.image || "/placeholder.svg"}
+                              alt={item.title}
+                              fill
+                              className="rounded-md object-cover"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="rounded-full bg-crimson-700 bg-opacity-70 p-4 text-white">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  className="w-6 h-6"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                                  />
+                                </svg>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </AspectRatio>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
+                        </AspectRatio>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-2 text-center py-12">
+                <p className="text-maroon-600">
+                  No videos available at the moment.
+                </p>
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

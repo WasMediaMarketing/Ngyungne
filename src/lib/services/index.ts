@@ -13,6 +13,7 @@ import { JoinCourseService } from "./joinCourseService";
 import { FaqService } from "./faqService";
 import { NewsletterService } from "./newsletterService";
 import { AmbassadorService } from "./ambassadorService";
+import { GalleryService } from "./galleryService";
 export {
   UserService,
   DonationService,
@@ -29,4 +30,5 @@ export {
   FaqService,
   NewsletterService,
   AmbassadorService,
+  GalleryService,
 };

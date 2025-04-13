@@ -12,7 +12,7 @@ import {
   Flame,
   Users,
   Newspaper,
-  Image,
+  ImageIcon,
   HelpCircle,
   BookMarked,
   Mountain,
@@ -115,7 +115,7 @@ export const siteConfig = {
         title: "Gallery",
         href: "/resources/gallery",
         description: "View photos and videos of our events and retreats",
-        icon: "Image",
+        icon: "ImageIcon",
       },
       {
         title: "FAQ",

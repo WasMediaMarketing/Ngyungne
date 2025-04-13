@@ -68,9 +68,9 @@ import { validateSettingInput } from "@/lib/middlewares/validateSettingInput";
  *                           accountName:
  *                             type: string
  *                             example: "Ngyungne Practice"
- *                          swiftCode:
+ *                           swiftCode:
  *                             type: string
- *                            example: "SWIFT123"
+ *                             example: "SWIFT123"
  *                           branchName:
  *                             type: string
  *                             example: "Kathmandu Branch"

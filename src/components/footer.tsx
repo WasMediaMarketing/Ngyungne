@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState, useEffect, type FormEvent } from "react";
 import Link from "next/link";
 import {
@@ -12,7 +11,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  ChevronRight,
   Linkedin,
   Send,
   Loader2,
@@ -21,6 +19,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { FooterPages } from "@/components/footer-pages";
 import Image from "next/image";
 import { getSettings } from "@/utils/settingsApi";
 import { newsletterApi } from "@/utils/newsletterApi";
@@ -135,61 +134,12 @@ export function Footer() {
 
           <div>
             <h3 className="text-lg font-bold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              {[
-                "About Us",
-                "Teachings",
-                "Courses",
-                "Events",
-                "Donate",
-                "Contact Us",
-              ].map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-center space-x-2 hover:tracking-wide transition-all duration-300 ease-in-out"
-                >
-                  <ChevronRight className="h-4 w-4 text-gray-400" />
-                  <Link
-                    href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="hover:text-[#FDBE33] transition-colors"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <FooterPages section="quick-links" />
           </div>
 
           <div>
             <h3 className="text-lg font-bold mb-4">Resources</h3>
-            <ul className="space-y-2">
-              {[
-                "Blog",
-                "FAQ",
-                "Ambassadors",
-                "Sponsors",
-                "Practices",
-                "Gallery",
-                "Buddhist Calendar",
-                "Practice Journal",
-                "Volunteers",
-              ].map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-center space-x-2 hover:tracking-wide transition-all duration-300 ease-in-out"
-                >
-                  <ChevronRight className="h-4 w-4 text-gray-400" />
-                  <Link
-                    href={`/resources/${item
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`}
-                    className="hover:text-amber-500 transition-colors"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <FooterPages section="resources" />
           </div>
 
           <div>

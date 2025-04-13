@@ -3269,6 +3269,451 @@
         }
       }
     },
+    "/api/gallery/{galleryItemId}": {
+      "get": {
+        "summary": "Get a gallery item by ID",
+        "description": "Retrieves a specific gallery item by its ID",
+        "tags": [
+          "Gallery"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "galleryItemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the gallery item to retrieve",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gallery item retrieved successfully"
+          },
+          "404": {
+            "description": "Gallery item not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a gallery item",
+        "description": "Updates a gallery item with the provided data",
+        "tags": [
+          "Gallery"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "galleryItemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the gallery item to update",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the gallery item"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Short description of the gallery item"
+                  },
+                  "fullDescription": {
+                    "type": "string",
+                    "description": "Detailed description of the gallery item"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "photo",
+                      "video"
+                    ],
+                    "description": "Type of the gallery item"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Main image for photos or thumbnail for videos"
+                  },
+                  "videoUrl": {
+                    "type": "string",
+                    "description": "URL for videos"
+                  },
+                  "additionalImages": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Additional images for the gallery item"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tags for the gallery item"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Date when the photo was taken or video was recorded"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Location where the photo was taken or video was recorded"
+                  },
+                  "photographer": {
+                    "type": "string",
+                    "description": "Name of the photographer (for photos)"
+                  },
+                  "presenter": {
+                    "type": "string",
+                    "description": "Name of the presenter (for videos)"
+                  },
+                  "event": {
+                    "type": "string",
+                    "description": "Event associated with the gallery item"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "description": "Duration of the video (for videos)"
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the gallery item is visible to the public"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gallery item updated successfully"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Gallery item not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a gallery item",
+        "description": "Deletes a gallery item by its ID",
+        "tags": [
+          "Gallery"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "galleryItemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the gallery item to delete",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gallery item deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Gallery item not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/gallery/{galleryItemId}/visibility": {
+      "put": {
+        "summary": "Update gallery item visibility",
+        "description": "Updates the visibility status of a gallery item",
+        "tags": [
+          "Gallery"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "galleryItemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the gallery item to update",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "isVisible"
+                ],
+                "properties": {
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "The visibility status to set"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gallery item visibility updated successfully"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Gallery item not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/gallery": {
+      "post": {
+        "summary": "Create a new gallery item",
+        "description": "Creates a new gallery item (photo or video) with the provided data",
+        "tags": [
+          "Gallery"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "description",
+                  "type",
+                  "image"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the gallery item"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Short description of the gallery item"
+                  },
+                  "fullDescription": {
+                    "type": "string",
+                    "description": "Detailed description of the gallery item"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "photo",
+                      "video"
+                    ],
+                    "description": "Type of the gallery item"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Main image for photos or thumbnail for videos"
+                  },
+                  "videoUrl": {
+                    "type": "string",
+                    "description": "URL for videos (required for video type)"
+                  },
+                  "additionalImages": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Additional images for the gallery item"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tags for the gallery item"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Date when the photo was taken or video was recorded"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Location where the photo was taken or video was recorded"
+                  },
+                  "photographer": {
+                    "type": "string",
+                    "description": "Name of the photographer (for photos)"
+                  },
+                  "presenter": {
+                    "type": "string",
+                    "description": "Name of the presenter (for videos)"
+                  },
+                  "event": {
+                    "type": "string",
+                    "description": "Event associated with the gallery item"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "description": "Duration of the video (for videos)"
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the gallery item is visible to the public"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gallery item created successfully"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all gallery items",
+        "description": "Retrieves all gallery items. With authentication, it returns all items; without authentication, it returns only visible items.",
+        "tags": [
+          "Gallery"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <your_token_here>"
+            },
+            "description": "Authorization token to get all gallery items including non-visible ones"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of gallery items retrieved successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple gallery items",
+        "description": "Deletes multiple gallery items based on their IDs",
+        "tags": [
+          "Gallery"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "galleryItemIds",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated list of gallery item IDs to delete",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1,64a1b2c3d4e5f6a7b8c9d0e2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gallery items successfully deleted"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Not found - No gallery items found with the provided IDs"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/join-course/{joinCourseId}": {
       "patch": {
         "summary": "Update a course registration",
@@ -3756,6 +4201,349 @@
           },
           "404": {
             "description": "Not found - No subscribers found with the provided IDs"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/pages/{pageId}": {
+      "get": {
+        "summary": "Get a page by ID",
+        "description": "Retrieves a specific page by ID (requires authentication for draft pages)",
+        "tags": [
+          "Pages"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pageId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the page to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page retrieved successfully"
+          },
+          "404": {
+            "description": "Page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a page",
+        "description": "Updates a specific page by ID (requires authentication)",
+        "tags": [
+          "Pages"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pageId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the page to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string",
+                    "enum": [
+                      "header",
+                      "footer"
+                    ]
+                  },
+                  "parentPage": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "draft",
+                      "published"
+                    ]
+                  },
+                  "metaTitle": {
+                    "type": "string"
+                  },
+                  "metaKeywords": {
+                    "type": "string"
+                  },
+                  "metaDescription": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Page updated successfully"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a page",
+        "description": "Deletes a specific page by ID (requires authentication)",
+        "tags": [
+          "Pages"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pageId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the page to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Page not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/pages": {
+      "post": {
+        "summary": "Create a new page",
+        "description": "Creates a new page with the provided data (requires authentication)",
+        "tags": [
+          "Pages"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "slug",
+                  "location",
+                  "content",
+                  "status"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The title of the page"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "description": "URL-friendly identifier for the page (lowercase letters, numbers, and hyphens only)"
+                  },
+                  "location": {
+                    "type": "string",
+                    "enum": [
+                      "header",
+                      "footer"
+                    ],
+                    "description": "Where the page should appear in navigation"
+                  },
+                  "parentPage": {
+                    "type": "string",
+                    "description": "ID of the parent page (if any)"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "The HTML content of the page"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "draft",
+                      "published"
+                    ],
+                    "description": "Publication status of the page"
+                  },
+                  "metaTitle": {
+                    "type": "string",
+                    "description": "SEO meta title"
+                  },
+                  "metaKeywords": {
+                    "type": "string",
+                    "description": "SEO meta keywords"
+                  },
+                  "metaDescription": {
+                    "type": "string",
+                    "description": "SEO meta description"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Page created successfully"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all pages",
+        "description": "Retrieves all pages (requires authentication for draft pages)",
+        "tags": [
+          "Pages"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "published",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, returns only published pages (no authentication required)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of pages retrieved successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple pages",
+        "description": "Deletes multiple pages based on their IDs (requires authentication)",
+        "tags": [
+          "Pages"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pageIds",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated list of page IDs to delete",
+            "example": "64a1b2c3d4e5f6a7b8c9d0e1,64a1b2c3d4e5f6a7b8c9d0e2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pages successfully deleted"
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required"
+          },
+          "404": {
+            "description": "Not found - No pages found with the provided IDs"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/pages/slug/{slug}": {
+      "get": {
+        "summary": "Get a page by slug",
+        "description": "Retrieves a specific published page by its slug",
+        "tags": [
+          "Pages"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The slug of the page to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page retrieved successfully"
+          },
+          "404": {
+            "description": "Page not found"
           },
           "500": {
             "description": "Internal server error"
@@ -4999,6 +5787,10 @@
                             "accountName": {
                               "type": "string",
                               "example": "Ngyungne Practice"
+                            },
+                            "swiftCode": {
+                              "type": "string",
+                              "example": "SWIFT123"
                             },
                             "branchName": {
                               "type": "string",

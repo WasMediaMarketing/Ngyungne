@@ -11,6 +11,7 @@ import { PhilosophyTopicController } from "./philosophyTopicController";
 import { CourseController } from "./courseController";
 import { JoinCourseController } from "./joinCourseController";
 import { AmbassadorController } from "./ambassadorController";
+import { PageController } from "./pageController";
 export {
   UserController,
   DonationController,
@@ -25,4 +26,5 @@ export {
   CourseController,
   JoinCourseController,
   AmbassadorController,
+  PageController,
 };

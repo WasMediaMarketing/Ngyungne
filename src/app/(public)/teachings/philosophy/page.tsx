@@ -215,13 +215,11 @@ export default function BuddhistPhilosophy() {
                       </motion.div>
                     </CardHeader>
                     <CardContent className="text-maroon-800 pt-6">
-                      <motion.div
-                        variants={itemVariants}
-                        className="prose prose-maroon max-w-none"
-                      >
-                        <div className="whitespace-pre-line text-lg">
-                          {topic.content}
-                        </div>
+                      <motion.div variants={itemVariants}>
+                        <div
+                          className="prose max-w-none dark:prose-invert"
+                          dangerouslySetInnerHTML={{ __html: topic.content }}
+                        />
                       </motion.div>
 
                       {topic.quotes && topic.quotes.length > 0 && (
