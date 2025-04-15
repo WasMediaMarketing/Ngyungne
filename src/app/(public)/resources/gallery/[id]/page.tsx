@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   ChevronLeft,
-  Share2,
   Calendar,
   Clock,
   Download,
@@ -279,13 +278,6 @@ export default function GalleryDetail() {
                     {item.description}
                   </CardDescription>
                 </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="rounded-full h-10 w-10 border-crimson-300 text-crimson-700 hover:bg-crimson-50"
-                >
-                  <Share2 className="h-5 w-5" />
-                </Button>
               </div>
             </CardHeader>
 

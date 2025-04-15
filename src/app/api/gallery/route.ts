@@ -175,19 +175,33 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   console.log("GET /api/gallery - Request received");
 
-  // Check authentication
-  const authResult = await isAuthenticated(req);
   const galleryController = createGalleryController();
 
-  // If authenticated (authResult is null), show all gallery items
-  // If not authenticated (authResult is a NextResponse), show only visible ones
-  if (authResult === null) {
-    console.log("GET /api/gallery - Returning all gallery items");
-    return galleryController.getGalleryItems();
-  } else {
-    console.log("GET /api/gallery - Returning visible gallery items only");
-    return galleryController.getVisibleGalleryItems();
+  // Get the Authorization header
+  const authHeader = req.headers.get("authorization");
+  const isAuthProvided =
+    authHeader &&
+    authHeader.startsWith("Bearer ") &&
+    authHeader.split(" ")[1] !== "invalid";
+
+  if (isAuthProvided) {
+    // Check if the token is valid
+    const authResult = await isAuthenticated(req);
+
+    if (!authResult) {
+      // Valid authentication - return all gallery items
+      console.log(
+        "GET /api/gallery - Authenticated request, returning all items"
+      );
+      return galleryController.getGalleryItems();
+    }
   }
+
+  // If not authenticated or token is invalid, return only visible items
+  console.log(
+    "GET /api/gallery - Unauthenticated or invalid token, returning visible items only"
+  );
+  return galleryController.getVisibleGalleryItems();
 }
 
 /**

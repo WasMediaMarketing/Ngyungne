@@ -30,25 +30,23 @@ import { Types } from "mongoose";
  *       500:
  *         description: Internal server error
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { galleryItemId: string } }
-) {
+export async function GET(req: NextRequest) {
   console.log("GET /api/gallery/[galleryItemId] - Request received");
-  console.log("Gallery Item ID from params:", params.galleryItemId);
+
+  const pathSegments = req.nextUrl.pathname.split("/");
+  const galleryItemId = pathSegments[pathSegments.length - 1];
+
+  console.log("Gallery Item ID from path:", galleryItemId);
 
   // Validate galleryItemId
-  if (!params.galleryItemId || params.galleryItemId === "undefined") {
-    console.error("Invalid gallery item ID:", params.galleryItemId);
+  if (!galleryItemId || galleryItemId === "undefined") {
     return Response.json(
       { success: false, message: "Gallery item ID is missing or invalid" },
       { status: 400 }
     );
   }
 
-  // Check if it's a valid MongoDB ObjectId
-  if (!Types.ObjectId.isValid(params.galleryItemId)) {
-    console.error("Invalid ObjectId format:", params.galleryItemId);
+  if (!Types.ObjectId.isValid(galleryItemId)) {
     return Response.json(
       { success: false, message: "Invalid gallery item ID format" },
       { status: 400 }
@@ -56,8 +54,7 @@ export async function GET(
   }
 
   const galleryController = createGalleryController();
-  console.log("GET /api/gallery/[galleryItemId] - Processing request");
-  return galleryController.getGalleryItemById(params.galleryItemId);
+  return galleryController.getGalleryItemById(galleryItemId);
 }
 
 /**
