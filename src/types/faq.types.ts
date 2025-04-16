@@ -1,18 +1,13 @@
-import { Types, Document } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IFaq extends Document {
-  _id: Types.ObjectId;
-  id: string;
+// Add these to your existing types/index.ts file
+
+export interface IFaq {
+  _id?: Types.ObjectId;
   question: string;
   answer: string;
-  updateAt: Date;
-  createdAt: Date;
-}
-export interface IFaqInput {
-  question: string;
-  answer: string;
-}
-export interface IFaqUpdate {
-  question?: string;
-  answer?: string;
+  category?: string;
+  isVisible?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

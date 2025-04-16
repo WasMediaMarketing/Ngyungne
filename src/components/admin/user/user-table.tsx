@@ -2,7 +2,14 @@
 
 import { useState, useCallback } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import {
+  MoreHorizontal,
+  Plus,
+  Eye,
+  Pencil,
+  Trash2,
+  Filter,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,6 +29,15 @@ import type { IUser } from "@/types/user.types";
 import { toast } from "@/components/ui/use-toast-hook";
 import { DataTable } from "@/components/ui/data-table";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 interface UserTableProps {
   users: IUser[];
@@ -46,6 +62,13 @@ export function UserTable({
     useState(false);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Filter states
+  const [nameFilter, setNameFilter] = useState("");
+  const [pageFilter, setPageFilter] = useState("");
+  const [pageTitleFilter, setPageTitleFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
 
   const handleAddUser = (newUser: IUser) => {
     console.log("UserTable - handleAddUser called with:", newUser);
@@ -100,6 +123,55 @@ export function UserTable({
     },
     [users]
   );
+
+  // Get unique values for filter dropdowns
+  const getUniquePages = () => {
+    const pages = users
+      .map((user) => user.page)
+      .filter((page, index, self) => page && self.indexOf(page) === index);
+    return pages;
+  };
+
+  const getUniquePageTitles = () => {
+    const pageTitles = users
+      .map((user) => user.pageTitle)
+      .filter((title, index, self) => title && self.indexOf(title) === index);
+    return pageTitles;
+  };
+
+  const getUniqueRoles = () => {
+    const roles = users
+      .map((user) => user.role)
+      .filter((role, index, self) => role && self.indexOf(role) === index);
+    return roles;
+  };
+
+  // Filter the users based on all filters
+  const filteredUsers = users.filter((user) => {
+    const nameMatch =
+      !nameFilter || user.name.toLowerCase().includes(nameFilter.toLowerCase());
+
+    const pageMatch =
+      !pageFilter ||
+      (user.page && user.page.toLowerCase() === pageFilter.toLowerCase());
+
+    const pageTitleMatch =
+      !pageTitleFilter ||
+      (user.pageTitle &&
+        user.pageTitle.toLowerCase() === pageTitleFilter.toLowerCase());
+
+    const roleMatch =
+      !roleFilter || user.role.toLowerCase() === roleFilter.toLowerCase();
+
+    return nameMatch && pageMatch && pageTitleMatch && roleMatch;
+  });
+
+  const resetFilters = () => {
+    setNameFilter("");
+    setPageFilter("");
+    setPageTitleFilter("");
+    setRoleFilter("");
+  };
 
   const columns: ColumnDef<IUser>[] = [
     {
@@ -239,6 +311,13 @@ export function UserTable({
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">User Management</h2>
         <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="mr-2 h-4 w-4" />
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </Button>
           {selectedRows.length > 0 && (
             <Button
               variant="destructive"
@@ -258,11 +337,98 @@ export function UserTable({
         </div>
       </div>
 
+      {showFilters && (
+        <Card className="mb-4">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="name-filter" className="text-sm font-medium">
+                  Filter by Name
+                </label>
+                <Input
+                  id="name-filter"
+                  placeholder="Search by name..."
+                  value={nameFilter}
+                  onChange={(e) => setNameFilter(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="page-filter" className="text-sm font-medium">
+                  Filter by Page
+                </label>
+                <Select value={pageFilter} onValueChange={setPageFilter}>
+                  <SelectTrigger id="page-filter">
+                    <SelectValue placeholder="Select page" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Pages</SelectItem>
+                    {getUniquePages().map((page) => (
+                      <SelectItem key={page} value={page}>
+                        {page}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="page-title-filter"
+                  className="text-sm font-medium"
+                >
+                  Filter by Page Title
+                </label>
+                <Select
+                  value={pageTitleFilter}
+                  onValueChange={setPageTitleFilter}
+                >
+                  <SelectTrigger id="page-title-filter">
+                    <SelectValue placeholder="Select page title" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Page Titles</SelectItem>
+                    {getUniquePageTitles().map((title) => (
+                      <SelectItem key={title} value={title}>
+                        {title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="role-filter" className="text-sm font-medium">
+                  Filter by Role
+                </label>
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger id="role-filter">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Roles</SelectItem>
+                    {getUniqueRoles().map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={resetFilters}>
+                Reset Filters
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <DataTable
         columns={columns}
-        data={users}
-        filterColumn="name"
-        filterPlaceholder="Filter by name..."
+        data={filteredUsers}
         onRowSelectionChange={handleRowSelectionChange}
       />
 

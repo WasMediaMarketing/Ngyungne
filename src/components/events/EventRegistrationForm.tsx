@@ -28,6 +28,7 @@ import { ArrowRight, CalendarDays, MapPin, User } from "lucide-react";
 import type { IEvent } from "@/types/event.types";
 import { bookingApi } from "@/utils/eventBookingsApi";
 import type { Types } from "mongoose";
+import Spinner from "../spinner";
 
 // Form schema
 const registrationSchema = z.object({
@@ -288,7 +289,11 @@ export function EventRegistrationForm({
                 className="bg-crimson-600 hover:bg-crimson-700"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Processing..." : "Complete Registration"}
+                {isSubmitting ? (
+                  <Spinner text="Processing..." />
+                ) : (
+                  "Complete Registration"
+                )}
                 {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </DialogFooter>

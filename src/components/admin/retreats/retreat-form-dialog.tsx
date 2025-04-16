@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/popover";
 import { retreatApi } from "@/utils/retreatApi";
 import type { IRetreat, IRetreatUpdate, IRetreatInput } from "@/types";
+import Spinner from "@/components/spinner";
 
 // Define the form schema with Zod
 const formSchema = z.object({
@@ -491,7 +492,13 @@ export default function RetreatFormDialog({
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : isEditing ? "Update" : "Create"}
+                {isSubmitting ? (
+                  <Spinner text="Saving..." />
+                ) : isEditing ? (
+                  "Update"
+                ) : (
+                  "Create"
+                )}
               </Button>
             </DialogFooter>
           </form>

@@ -1,9 +1,7 @@
+import type { NextRequest } from "next/server";
 import { createPhilosophyTopicController } from "@/lib/factories/philosophyTopicFactory";
-import {
-  validatePhilosophyTopicInput,
-  isAuthenticated,
-} from "@/lib/middlewares";
-import { NextRequest } from "next/server";
+import { isAuthenticated } from "@/lib/middlewares";
+import { validatePhilosophyTopicInput } from "@/lib/middlewares/validatePhilosophyTopicInput";
 
 /**
  * @openapi
@@ -94,16 +92,26 @@ import { NextRequest } from "next/server";
  *                   type: string
  */
 export async function POST(req: NextRequest) {
+  console.log("POST /api/philosophy - Request received");
+
+  // Check authentication
   const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
+  if (authResult) {
+    console.log("POST /api/philosophy - Authentication failed");
+    return authResult;
+  }
 
-  const requestData = await req.json();
+  // Validate input and get the parsed body
+  const { error, body } = await validatePhilosophyTopicInput(req);
+  if (error) {
+    console.log("POST /api/philosophy - Validation failed");
+    return error;
+  }
 
-  const validationResponse = await validatePhilosophyTopicInput(requestData);
-  if (validationResponse) return validationResponse;
-
+  // Process request with the already parsed body
   const philosophyTopicController = createPhilosophyTopicController();
-  return philosophyTopicController.createPhilosophyTopic(requestData);
+  console.log("POST /api/philosophy - Processing request");
+  return philosophyTopicController.createPhilosophyTopic(body);
 }
 
 /**
@@ -163,13 +171,20 @@ export async function POST(req: NextRequest) {
  *                   type: string
  */
 export async function GET(req: NextRequest) {
+  console.log("GET /api/philosophy - Request received");
+
+  // Check authentication
   const authResult = await isAuthenticated(req);
   const philosophyTopicController = createPhilosophyTopicController();
 
   if (authResult) {
+    console.log(
+      "GET /api/philosophy - Returning visible philosophy topics only"
+    );
     return philosophyTopicController.getVisiblePhilosophyTopics();
   }
 
+  console.log("GET /api/philosophy - Returning all philosophy topics");
   return philosophyTopicController.getPhilosophyTopics();
 }
 
@@ -225,9 +240,17 @@ export async function GET(req: NextRequest) {
  *                   type: string
  */
 export async function DELETE(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
+  console.log("DELETE /api/philosophy - Request received");
 
+  // Check authentication
+  const authResult = await isAuthenticated(req);
+  if (authResult) {
+    console.log("DELETE /api/philosophy - Authentication failed");
+    return authResult;
+  }
+
+  // Process request
   const philosophyTopicController = createPhilosophyTopicController();
+  console.log("DELETE /api/philosophy - Processing request");
   return philosophyTopicController.deletePhilosophyTopics(req);
 }

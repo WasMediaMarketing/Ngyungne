@@ -54,4 +54,8 @@ export const httpMessages = {
     statusCode: 201,
     message: `${message} successfully created.`,
   }),
+  CONFLICT: (message?: string) => ({
+    statusCode: 409,
+    message: message ?? "Conflict",
+  }),
 };

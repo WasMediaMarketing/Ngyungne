@@ -14,6 +14,7 @@ import {
 import { deleteMultipleUsers } from "@/utils/userApi";
 import { toast } from "sonner";
 import type { IUser } from "@/types/user.types";
+import Spinner from "@/components/spinner";
 
 interface DeleteMultipleUsersAlertProps {
   open: boolean;
@@ -87,7 +88,7 @@ export function DeleteMultipleUsersAlert({
             disabled={isLoading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? <Spinner text="Deleting..." /> : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

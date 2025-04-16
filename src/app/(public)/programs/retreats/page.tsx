@@ -33,6 +33,7 @@ import { RetreatRegistrationForm } from "@/components/retreat/RetreatRegistratio
 import { retreatApi } from "@/utils/retreatApi";
 import type { IRetreat } from "@/types";
 import { format } from "date-fns";
+import { Loader } from "@/components/common/loader";
 
 export default function Retreats() {
   const [retreats, setRetreats] = useState<IRetreat[]>([]);
@@ -59,14 +60,7 @@ export default function Retreats() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p>Loading retreats...</p>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error) {

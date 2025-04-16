@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UI Libraries PDF Generator</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(135deg, #a5f3fc, #e0f2fe);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .container {
+        max-width: 600px;
+        text-align: center;
+      }
+      .card {
+        border-radius: 16px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      }
+      .card-header {
+        background: linear-gradient(135deg, #8b5cf6, #d946ef);
+        color: white;
+        padding: 25px;
+        border-bottom: none;
+      }
+      .card-body {
+        padding: 35px;
+        background-color: #ffffff;
+      }
+      .btn-download {
+        background: linear-gradient(135deg, #f43f5e, #ec4899);
+        border: none;
+        padding: 16px 32px;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        font-weight: 600;
+        color: white;
+        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+      }
+      .btn-download:hover {
+        background: linear-gradient(135deg, #e11d48, #db2777);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(244, 63, 94, 0.4);
+      }
+      .hidden-content {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h1 class="mb-0">UI Libraries PDF Generator</h1>
+        </div>
+        <div class="card-body">
+          <p class="mb-4" style="color: #6b7280; font-size: 18px">
+            Click the button below to generate and download a colorful PDF
+            containing 40 popular UI libraries.
+          </p>
+          <button id="generate-pdf" class="btn btn-download btn-lg">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-file-earmark-pdf me-2"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"
+              />
+              <path
+                d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a10.954 10.954 0 0 0 .98 1.686 5.753 5.753 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.354.416.856.856 0 0 1-.51.138c-.331-.014-.654-.196-.933-.417a5.712 5.712 0 0 1-.911-.95 11.651 11.651 0 0 0-1.997.406 11.307 11.307 0 0 1-1.02 1.51c-.292.35-.609.656-.927.787a.793.793 0 0 1-.58.029zm1.379-1.901c-.166.076-.32.156-.459.238-.328.194-.541.383-.647.547-.094.145-.096.25-.04.361.01.022.02.036.026.044a.266.266 0 0 0 .035-.012c.137-.056.355-.235.635-.572a8.18 8.18 0 0 0 .45-.606zm1.64-1.33a12.71 12.71 0 0 1 1.01-.193 11.744 11.744 0 0 1-.51-.858 20.801 20.801 0 0 1-.5 1.05zm2.446.45c.15.163.296.3.435.41.24.19.407.253.498.256a.107.107 0 0 0 .07-.015.307.307 0 0 0 .094-.125.436.436 0 0 0 .059-.2.095.095 0 0 0-.026-.063c-.052-.062-.2-.152-.518-.209a3.876 3.876 0 0 0-.612-.053zM8.078 7.8a6.7 6.7 0 0 0 .2-.828c.031-.188.043-.343.038-.465a.613.613 0 0 0-.032-.198.517.517 0 0 0-.145.04c-.087.035-.158.106-.196.283-.04.192-.03.469.046.822.024.111.054.227.09.346z"
+              />
+            </svg>
+            Generate & Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden content that will be used for PDF generation -->
+    <div id="pdf-content" class="hidden-content"></div>
+
+    <!-- Include jsPDF and html2canvas libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+      // Library data - all 40 libraries from both messages
+      const libraries = [
+        // First set of 20 libraries
+        {
+          name: "Shadcn UI",
+          description:
+            "A modern, accessible component library built with Radix UI and Tailwind CSS",
+          uses: "Building modern, accessible web applications with a clean design",
+          url: "https://ui.shadcn.dev/",
+        },
+        {
+          name: "Radix UI",
+          description:
+            "Unstyled, accessible primitives for building high-quality design systems",
+          uses: "Creating accessible, customizable component systems",
+          url: "https://www.radix-ui.com/",
+        },
+        {
+          name: "Headless UI",
+          description:
+            "Completely unstyled, fully accessible UI components designed to integrate beautifully with Tailwind CSS",
+          uses: "Building Tailwind-based interfaces with accessibility in mind",
+          url: "https://headlessui.com/",
+        },
+        {
+          name: "Chakra UI",
+          description:
+            "A simple, modular, and accessible component library that gives you the building blocks to build React applications",
+          uses: "Rapidly building accessible React applications with consistent design",
+          url: "https://chakra-ui.com/",
+        },
+        {
+          name: "Mantine",
+          description:
+            "A fully featured React components library with native dark theme support and focus on usability",
+          uses: "Building feature-rich applications with dark mode support",
+          url: "https://mantine.dev/",
+        },
+        {
+          name: "Material UI (MUI)",
+          description:
+            "React components for faster and easier web development, following Google's Material Design",
+          uses: "Creating applications with Google's Material Design principles",
+          url: "https://mui.com/",
+        },
+        {
+          name: "Ant Design",
+          description:
+            "A design system with a set of high-quality React components out of the box",
+          uses: "Enterprise-level applications with a consistent design language",
+          url: "https://ant.design/",
+        },
+        {
+          name: "Next UI",
+          description: "Beautiful, fast, and modern React UI library",
+          uses: "Building modern web applications with a focus on performance",
+          url: "https://nextui.org/",
+        },
+        {
+          name: "React Bootstrap",
+          description: "The most popular front-end framework rebuilt for React",
+          uses: "Quickly building responsive web applications with Bootstrap components",
+          url: "https://react-bootstrap.github.io/",
+        },
+        {
+          name: "Semantic UI React",
+          description: "The official Semantic-UI-React integration",
+          uses: "Creating semantic and responsive web interfaces",
+          url: "https://react.semantic-ui.com/",
+        },
+        {
+          name: "React Suite",
+          description:
+            "A suite of React components, sensible UI design, and a friendly development experience",
+          uses: "Building enterprise-level applications with a consistent design",
+          url: "https://rsuitejs.com/",
+        },
+        {
+          name: "Blueprint",
+          description: "A React-based UI toolkit for the web",
+          uses: "Building complex data-dense interfaces for desktop applications",
+          url: "https://blueprintjs.com/",
+        },
+        {
+          name: "Grommet",
+          description:
+            "A react-based framework that provides accessibility, modularity, responsiveness, and theming in a tidy package",
+          uses: "Creating responsive and accessible web applications",
+          url: "https://v2.grommet.io/",
+        },
+        {
+          name: "Evergreen",
+          description: "A React UI Framework by Segment",
+          uses: "Building feature-rich web applications with a clean design",
+          url: "https://evergreen.segment.com/",
+        },
+        {
+          name: "Rebass",
+          description: "React primitive UI components built with Styled System",
+          uses: "Creating design system-based applications with consistent styling",
+          url: "https://rebassjs.org/",
+        },
+        {
+          name: "React Aria",
+          description:
+            "A library of React Hooks that provides accessible UI primitives for your design system",
+          uses: "Building accessible components for design systems",
+          url: "https://react-spectrum.adobe.com/react-aria/",
+        },
+        {
+          name: "Ariakit",
+          description: "A toolkit for building accessible web apps with React",
+          uses: "Creating accessible web applications with React",
+          url: "https://ariakit.org/",
+        },
+        {
+          name: "Tremor",
+          description: "The React library to build dashboards fast",
+          uses: "Quickly building data dashboards and visualization interfaces",
+          url: "https://www.tremor.so/",
+        },
+        {
+          name: "Magic UI",
+          description:
+            "A modern UI library with a focus on animations and interactions",
+          uses: "Building interactive and animated web interfaces",
+          url: "https://magicui.design/",
+        },
+        {
+          name: "React Image Uploader",
+          description:
+            "A simple component for uploading images with preview functionality",
+          uses: "Adding image upload capabilities to React applications",
+          url: "https://www.npmjs.com/package/react-images-upload",
+        },
+
+        // Second set of 20 libraries
+        {
+          name: "PrimeReact",
+          description:
+            "A comprehensive collection of rich UI components for React, including data tables, charts, and more",
+          uses: "Building feature-rich applications with complex UI requirements",
+          url: "https://primereact.org/",
+        },
+        {
+          name: "React Suite (Additional)",
+          description:
+            "A library of React components designed for middle and back-end products",
+          uses: "Creating enterprise-level React applications",
+          url: "https://rsuitejs.com/",
+        },
+        {
+          name: "Grommet (Additional)",
+          description:
+            "A responsive and accessible mobile-first UI framework for React applications",
+          uses: "Building responsive and accessible mobile-first applications",
+          url: "https://v2.grommet.io/",
+        },
+        {
+          name: "React Toolbox",
+          description:
+            "A set of React components implementing Google's Material Design specification",
+          uses: "Creating Material Design interfaces with React",
+          url: "http://react-toolbox.io/",
+        },
+        {
+          name: "React Virtualized",
+          description:
+            "Efficiently render large lists and tabular data in React",
+          uses: "Handling large datasets with optimal performance",
+          url: "https://github.com/bvaughn/react-virtualized",
+        },
+        {
+          name: "React Table",
+          description:
+            "A headless utility for building powerful tables and datagrids",
+          uses: "Creating customizable, powerful data tables",
+          url: "https://tanstack.com/table/v8/docs/guide/introduction",
+        },
+        {
+          name: "React Final Form",
+          description:
+            "A framework-agnostic form state management library for React",
+          uses: "Building complex forms with validation",
+          url: "https://final-form.org/react",
+        },
+        {
+          name: "Formik",
+          description:
+            "Build forms in React with ease using Formik's robust form handling capabilities",
+          uses: "Creating and validating forms in React",
+          url: "https://formik.org/",
+        },
+        {
+          name: "React Hook Form",
+          description:
+            "Performant, flexible, and extensible forms with easy-to-use validation",
+          uses: "Building high-performance forms with minimal re-renders",
+          url: "https://react-hook-form.com/",
+        },
+        {
+          name: "React Select",
+          description:
+            "A flexible and beautiful Select Input control for ReactJS with multiselect, autocomplete, async and creatable support",
+          uses: "Creating advanced select inputs with autocomplete",
+          url: "https://react-select.com/",
+        },
+        {
+          name: "Webix",
+          description:
+            "A JavaScript UI library with a rich set of widgets for building complex web applications",
+          uses: "Building data-centric web applications",
+          url: "https://webix.com/",
+        },
+        {
+          name: "DHTMLX",
+          description:
+            "A suite of JavaScript UI components for building dynamic web interfaces",
+          uses: "Creating enterprise web applications",
+          url: "https://dhtmlx.com/",
+        },
+        {
+          name: "Base Web",
+          description:
+            "A React Component library implementing the Base Design System",
+          uses: "Building design-consistent applications",
+          url: "https://baseweb.design/",
+        },
+        {
+          name: "Evergreen (Additional)",
+          description:
+            "A React UI Framework by Segment for building ambitious products on the web",
+          uses: "Creating ambitious web products with consistent design",
+          url: "https://evergreen.segment.com/",
+        },
+        {
+          name: "Rebass (Additional)",
+          description: "React primitive UI components built with Styled System",
+          uses: "Building themeable design systems",
+          url: "https://rebassjs.org/",
+        },
+        {
+          name: "Onsen UI",
+          description:
+            "A UI framework and components for creating beautiful cross-platform apps",
+          uses: "Building mobile-first hybrid applications",
+          url: "https://onsen.io/",
+        },
+        {
+          name: "Quasar Framework",
+          description:
+            "Build high-performance VueJS user interfaces in record time",
+          uses: "Creating Vue.js applications for multiple platforms",
+          url: "https://quasar.dev/",
+        },
+        {
+          name: "Vuetify",
+          description:
+            "A Vue UI Library with beautifully handcrafted Material Components",
+          uses: "Building material design Vue applications",
+          url: "https://vuetifyjs.com/en/",
+        },
+        {
+          name: "Svelte Material UI",
+          description: "Material Design components for Svelte",
+          uses: "Creating material design Svelte applications",
+          url: "https://sveltematerialui.com/",
+        },
+        {
+          name: "Ink",
+          description: "React for building command-line interfaces",
+          uses: "Creating beautiful command-line interfaces",
+          url: "https://github.com/vadimdemedes/ink",
+        },
+      ];
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const generateButton = document.getElementById("generate-pdf");
+        const pdfContent = document.getElementById("pdf-content");
+
+        if (generateButton && pdfContent) {
+          generateButton.addEventListener("click", generatePDF);
+        }
+
+        function generatePDF() {
+          const { jsPDF } = window.jspdf;
+
+          // Create a new PDF document
+          const doc = new jsPDF("p", "pt", "a4");
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+          const margin = 40;
+
+          // Define ONLY light, vibrant background colors for library entries
+          const backgroundColors = [
+            [255, 236, 179], // Light Yellow
+            [204, 255, 204], // Light Green
+            [204, 229, 255], // Light Blue
+            [255, 204, 229], // Light Pink
+            [255, 204, 204], // Light Red
+            [230, 255, 230], // Light Mint
+            [230, 230, 255], // Light Lavender
+            [255, 222, 179], // Light Orange
+            [230, 204, 255], // Light Purple
+            [204, 255, 255], // Light Cyan
+          ];
+
+          // Define vibrant text colors for headings (no black)
+          const textColors = [
+            [217, 119, 6], // Yellow-600
+            [4, 120, 87], // Green-700
+            [29, 78, 216], // Blue-700
+            [219, 39, 119], // Pink-600
+            [220, 38, 38], // Red-600
+            [5, 150, 105], // Emerald-600
+            [79, 70, 229], // Indigo-600
+            [234, 88, 12], // Orange-600
+            [147, 51, 234], // Purple-600
+            [3, 105, 161], // Sky-700
+          ];
+
+          // Process libraries in groups of 4 per page
+          for (let i = 0; i < libraries.length; i += 4) {
+            // Add a new page for each group of 4 (except the first page)
+            if (i > 0) {
+              doc.addPage();
+            }
+
+            // Add colorful header to each page - light gradient
+            const gradientWidth = pageWidth;
+            const gradientHeight = 100;
+
+            // Create light gradient header effect
+            for (let x = 0; x < gradientWidth; x += 10) {
+              const ratio = x / gradientWidth;
+              // Interpolate between light purple and light pink
+              const r = Math.floor(230 + (255 - 230) * ratio);
+              const g = Math.floor(204 + (204 - 204) * ratio);
+              const b = Math.floor(255 + (229 - 255) * ratio);
+
+              doc.setFillColor(r, g, b);
+              doc.rect(x, 0, 10, gradientHeight, "F");
+            }
+
+            // Add title to each page
+            doc.setTextColor(139, 92, 246); // Purple
+            doc.setFontSize(24);
+            doc.text("React & JavaScript UI Libraries", pageWidth / 2, 40, {
+              align: "center",
+            });
+
+            // Add subtitle
+            doc.setFontSize(14);
+            doc.setTextColor(236, 72, 153); // Pink
+            doc.text(
+              "A colorful collection of popular UI libraries",
+              pageWidth / 2,
+              65,
+              { align: "center" }
+            );
+
+            // Add page number
+            doc.setFontSize(12);
+            doc.setTextColor(79, 70, 229); // Indigo
+            doc.text(
+              `Page ${Math.floor(i / 4) + 1} of ${Math.ceil(
+                libraries.length / 4
+              )}`,
+              pageWidth / 2,
+              85,
+              { align: "center" }
+            );
+
+            // Process each library in the current group (up to 4)
+            const groupEnd = Math.min(i + 4, libraries.length);
+            for (let j = i; j < groupEnd; j++) {
+              const lib = libraries[j];
+              const colorIndex = j % backgroundColors.length;
+              const bgColor = backgroundColors[colorIndex];
+              const textColor = textColors[colorIndex];
+
+              // Calculate position for this library on the page
+              const libraryIndex = j % 4; // 0-3 position on current page
+              const yStart = 120 + libraryIndex * 170; // Each library takes 170pt height
+
+              // Add colored background - LIGHT COLORS ONLY
+              doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+              doc.roundedRect(
+                margin,
+                yStart,
+                pageWidth - margin * 2,
+                150,
+                8,
+                8,
+                "F"
+              );
+
+              // Add library number and name
+              doc.setFontSize(18);
+              doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+              doc.text(`${j + 1}. ${lib.name}`, margin + 15, yStart + 25);
+
+              // Add horizontal line
+              doc.setDrawColor(textColor[0], textColor[1], textColor[2]);
+              doc.setLineWidth(1);
+              doc.line(
+                margin + 15,
+                yStart + 35,
+                pageWidth - margin - 15,
+                yStart + 35
+              );
+
+              // Add description - NO BLACK TEXT
+              doc.setFontSize(12);
+              doc.setTextColor(29, 78, 216); // Blue for description
+              const descriptionLines = doc.splitTextToSize(
+                lib.description,
+                pageWidth - margin * 2 - 30
+              );
+              doc.text(descriptionLines, margin + 15, yStart + 55);
+
+              // Add uses - NO BLACK TEXT
+              doc.setTextColor(147, 51, 234); // Purple for uses
+              doc.setFont(undefined, "bold");
+              doc.text("Primary Use:", margin + 15, yStart + 85);
+              doc.setFont(undefined, "normal");
+
+              const usesText = lib.uses;
+              const usesLines = doc.splitTextToSize(
+                usesText,
+                pageWidth - margin * 2 - 100
+              );
+              doc.text(usesLines, margin + 100, yStart + 85);
+
+              // Add URL - NO BLACK TEXT
+              doc.setTextColor(2, 132, 199); // Link blue
+              doc.setFont(undefined, "bold");
+              doc.text("Website:", margin + 15, yStart + 115);
+              doc.setFont(undefined, "normal");
+              doc.text(lib.url, margin + 100, yStart + 115);
+            }
+
+            // Add footer - LIGHT COLORS
+            doc.setDrawColor(230, 204, 255); // Light purple
+            doc.setLineWidth(2);
+            doc.line(
+              margin,
+              pageHeight - 40,
+              pageWidth - margin,
+              pageHeight - 40
+            );
+
+            doc.setFillColor(230, 204, 255); // Light purple
+            doc.rect(0, pageHeight - 30, pageWidth, 30, "F");
+
+            doc.setFontSize(10);
+            doc.setTextColor(139, 92, 246); // Purple
+            doc.text(
+              `Page ${Math.floor(i / 4) + 1} of ${Math.ceil(
+                libraries.length / 4
+              )}`,
+              margin,
+              pageHeight - 15
+            );
+          }
+
+          // Save the PDF
+          doc.save("40_UI_Libraries_Collection.pdf");
+        }
+      });
+    </script>
+  </body>
+</html>

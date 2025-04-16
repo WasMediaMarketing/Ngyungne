@@ -53,6 +53,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { IBookEventData, IBookEventupdate, IEvent, IUser } from "@/types";
+import { Loader } from "@/components/common/loader";
+import Spinner from "@/components/spinner";
 
 export default function AdminEventBookingsPage() {
   const [bookings, setBookings] = useState<IBookEventData[]>([]);
@@ -399,9 +401,7 @@ export default function AdminEventBookingsPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <Loader />
       ) : (
         <DataTable
           columns={columns}
@@ -563,14 +563,7 @@ export default function AdminEventBookingsPage() {
                 Cancel
               </Button>
               <Button onClick={handleUpdateBooking} disabled={isUpdating}>
-                {isUpdating ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  "Save Changes"
-                )}
+                {isUpdating ? <Spinner text="Saving..." /> : "Save Changes"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -639,10 +632,7 @@ export default function AdminEventBookingsPage() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
-                </>
+                <Spinner text="Deleting..." />
               ) : (
                 <>Delete {selectedIds.length} Bookings</>
               )}

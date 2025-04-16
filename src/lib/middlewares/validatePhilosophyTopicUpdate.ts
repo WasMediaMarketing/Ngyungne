@@ -11,29 +11,21 @@ const quoteSchema = z.object({
 const philosophyTopicSchema = z
   .object({
     title: z.string().optional(),
-
     icon: z.string().optional(),
-
     description: z.string().optional(),
-
     content: z.string().optional(),
-
     quotes: z.array(quoteSchema).optional(),
-
     practices: z.array(z.string()).optional(),
-
     isVisible: z.boolean().optional(),
   })
   .strict();
 
-export const validatePhilosophyTopicUpdate = async (
-  req: NextRequest
-): Promise<NextResponse | void> => {
+// Function to validate Philosophy Topic update data directly
+export const validatePhilosophyTopicUpdateData = (
+  data: any
+): NextResponse | null => {
   try {
-    const reqClone = req.clone();
-    const philosophyTopicData = await reqClone.json();
-
-    const result = philosophyTopicSchema.safeParse(philosophyTopicData);
+    const result = philosophyTopicSchema.safeParse(data);
 
     if (!result.success) {
       const errorMessages = result.error.errors
@@ -43,9 +35,42 @@ export const validatePhilosophyTopicUpdate = async (
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 
-    return;
+    return null;
   } catch (err) {
-    console.error("Error validating philosophy topic input:", err);
+    console.error("Error validating philosophy topic update data:", err);
     return handleError();
+  }
+};
+
+// Function to validate Philosophy Topic update from request
+export const validatePhilosophyTopicUpdate = async (
+  req: NextRequest
+): Promise<{ error: NextResponse | null; body: any }> => {
+  try {
+    // Parse the request body
+    let body;
+    try {
+      body = await req.json();
+    } catch (error) {
+      console.error("Invalid JSON body:", error);
+      return {
+        error: handleError(httpMessages.BAD_REQUEST("Invalid request body")),
+        body: null,
+      };
+    }
+
+    // Validate the parsed body
+    const validationError = validatePhilosophyTopicUpdateData(body);
+    if (validationError) {
+      return { error: validationError, body: null };
+    }
+
+    return { error: null, body };
+  } catch (err) {
+    console.error("Error validating philosophy topic update:", err);
+    return {
+      error: handleError(),
+      body: null,
+    };
   }
 };

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import type React from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Facebook,
   Twitter,
@@ -10,7 +10,7 @@ import {
   Linkedin,
   Mail,
   Globe,
-  ExternalLink,
+  RefreshCw,
 } from "lucide-react";
 import {
   Dialog,
@@ -21,76 +21,54 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { cn } from "@/lib/utils";
-import { TeamMember, TeamMemberRole } from "@/types/team-member";
+import { ambassadorApi } from "@/utils/ambassadorApi";
+import type { Ambassador } from "@/types/ambassador.types";
+import type { TeamMemberRole } from "@/types/team-member";
 import MemberCard from "@/components/ambassador/MemberCard";
+import { Loader } from "@/components/common/loader";
 
 const AmbassadorsPage: React.FC = () => {
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<Ambassador | null>(null);
   const [activeTab, setActiveTab] = useState<string>("all");
+  const [ambassadors, setAmbassadors] = useState<Ambassador[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const teamMembers: TeamMember[] = [
-    {
-      id: 1,
-      name: "Tenzin Dorjee",
-      role: "Founder",
-      bio: "Tenzin founded NgYungNe in 2018 with a vision to preserve Tibetan culture and support educational initiatives for Tibetan youth. With over 15 years of experience in community organizing and nonprofit management, he has dedicated his life to creating sustainable opportunities for marginalized communities.",
-      image: "/placeholder.svg",
-      location: "Dharamshala, India",
-      quote:
-        "Our cultural heritage is not just our past, but the foundation for our future.",
-      achievements: [
-        "Established 5 educational centers across India and Nepal",
-        "Recipient of the Cultural Preservation Award 2022",
-        "Published author on Tibetan cultural preservation",
-      ],
-      socialLinks: {
-        linkedin: "https://linkedin.com/in/tenzindorjee",
-        twitter: "https://twitter.com/tenzindorjee",
-        email: "tenzin@ngyungne.org",
-        website: "https://tenzindorjee.com",
-      },
-    },
-    {
-      id: 2,
-      name: "Pema Yangchen",
-      role: "Co-Founder",
-      bio: "Pema brings her expertise in educational programming and curriculum development to NgYungNe. Her background in international development and passion for cultural preservation has been instrumental in shaping the organization's strategic vision and educational initiatives.",
-      image: "/placeholder.svg",
-      location: "New York, USA",
-      quote:
-        "Education is the most powerful tool we have to ensure cultural continuity.",
-      achievements: [
-        "Developed comprehensive Tibetan language curriculum",
-        "Led educational workshops in 12 countries",
-        "Former UNESCO education consultant",
-      ],
-      socialLinks: {
-        linkedin: "https://linkedin.com/in/pemayangchen",
-        instagram: "https://instagram.com/pemayangchen",
-        email: "pema@ngyungne.org",
-      },
-    },
-    // Add more team members here...
-  ];
+  useEffect(() => {
+    const fetchAmbassadors = async () => {
+      try {
+        setLoading(true);
+        const data = await ambassadorApi.getAmbassadors();
+        setAmbassadors(data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching ambassadors:", err);
+        setError("Failed to load ambassadors. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const groupedMembers: Record<TeamMemberRole, TeamMember[]> = {
+    fetchAmbassadors();
+  }, []);
+
+  const groupedMembers: Record<TeamMemberRole, Ambassador[]> = {
     Founder: [],
     "Co-Founder": [],
     "Executive Director": [],
     Ambassador: [],
     "Program Coordinator": [],
     "Community Liaison": [],
-    "Volunteer Coordinator": [],
+    Volunteer: [],
   };
 
-  teamMembers.forEach((member) => {
-    if (groupedMembers[member.role]) {
-      groupedMembers[member.role].push(member);
+  ambassadors.forEach((member) => {
+    if (groupedMembers[member.role as TeamMemberRole]) {
+      groupedMembers[member.role as TeamMemberRole].push(member);
     }
   });
 
@@ -101,7 +79,7 @@ const AmbassadorsPage: React.FC = () => {
     "Ambassador",
     "Program Coordinator",
     "Community Liaison",
-    "Volunteer Coordinator",
+    "Volunteer",
   ];
 
   const getRolePlural = (role: TeamMemberRole): string => {
@@ -118,8 +96,8 @@ const AmbassadorsPage: React.FC = () => {
         return "Program Coordinators";
       case "Community Liaison":
         return "Community Liaisons";
-      case "Volunteer Coordinator":
-        return "Volunteer Coordinators";
+      case "Volunteer":
+        return "Volunteer";
       default:
         return `${role}s`;
     }
@@ -139,7 +117,7 @@ const AmbassadorsPage: React.FC = () => {
         return "Program Coordinators develop and manage our various initiatives focused on education, cultural preservation, and community outreach.";
       case "Community Liaison":
         return "Community Liaisons serve as vital connections between NgYungNe and the communities we serve, ensuring our programs meet real needs.";
-      case "Volunteer Coordinator":
+      case "Volunteer":
         return "Volunteer Coordinators manage our network of dedicated volunteers who contribute their time and skills to advancing our mission.";
       default:
         return "";
@@ -153,20 +131,41 @@ const AmbassadorsPage: React.FC = () => {
     Ambassador: "bg-purple-100 text-purple-800 border-purple-300",
     "Program Coordinator": "bg-green-100 text-green-800 border-green-300",
     "Community Liaison": "bg-pink-100 text-pink-800 border-pink-300",
-    "Volunteer Coordinator": "bg-orange-100 text-orange-800 border-orange-300",
+    Volunteer: "bg-orange-100 text-orange-800 border-orange-300",
   };
 
   const getFilteredMembers = () => {
     if (activeTab === "all") {
-      return teamMembers;
+      return ambassadors;
     }
 
-    return teamMembers.filter((member) => member.role === activeTab);
+    return ambassadors.filter((member) => member.role === activeTab);
   };
+
+  if (loading) {
+    <Loader />;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md p-8 bg-white rounded-xl shadow-md">
+          <h2 className="text-2xl font-bold text-primary mb-4">
+            Something went wrong
+          </h2>
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <Button onClick={() => window.location.reload()}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh Page
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-maroon-100 py-12">
+      <div className="bg-gradient-to-t from-amber-50 to-orange-100 py-12">
         <div className="container mx-auto px-4 max-w-6xl">
           <Breadcrumbs />
 
@@ -222,7 +221,7 @@ const AmbassadorsPage: React.FC = () => {
                     </div>
 
                     {getRoleDescription(role) && (
-                      <div className="bg-maroon-200 text-accent-foreground p-6 rounded-lg mb-8 border-l-4 border-primary shadow-sm">
+                      <div className="bg-gradient-to-r from-amber-50 to-amber-100 text-accent-foreground p-6 rounded-lg mb-8 border-l-4 border-primary shadow-sm">
                         <p>{getRoleDescription(role)}</p>
                       </div>
                     )}
@@ -233,7 +232,9 @@ const AmbassadorsPage: React.FC = () => {
                           key={member.id}
                           member={member}
                           onClick={() => setSelectedMember(member)}
-                          roleColor={roleColorMap[member.role]}
+                          roleColor={
+                            roleColorMap[member.role as TeamMemberRole]
+                          }
                         />
                       ))}
                     </div>
@@ -246,7 +247,7 @@ const AmbassadorsPage: React.FC = () => {
           {roleOrder.map((role) => (
             <TabsContent key={role} value={role}>
               <section className="mb-12">
-                <div className="bg-maroon-200 text-accent-foreground p-6 rounded-lg mb-8 border-l-4 border-primary shadow-sm">
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 text-accent-foreground p-6 rounded-lg mb-8 border-l-4 border-primary shadow-sm">
                   <h3 className="font-semibold text-primary mb-2">
                     About Our {getRolePlural(role)}
                   </h3>
@@ -259,7 +260,7 @@ const AmbassadorsPage: React.FC = () => {
                       key={member.id}
                       member={member}
                       onClick={() => setSelectedMember(member)}
-                      roleColor={roleColorMap[member.role]}
+                      roleColor={roleColorMap[member.role as TeamMemberRole]}
                     />
                   ))}
                 </div>
@@ -292,7 +293,7 @@ const AmbassadorsPage: React.FC = () => {
                     <Badge
                       className={cn(
                         "mb-2 px-3 py-1",
-                        roleColorMap[selectedMember.role]
+                        roleColorMap[selectedMember.role as TeamMemberRole]
                       )}
                     >
                       {selectedMember.role}

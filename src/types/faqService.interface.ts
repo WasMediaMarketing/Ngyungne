@@ -1,13 +1,11 @@
-import { IFaqInput, IFaqUpdate, IFaq } from "@/types";
+import { Types } from "mongoose";
+import { IFaq } from "./faq.types";
 
 export interface IFaqService {
-  createFaq(faqData: IFaqInput): Promise<IFaq>;
-
-  updateFaq(faqId: string, faqData: IFaqUpdate): Promise<boolean>;
-
-  getFaqs(faqId?: string): Promise<IFaq[]>;
-
-  deleteFaq(faqId: string): Promise<boolean>;
-
-  deleteFaqs(faqIds: string[]): Promise<boolean>;
+  createFaq(faqData: IFaq): Promise<IFaq>;
+  getFaqs(onlyVisible?: boolean): Promise<IFaq[]>;
+  getFaqById(faqId: Types.ObjectId): Promise<IFaq>;
+  updateFaq(faqId: Types.ObjectId, faqData: Partial<IFaq>): Promise<IFaq>;
+  deleteFaq(faqId: Types.ObjectId): Promise<IFaq>;
+  deleteFaqs(faqIds: Types.ObjectId[]): Promise<boolean>;
 }

@@ -1,3 +1,4 @@
+import SettingModel from "@/lib/models/setting.model";
 import { User } from "./user.model";
 import { Event } from "./event.model";
 import { Donation } from "./donation.model";
@@ -11,6 +12,10 @@ import { PhilosophyTopic } from "./philosophyTopic.model";
 import { Course } from "./course.model";
 import { JoinCourse } from "./joinCourse.model";
 import { Faq } from "./faq.model";
+import { Newsletter } from "./newsletter.model";
+import { AmbassadorModel } from "./ambassador.model";
+import { PageModel } from "./page.model";
+import { Gallery } from "./gallery.model";
 
 export {
   User,
@@ -26,4 +31,8 @@ export {
   Course,
   JoinCourse,
   Faq,
+  Newsletter,
+  SettingModel,
+  AmbassadorModel,
+  PageModel,
 };

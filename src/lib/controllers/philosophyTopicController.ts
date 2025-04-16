@@ -1,10 +1,9 @@
-import { IPhilosophyTopicService } from "@/types";
-import { NextRequest, NextResponse } from "next/server";
+import type { IPhilosophyTopicService } from "@/types";
+import type { NextRequest, NextResponse } from "next/server";
 import { handleError } from "../utils/errorHandler";
 import { handleResponse } from "../utils/responseHandler";
 import { httpMessages } from "../utils/HttpMessage";
 import { Types } from "mongoose";
-import { ExtendedNextRequest } from "@/lib/utils/requestHelpers";
 
 export class PhilosophyTopicController {
   private philosophyTopicService: IPhilosophyTopicService;
@@ -15,12 +14,11 @@ export class PhilosophyTopicController {
 
   /**
    * @summary Create a new philosophy topic
-   * @param {NextRequest} req - The request object
+   * @param {any} philosophyTopicData - The philosophy topic data
    * @returns {NextResponse} The response with the created philosophy topic
    */
-  async createPhilosophyTopic(req: ExtendedNextRequest): Promise<NextResponse> {
+  async createPhilosophyTopic(philosophyTopicData: any): Promise<NextResponse> {
     try {
-      const philosophyTopicData = await req.json();
       const philosophyTopic =
         await this.philosophyTopicService.createPhilosophyTopic(
           philosophyTopicData
@@ -28,13 +26,12 @@ export class PhilosophyTopicController {
       return handleResponse(philosophyTopic, httpMessages.CREATED());
     } catch (error) {
       console.log("createPhilosophyTopicController error", error);
-      return handleError(undefined, req);
+      return handleError();
     }
   }
 
   /**
    * @summary Get all philosophy topics
-   * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the list of philosophy topics
    */
   async getPhilosophyTopics(): Promise<NextResponse> {
@@ -50,7 +47,6 @@ export class PhilosophyTopicController {
 
   /**
    * @summary Get all visible philosophy topics
-   * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the list of visible philosophy topics
    */
   async getVisiblePhilosophyTopics(): Promise<NextResponse> {
@@ -91,57 +87,17 @@ export class PhilosophyTopicController {
     }
   }
 
-  //   /**
-  //    * @summary Get all philosophy topics directly in props
-  //    * @param {NextRequest} req - The request object
-  //    * @returns {NextResponse} The response with the list of philosophy topics
-  //    */
-  //   async getPhilosophyTopicsForProps(): Promise<IPhilosophyTopic[] | unknown> {
-  //     try {
-  //       const philosophyTopics =
-  //         await this.philosophyTopicService.getPhilosophyTopics();
-  //       return { data: philosophyTopics };
-  //     } catch (error) {
-  //       console.log("getPhilosophyTopicsController error", error);
-  //       return { error: error as Error };
-  //     }
-  //   }
-
-  //   /**
-  //    * @summary Get a philosophy topic by ID directly for props
-  //    * @param {NextRequest} req - The request object
-  //    * @returns {NextResponse} The response with the philosophy topic details
-  //    */
-  //   async getPhilosophyTopicByIdForProps(
-  //     topicId: string
-  //   ): Promise<IPhilosophyTopic | unknown> {
-  //     try {
-  //       if (!topicId || !Types.ObjectId.isValid(topicId)) {
-  //         throw new Error("Philosophy Topic ID is either missing or invalid");
-  //       }
-
-  //       // Fetch the philosophy topic using the topicId
-  //       const philosophyTopic =
-  //         await this.philosophyTopicService.getPhilosophyTopicById(
-  //           new Types.ObjectId(topicId)
-  //         );
-  //       return { data: philosophyTopic };
-  //     } catch (error) {
-  //       console.log("getPhilosophyTopicByIdForPropsController error", error);
-  //       return { error: error };
-  //     }
-  //   }
-
   /**
    * @summary Update a philosophy topic by ID
-   * @param {NextRequest} req - The request object
+   * @param {string} topicId - The ID of the philosophy topic to update
+   * @param {any} philosophyTopicData - The philosophy topic data to update
    * @returns {NextResponse} The response with the updated philosophy topic
    */
   async updatePhilosophyTopic(
-    req: ExtendedNextRequest | NextRequest
+    topicId: string,
+    philosophyTopicData: any
   ): Promise<NextResponse> {
     try {
-      const topicId = req.nextUrl.pathname.split("/").pop();
       if (!topicId || !Types.ObjectId.isValid(topicId)) {
         return handleError(
           httpMessages.BAD_REQUEST(
@@ -150,7 +106,6 @@ export class PhilosophyTopicController {
         );
       }
 
-      const philosophyTopicData = await req.json();
       const updatedPhilosophyTopic =
         await this.philosophyTopicService.updatePhilosophyTopic(
           new Types.ObjectId(topicId),
@@ -159,9 +114,7 @@ export class PhilosophyTopicController {
       return handleResponse(updatedPhilosophyTopic);
     } catch (error) {
       console.log("updatePhilosophyTopicController error", error);
-      return req instanceof ExtendedNextRequest
-        ? handleError(undefined, req)
-        : handleError();
+      return handleError();
     }
   }
 

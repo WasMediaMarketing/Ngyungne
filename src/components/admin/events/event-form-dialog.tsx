@@ -30,6 +30,7 @@ import { eventApi } from "@/utils/eventApi";
 import { toast } from "sonner";
 import Image from "next/image";
 import type { IEvent, ScheduleItem } from "@/types/event.types";
+import Spinner from "@/components/spinner";
 
 interface EventFormDialogProps {
   event?: IEvent;
@@ -852,7 +853,11 @@ export default function EventFormDialog({
               {isSubmitting ? (
                 <>
                   <span className="animate-spin mr-2">⟳</span>
-                  {isEditMode ? "Updating..." : "Creating..."}
+                  {isEditMode ? (
+                    <Spinner text="Updating..." />
+                  ) : (
+                    <Spinner text="Creating..." />
+                  )}
                 </>
               ) : (
                 <>{isEditMode ? "Update Event" : "Create Event"}</>

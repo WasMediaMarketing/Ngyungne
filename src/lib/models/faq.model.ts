@@ -1,20 +1,36 @@
-import mongoose, { Schema, Model } from "mongoose";
-import { IFaq } from "@/types";
+import mongoose, { Schema } from "mongoose";
+import type { IFaq } from "@/types";
 
-const FaqSchema: Schema<IFaq> = new mongoose.Schema(
+/**
+ * Mongoose schema for the FAQ model
+ */
+const faqSchema = new Schema<IFaq>(
   {
-    question: { type: String, required: true },
-    answer: { type: String, required: true },
+    question: {
+      type: String,
+      required: [true, "Question is required"],
+      trim: true,
+    },
+    answer: {
+      type: String,
+      required: [true, "Answer is required"],
+      trim: true,
+    },
+    category: {
+      type: String,
+      default: "General",
+      trim: true,
+    },
+    isVisible: {
+      type: Boolean,
+      default: true,
+    },
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  {
+    timestamps: true,
+  }
 );
 
-FaqSchema.virtual("id").get(function () {
-  return this._id.toHexString();
-});
-
-const Faq =
-  (mongoose.models.Faq as Model<IFaq>) ||
-  mongoose.model<IFaq>("Faq", FaqSchema);
-
-export { Faq };
+// Check if the model is already defined to prevent overwriting
+export const Faq =
+  mongoose.models.Faq || mongoose.model<IFaq>("Faq", faqSchema);

@@ -14,6 +14,7 @@ import {
 import { deleteUser } from "@/utils/userApi";
 import { toast } from "sonner";
 import type { IUser } from "@/types/user.types";
+import Spinner from "@/components/spinner";
 
 interface DeleteUserAlertProps {
   open: boolean;
@@ -75,7 +76,7 @@ export function DeleteUserAlert({
             disabled={isLoading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? <Spinner text="Deleting..." /> : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

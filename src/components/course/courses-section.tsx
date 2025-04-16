@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -20,8 +21,8 @@ import {
   ChevronRight,
   Filter,
   Search,
+  RefreshCw,
 } from "lucide-react";
-import { courses } from "@/data/courses";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +32,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseEnrollmentDialog } from "./course-enrollment-form";
-import { toast } from "@/components/ui/use-toast-hook";
+import { courseApi } from "@/utils/courseApi";
+import type { ICourse } from "@/types";
+import { Loader } from "../common/loader";
 
 export function CoursesSection() {
   const [ref, inView] = useInView({
@@ -39,9 +42,28 @@ export function CoursesSection() {
     threshold: 0.1,
   });
 
+  const [courses, setCourses] = useState<ICourse[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("grid");
+
+  // Fetch courses on component mount
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      try {
+        const data = await courseApi.getPublicCourses();
+        setCourses(data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   // Filter courses based on search term and level filter
   const filteredCourses = courses.filter((course) => {
@@ -55,16 +77,6 @@ export function CoursesSection() {
 
   // Extract unique levels for filter dropdown
   const levels = [...new Set(courses.map((course) => course.level))];
-
-  // Handle enrollment form submission
-  const handleEnrollmentSubmit = (data: any) => {
-    console.log("Enrollment submitted:", data);
-    // Here you would typically send the data to your backend
-    toast({
-      title: "Enrollment Submitted",
-      description: "Thank you for enrolling in this course!",
-    });
-  };
 
   // Animation variants
   const containerVariants = {
@@ -81,6 +93,10 @@ export function CoursesSection() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
+
+  if (loading) {
+    <Loader />;
+  }
 
   return (
     <section
@@ -191,18 +207,28 @@ export function CoursesSection() {
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
           >
-            {filteredCourses.map((course, index) => (
+            {filteredCourses.map((course) => (
               <motion.div
-                key={index}
+                key={course.id}
                 variants={itemVariants}
                 className="h-full"
               >
                 <Card className="group h-full flex flex-col hover:shadow-lg transition-all duration-300 bg-white border border-maroon-100 overflow-hidden">
-                  {course?.featured && (
-                    <div className="bg-crimson-600 text-white text-xs font-semibold px-3 py-1 absolute top-4 right-4 rounded-full">
-                      Featured
-                    </div>
-                  )}
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <Image
+                      src={
+                        course.image || "/placeholder.svg?height=200&width=400"
+                      }
+                      alt={course.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    {course?.featured && (
+                      <div className="bg-crimson-600 text-white text-xs font-semibold px-3 py-1 absolute top-4 right-4 rounded-full">
+                        Featured
+                      </div>
+                    )}
+                  </div>
                   <CardHeader className="pb-4">
                     <div className="flex justify-between items-start gap-2">
                       <CardTitle className="text-2xl text-crimson-700 group-hover:text-crimson-800 transition-colors duration-300">
@@ -237,7 +263,7 @@ export function CoursesSection() {
                   </CardContent>
                   <CardFooter className="pt-2 flex gap-2">
                     <Link
-                      href={`/teachings/courses/${course.slug}`}
+                      href={`/teachings/courses/${course.id}`}
                       passHref
                       className="flex-1"
                     >
@@ -251,7 +277,7 @@ export function CoursesSection() {
                     </Link>
                     <CourseEnrollmentDialog
                       courseTitle={course.title}
-                      onSubmit={handleEnrollmentSubmit}
+                      courseId={course.id}
                       buttonText="Enroll Now"
                       buttonClassName="flex-1 bg-crimson-600 hover:bg-crimson-700 text-white"
                     />
@@ -271,65 +297,76 @@ export function CoursesSection() {
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
           >
-            {filteredCourses.map((course, index) => (
-              <motion.div key={index} variants={itemVariants}>
+            {filteredCourses.map((course) => (
+              <motion.div key={course.id} variants={itemVariants}>
                 <Card className="group hover:shadow-lg transition-all duration-300 bg-white border border-maroon-100 overflow-hidden">
                   <div className="flex flex-col md:flex-row">
-                    <CardHeader className="md:w-1/3">
-                      <div className="flex flex-col">
-                        <CardTitle className="text-xl text-crimson-700">
-                          {course.title}
-                        </CardTitle>
-                        <div className="flex items-center mt-2 gap-2">
+                    <div className="relative h-48 md:h-auto md:w-1/4 overflow-hidden">
+                      <Image
+                        src={
+                          course.image ||
+                          "/placeholder.svg?height=200&width=400"
+                        }
+                        alt={course.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      {course?.featured && (
+                        <div className="bg-crimson-600 text-white text-xs font-semibold px-3 py-1 absolute top-4 right-4 rounded-full">
+                          Featured
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col md:w-3/4">
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start gap-2">
+                          <CardTitle className="text-xl text-crimson-700">
+                            {course.title}
+                          </CardTitle>
                           <Badge
                             variant="secondary"
                             className="bg-saffron-100 text-crimson-700"
                           >
                             {course.level}
                           </Badge>
-                          {course.featured && (
-                            <Badge className="bg-crimson-600 text-white">
-                              Featured
-                            </Badge>
-                          )}
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="md:w-1/2 py-6 md:py-6">
-                      <p className="text-maroon-600 mb-4 line-clamp-2">
-                        {course.description}
-                      </p>
-                      <div className="flex flex-wrap gap-x-6 gap-y-2">
-                        <div className="flex items-center text-maroon-500">
-                          <Clock className="mr-2 h-4 w-4" />
-                          {course.duration}
+                      </CardHeader>
+                      <CardContent className="py-2">
+                        <p className="text-maroon-600 mb-4 line-clamp-2">
+                          {course.description}
+                        </p>
+                        <div className="flex flex-wrap gap-x-6 gap-y-2">
+                          <div className="flex items-center text-maroon-500">
+                            <Clock className="mr-2 h-4 w-4" />
+                            {course.duration}
+                          </div>
+                          <div className="flex items-center text-maroon-500">
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            {course.lessons} lessons
+                          </div>
+                          <div className="flex items-center text-maroon-500">
+                            <Users className="mr-2 h-4 w-4" />
+                            {course.students || "500+"} students
+                          </div>
                         </div>
-                        <div className="flex items-center text-maroon-500">
-                          <BookOpen className="mr-2 h-4 w-4" />
-                          {course.lessons} lessons
-                        </div>
-                        <div className="flex items-center text-maroon-500">
-                          <Users className="mr-2 h-4 w-4" />
-                          {course.students || "500+"} students
-                        </div>
-                      </div>
-                    </CardContent>
-                    <div className="flex items-center justify-center md:w-1/6 p-6 gap-2 flex-col">
-                      <Link
-                        href={`/teachings/courses/${course.slug}`}
-                        passHref
-                        className="w-full"
-                      >
-                        <Button variant="outline" className="w-full">
-                          Details
-                        </Button>
-                      </Link>
-                      <CourseEnrollmentDialog
-                        courseTitle={course.title}
-                        onSubmit={handleEnrollmentSubmit}
-                        buttonText="Enroll"
-                        buttonClassName="w-full bg-crimson-600 hover:bg-crimson-700 text-white"
-                      />
+                      </CardContent>
+                      <CardFooter className="pt-2 flex gap-2 mt-auto">
+                        <Link
+                          href={`/teachings/courses/${course.id}`}
+                          passHref
+                          className="flex-1"
+                        >
+                          <Button variant="outline" className="w-full">
+                            Details
+                          </Button>
+                        </Link>
+                        <CourseEnrollmentDialog
+                          courseTitle={course.title}
+                          courseId={course.id}
+                          buttonText="Enroll"
+                          buttonClassName="flex-1 bg-crimson-600 hover:bg-crimson-700 text-white"
+                        />
+                      </CardFooter>
                     </div>
                   </div>
                 </Card>

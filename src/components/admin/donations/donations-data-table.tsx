@@ -39,6 +39,8 @@ import {
 } from "@/utils/donationApi";
 import Image from "next/image";
 import type { Types } from "mongoose";
+import { Loader } from "@/components/common/loader";
+import Spinner from "@/components/spinner";
 
 // Helper function to safely get user name
 const getUserName = (userId: Types.ObjectId | any): string => {
@@ -431,10 +433,7 @@ export function DonationsDataTable() {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <RefreshCw className="h-6 w-6 animate-spin text-primary mr-2" />
-            <span>Loading donations...</span>
-          </div>
+          <Loader />
         ) : (
           <DataTable
             columns={columns}
@@ -584,14 +583,7 @@ export function DonationsDataTable() {
               onClick={handleDeleteDonation}
               disabled={isDeleting}
             >
-              {isDeleting ? (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete"
-              )}
+              {isDeleting ? <Spinner text="Deleting..." /> : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -624,10 +616,7 @@ export function DonationsDataTable() {
               disabled={isDeleting}
             >
               {isDeleting ? (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
+                <Spinner text="Deleting..." />
               ) : (
                 "Delete All Selected"
               )}

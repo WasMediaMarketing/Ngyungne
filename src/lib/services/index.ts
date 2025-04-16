@@ -11,7 +11,9 @@ import { PhilosophyTopicService } from "./philosophyService";
 import { CourseService } from "./courseService";
 import { JoinCourseService } from "./joinCourseService";
 import { FaqService } from "./faqService";
-
+import { NewsletterService } from "./newsletterService";
+import { AmbassadorService } from "./ambassadorService";
+import { GalleryService } from "./galleryService";
 export {
   UserService,
   DonationService,
@@ -26,4 +28,7 @@ export {
   CourseService,
   JoinCourseService,
   FaqService,
+  NewsletterService,
+  AmbassadorService,
+  GalleryService,
 };
