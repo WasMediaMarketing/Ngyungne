@@ -6,6 +6,7 @@ export function parseJsonAndNumbersFields(
 ): Record<string, unknown> {
   // Parse JSON fields
   fields.forEach((field) => {
+    console.log("Parsing field:", field, "with value:", body[field]);
     if (body[field] && typeof body[field] === "string") {
       try {
         // Trying to parse the field as JSON

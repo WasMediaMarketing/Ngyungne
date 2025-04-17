@@ -26,7 +26,7 @@ const createAuthHeaders = (contentType = "application/json") => {
 
 export const blogApi = {
   // Get all blog posts (admin view - includes both visible and hidden posts)
-  getAdminBlogPosts: async (): Promise<IBlogPost[]> => {
+  getAdminBlogPosts: async (): Promise<{ data: IBlogPost[] }> => {
     try {
       const response = await fetch("/api/blogpost", {
         method: "GET",
@@ -34,7 +34,7 @@ export const blogApi = {
       });
 
       await handleResponse(response);
-      return await response.json();
+      return await response.json(); // should be { data: IBlogPost[] }
     } catch (error) {
       console.error("Error fetching blog posts:", error);
       throw error;
@@ -42,7 +42,7 @@ export const blogApi = {
   },
 
   // Get all visible blog posts (public view - only includes published posts)
-  getPublicBlogPosts: async (): Promise<IBlogPost[]> => {
+  getPublicBlogPosts: async (): Promise<{ data: IBlogPost[] }> => {
     try {
       const response = await fetch("/api/blogpost", {
         method: "GET",
@@ -101,6 +101,7 @@ export const blogApi = {
     id: string,
     blogPostData: FormData
   ): Promise<IBlogPost> => {
+    console.log("updateBlogPost", id, blogPostData);
     try {
       const response = await fetch(`/api/blogpost/${id}`, {
         method: "PATCH",

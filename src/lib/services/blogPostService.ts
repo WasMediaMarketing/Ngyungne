@@ -50,6 +50,7 @@ export class BlogPostService implements IBlogPostService {
     await this.initializeDbConnection();
     const blogPost = await BlogPost.findById(blogPostId);
     if (!blogPost) throw new Error("BlogPost not found");
+    console.log("result of blogPost servoce get", blogPost);
     return blogPost;
   }
 

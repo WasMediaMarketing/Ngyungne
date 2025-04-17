@@ -74,8 +74,8 @@ export default function AdminBlogPage() {
   const fetchBlogPosts = async () => {
     setLoading(true);
     try {
-      const data = await blogApi.getAdminBlogPosts();
-      setBlogPosts(data);
+      const blogPosts = await blogApi.getAdminBlogPosts();
+      setBlogPosts(blogPosts.data); // ✅ no `.data` here
     } catch (error) {
       console.error("Error fetching blog posts:", error);
     } finally {
@@ -86,6 +86,7 @@ export default function AdminBlogPage() {
   useEffect(() => {
     fetchBlogPosts();
   }, []);
+  console.log("Blog posts:", blogPosts);
 
   const handleRowSelectionChange = (rowSelection: Record<string, boolean>) => {
     const selectedRows = Object.keys(rowSelection).filter(

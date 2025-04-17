@@ -37,6 +37,7 @@ export class BlogPostController {
   async getBlogPosts(): Promise<NextResponse> {
     try {
       const blogPosts = await this.blogPostService.getBlogPosts();
+      console.log("result of blogPost controller get", blogPosts);
       return handleResponse(blogPosts);
     } catch (error) {
       console.log("getBlogPostsController error", error);
@@ -52,7 +53,8 @@ export class BlogPostController {
    */
   async getPublishedBlogPosts(): Promise<NextResponse> {
     try {
-      const blogPosts = await this.blogPostService.getBlogPosts(true); // Assuming true means published
+      const blogPosts = await this.blogPostService.getBlogPosts(true);
+      console.log("result of blogPost servoce get", blogPosts); // Assuming true means published
       return handleResponse(blogPosts);
     } catch (error) {
       console.log("getPublishedBlogPostsController error", error);

@@ -216,6 +216,11 @@ export function EditBlogPostDialog({
       // Add author as JSON string
       formData.append("author", JSON.stringify(author));
 
+      // Handle isVisible properly - convert "on" to true
+      const isVisibleValue = formData.get("isVisible");
+      formData.delete("isVisible");
+      formData.append("isVisible", isVisibleValue === "on" ? "true" : "false");
+
       // If image wasn't changed, don't send it
       if (!imageChanged && fileInputRef.current) {
         formData.delete("image");
