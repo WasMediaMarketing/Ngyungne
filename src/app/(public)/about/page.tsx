@@ -134,7 +134,7 @@ export default function About() {
             >
               <div className="absolute inset-0 bg-gradient-to-t from-crimson-900/40 to-transparent z-10"></div>
               <Image
-                src="https://www.dharmaideal.org/api/image/1736165623116.jpeg"
+                src="https://cdn.pixabay.com/photo/2024/04/29/10/29/buddha-8727582_1280.png"
                 alt="About Ngyungne"
                 fill
                 className="object-cover"

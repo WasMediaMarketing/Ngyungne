@@ -24,6 +24,7 @@ import Image from "next/image";
 import { getSettings } from "@/utils/settingsApi";
 import { newsletterApi } from "@/utils/newsletterApi";
 import type { Setting, SocialLink } from "@/types/setting.types";
+import { Loader } from "./common/loader";
 
 // Map of social media platform names to Lucide icons
 const socialIcons: Record<string, React.ReactNode> = {
@@ -105,30 +106,20 @@ export function Footer() {
             <ul className="space-y-2">
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 mr-2 text-gray-400 mt-1 flex-shrink-0" />
-                <span>
-                  {settings?.organizationInfo.address || "Loading address..."}
-                </span>
+                <span>{settings?.organizationInfo.address}</span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 mr-2 text-gray-400" />
-                <span>
-                  {settings?.organizationInfo.phone || "Loading phone..."}
-                </span>
+                <span>{settings?.organizationInfo.phone}</span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 mr-2 text-gray-400" />
-                <span>
-                  {settings?.organizationInfo.email || "Loading email..."}
-                </span>
+                <span>{settings?.organizationInfo.email}</span>
               </li>
             </ul>
             <div className="flex space-x-4">
               {settings?.organizationInfo.socialLinks &&
-              settings.organizationInfo.socialLinks.length > 0 ? (
-                renderSocialLinks(settings.organizationInfo.socialLinks)
-              ) : (
-                <span className="text-gray-400">Loading social links...</span>
-              )}
+                renderSocialLinks(settings.organizationInfo.socialLinks)}
             </div>
           </div>
 

@@ -24,7 +24,7 @@ export function AboutSection() {
         >
           <div className="relative h-[500px] rounded-lg overflow-hidden">
             <Image
-              src="https://www.dharmaideal.org/api/image/1736165623116.jpeg"
+              src="https://cdn.pixabay.com/photo/2024/04/29/10/29/buddha-8727582_1280.png"
               alt="About Ngyungne"
               fill
               className="object-cover"
