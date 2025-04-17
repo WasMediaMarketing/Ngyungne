@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CalendarDays, Clock, Search } from "lucide-react";
+import { newsletterApi } from "@/utils/newsletterApi";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -47,6 +49,8 @@ export default function Blog() {
   const [currentPage, setCurrentPage] = useState(1);
   const [allCategories, setAllCategories] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
+  const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
 
   const postsPerPage = 3;
 
@@ -163,6 +167,26 @@ export default function Blog() {
       </div>
     );
   }
+  const handleNewsletterSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !email.trim()) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setSubscribing(true);
+    try {
+      const success = await newsletterApi.subscribe(email.trim());
+      if (success) {
+        setEmail("");
+      }
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+    } finally {
+      setSubscribing(false);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -610,12 +634,33 @@ export default function Blog() {
                 directly in your inbox.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <Input placeholder="Enter your email" className="flex-grow" />
-              <Button className="bg-crimson-600 hover:bg-crimson-700 text-white whitespace-nowrap">
-                Subscribe
+            <form
+              onSubmit={handleNewsletterSubmit}
+              className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+            >
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-grow"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <Button
+                type="submit"
+                className="bg-crimson-600 hover:bg-crimson-700 text-white whitespace-nowrap"
+                disabled={subscribing}
+              >
+                {subscribing ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Subscribing...
+                  </div>
+                ) : (
+                  "Subscribe"
+                )}
               </Button>
-            </div>
+            </form>
           </motion.div>
 
           {/* Popular Tags */}
