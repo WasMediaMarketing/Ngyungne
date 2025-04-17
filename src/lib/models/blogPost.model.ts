@@ -20,6 +20,18 @@ const BlogPostSchema: Schema<IBlogPost> = new Schema(
     image: { type: String, required: true },
     views: { type: Number, default: 0 },
     isVisible: { type: Boolean, default: true },
+    metaTitle: {
+      type: String,
+      required: false,
+    },
+    metaKeywords: {
+      type: [String],
+      required: false,
+    },
+    metaDescription: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,

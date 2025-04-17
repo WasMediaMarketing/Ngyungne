@@ -96,7 +96,7 @@ export async function PATCH(req: NextRequest) {
     { fileField: "image", bodyField: "image" },
     { fileField: "authorImage", bodyField: "author.image" },
   ];
-  const jsonFields = ["tags", "categories", "author"];
+  const jsonFields = ["tags", "categories", "author", "metaKeywords"];
   const numericFields = ["views"];
   const booleanFields = ["isVisible"];
 

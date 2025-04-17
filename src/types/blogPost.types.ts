@@ -54,5 +54,8 @@ export interface IBlogPost extends Document {
   content: string;
   image: string;
   views: number;
-  isVisible: boolean; // Visibility flag to mark if the blog post is visible
+  isVisible: boolean;
+  metaTitle: string;
+  metaKeywords: string[];
+  metaDescription: string;
 }
