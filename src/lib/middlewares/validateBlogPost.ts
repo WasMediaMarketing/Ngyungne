@@ -29,6 +29,9 @@ const blogPostSchema = z
     image: z.string().optional(),
     views: z.number().int().nonnegative().optional(),
     isVisible: z.boolean().optional(),
+    metaTitle: z.string().optional(),
+    metaKeywords: z.array(z.string()).optional(),
+    metaDescription: z.string().optional(),
   })
   .strict();
 
