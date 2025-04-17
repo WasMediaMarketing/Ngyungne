@@ -53,5 +53,6 @@ export const handleError = (
   }
 
   // Return a JSON response with the error message and status code
+  console.log("Error message:", message);
   return NextResponse.json({ message }, { status: statusCode });
 };
