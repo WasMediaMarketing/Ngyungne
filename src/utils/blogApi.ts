@@ -28,7 +28,7 @@ export const blogApi = {
   // Get all blog posts (admin view - includes both visible and hidden posts)
   getAdminBlogPosts: async (): Promise<IBlogPost[]> => {
     try {
-      const response = await fetch("/api/blogPost", {
+      const response = await fetch("/api/blogpost", {
         method: "GET",
         headers: createAuthHeaders(),
       });
@@ -44,7 +44,7 @@ export const blogApi = {
   // Get all visible blog posts (public view - only includes published posts)
   getPublicBlogPosts: async (): Promise<IBlogPost[]> => {
     try {
-      const response = await fetch("/api/blogPost", {
+      const response = await fetch("/api/blogpost", {
         method: "GET",
       });
 
@@ -59,7 +59,7 @@ export const blogApi = {
   // Get a single blog post by ID
   getBlogPost: async (id: string): Promise<IBlogPost> => {
     try {
-      const response = await fetch(`/api/blogPost/${id}`, {
+      const response = await fetch(`/api/blogpost/${id}`, {
         method: "GET",
         headers: createAuthHeaders(),
       });
@@ -76,7 +76,7 @@ export const blogApi = {
   createBlogPost: async (blogPostData: FormData): Promise<IBlogPost> => {
     try {
       // Add authentication to FormData request
-      const response = await fetch("/api/blogPost", {
+      const response = await fetch("/api/blogpost", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${getAdminToken()}`,
@@ -102,7 +102,7 @@ export const blogApi = {
     blogPostData: FormData
   ): Promise<IBlogPost> => {
     try {
-      const response = await fetch(`/api/blogPost/${id}`, {
+      const response = await fetch(`/api/blogpost/${id}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${getAdminToken()}`,
@@ -128,7 +128,7 @@ export const blogApi = {
     blogPostData: Partial<IBlogPostUpdate>
   ): Promise<IBlogPost> => {
     try {
-      const response = await fetch(`/api/blogPost/${id}`, {
+      const response = await fetch(`/api/blogpost/${id}`, {
         method: "PUT",
         headers: createAuthHeaders(),
         body: JSON.stringify(blogPostData),
@@ -152,7 +152,7 @@ export const blogApi = {
     isVisible: boolean
   ): Promise<boolean> => {
     try {
-      const response = await fetch(`/api/blogPost/${id}`, {
+      const response = await fetch(`/api/blogpost/${id}`, {
         method: "PUT",
         headers: createAuthHeaders(),
         body: JSON.stringify({ isVisible }),
@@ -174,7 +174,7 @@ export const blogApi = {
   // Delete a single blog post
   deleteBlogPost: async (id: string): Promise<boolean> => {
     try {
-      const response = await fetch(`/api/blogPost/${id}`, {
+      const response = await fetch(`/api/blogpost/${id}`, {
         method: "DELETE",
         headers: createAuthHeaders(),
       });
@@ -194,7 +194,7 @@ export const blogApi = {
   deleteBlogPosts: async (ids: string[]): Promise<boolean> => {
     try {
       const queryString = ids.join(",");
-      const response = await fetch(`/api/blogPost?blogPostIds=${queryString}`, {
+      const response = await fetch(`/api/blogpost?blogPostIds=${queryString}`, {
         method: "DELETE",
         headers: createAuthHeaders(),
       });

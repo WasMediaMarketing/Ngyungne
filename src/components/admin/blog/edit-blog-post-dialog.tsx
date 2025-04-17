@@ -43,10 +43,15 @@ export function EditBlogPostDialog({
 }: EditBlogPostDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [authorImagePreview, setAuthorImagePreview] = useState<string | null>(
+    null
+  );
   const [imageChanged, setImageChanged] = useState(false);
+  const [authorImageChanged, setAuthorImageChanged] = useState(false);
   const [content, setContent] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const authorFileInputRef = useRef<HTMLInputElement>(null);
   const contentEditorRef = useRef(null);
 
   // Editor configuration
@@ -97,11 +102,22 @@ export function EditBlogPostDialog({
         setImagePreview(null);
       }
 
+      if (blogPost.author?.image) {
+        setAuthorImagePreview(blogPost.author.image);
+        setAuthorImageChanged(false);
+      } else {
+        setAuthorImagePreview(null);
+      }
+
       // Set content for the editor
       setContent(blogPost.content || "");
     }
   }, [blogPost]);
 
+  // Keep the preview functionality using FileReader, but don't convert the actual file upload
+  // Only modify the handleImageChange and handleAuthorImageChange functions to separate preview from file handling
+
+  // In the handleImageChange function, keep the preview but don't modify the file
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -111,9 +127,27 @@ export function EditBlogPostDialog({
         setImageChanged(true);
       };
       reader.readAsDataURL(file);
+      // Don't modify the file itself - it will be sent as is
     } else {
       setImagePreview(blogPost?.image || null);
       setImageChanged(false);
+    }
+  };
+
+  // Similarly for handleAuthorImageChange
+  const handleAuthorImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAuthorImagePreview(reader.result as string);
+        setAuthorImageChanged(true);
+      };
+      reader.readAsDataURL(file);
+      // Don't modify the file itself - it will be sent as is
+    } else {
+      setAuthorImagePreview(blogPost?.author?.image || null);
+      setAuthorImageChanged(false);
     }
   };
 
@@ -125,6 +159,15 @@ export function EditBlogPostDialog({
     setImageChanged(true);
   };
 
+  const clearAuthorImage = () => {
+    if (authorFileInputRef.current) {
+      authorFileInputRef.current.value = "";
+    }
+    setAuthorImagePreview(null);
+    setAuthorImageChanged(true);
+  };
+
+  // In the handleSubmit function, simplify the form data handling
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!blogPost) return;
@@ -160,13 +203,14 @@ export function EditBlogPostDialog({
       // Handle author as an object
       const author: IAuthor = {
         name: formData.get("authorName") as string,
-        image: formData.get("authorImage") as string,
         bio: formData.get("authorBio") as string,
+        image: authorImageChanged
+          ? (formData.get("authorImage") as string)
+          : blogPost.author?.image || "",
       };
 
       // Remove original author fields
       formData.delete("authorName");
-      formData.delete("authorImage");
       formData.delete("authorBio");
 
       // Add author as JSON string
@@ -175,6 +219,11 @@ export function EditBlogPostDialog({
       // If image wasn't changed, don't send it
       if (!imageChanged && fileInputRef.current) {
         formData.delete("image");
+      }
+
+      // If author image wasn't changed, don't send it
+      if (!authorImageChanged && authorFileInputRef.current) {
+        formData.delete("authorImage");
       }
 
       await blogApi.updateBlogPost(blogPost.id.toString(), formData);
@@ -365,14 +414,57 @@ export function EditBlogPostDialog({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="authorImage">Author Image URL *</Label>
-                    <Input
-                      id="authorImage"
-                      name="authorImage"
-                      placeholder="Enter author image URL"
-                      defaultValue={blogPost.author?.image || ""}
-                      required
-                    />
+                    <Label>Author Image {!authorImagePreview && "*"}</Label>
+                    <div className="border-2 border-dashed rounded-md p-4 text-center">
+                      {authorImagePreview ? (
+                        <div className="relative">
+                          <Image
+                            src={authorImagePreview || "/placeholder.svg"}
+                            alt="Author Preview"
+                            width={100}
+                            height={100}
+                            className="mx-auto object-cover rounded-full"
+                            style={{ height: "100px", width: "100px" }}
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2 h-6 w-6"
+                            onClick={clearAuthorImage}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="py-4">
+                          <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                          <p className="mt-2 text-sm text-muted-foreground">
+                            Click to upload or drag and drop
+                          </p>
+                        </div>
+                      )}
+                      <Input
+                        ref={authorFileInputRef}
+                        id="authorImage"
+                        name="authorImage"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAuthorImageChange}
+                        required={!authorImagePreview}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => authorFileInputRef.current?.click()}
+                        className="mt-2"
+                      >
+                        {authorImagePreview
+                          ? "Change Author Image"
+                          : "Select Author Image"}
+                      </Button>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="authorBio">Author Bio *</Label>
