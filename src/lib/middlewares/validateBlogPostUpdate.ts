@@ -6,7 +6,7 @@ import { httpMessages } from "@/lib/utils/HttpMessage";
 // Author update schema (optional fields)
 const authorUpdateSchema = z.object({
   name: z.string().min(1).optional(),
-  image: z.string().url().optional(),
+  image: z.string().optional(),
   bio: z.string().optional(),
 });
 

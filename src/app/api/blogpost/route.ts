@@ -24,6 +24,10 @@ import { NextRequest, NextResponse } from "next/server";
  *               image:
  *                 type: string
  *                 format: binary
+ *                 description: Image for the blog post ( processed later)
+ *               authorImage:
+ *                 type: string
+ *                 format: binary
  *                 description: Image for the blog post (optional, processed later)
  *               title:
  *                 type: string
@@ -50,7 +54,6 @@ import { NextRequest, NextResponse } from "next/server";
  *                     description: Short bio of the author
  *                   image:
  *                     type: string
- *                     format: uri
  *                     description: Author's image URL
  *               tags:
  *                 type: array
@@ -101,7 +104,8 @@ export async function POST(req: NextRequest) {
   if (authResult) return authResult;
 
   const uploadFields = [
-    { fileField: "image", bodyField: "image" }, // Image field for blog post
+    { fileField: "image", bodyField: "image" },
+    { fileField: "authorImage", bodyField: "author.image" },
   ];
   const jsonFields = ["tags", "categories", "author"]; // Additional fields for blog post
   const numericFields = ["views"]; // Numeric fields for blog post

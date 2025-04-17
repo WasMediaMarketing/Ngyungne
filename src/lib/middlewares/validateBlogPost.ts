@@ -6,7 +6,7 @@ import { httpMessages } from "@/lib/utils/HttpMessage";
 // Author schema
 const authorSchema = z.object({
   name: z.string().min(1, "Author name is required").optional(),
-  image: z.string().url("Invalid URL format").optional(),
+  image: z.string().optional(),
   bio: z.string().optional(),
 });
 

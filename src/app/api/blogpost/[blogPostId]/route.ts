@@ -61,6 +61,9 @@ export async function GET(req: NextRequest) {
  *               image:
  *                 type: string
  *                 format: binary
+ *               authorImage:
+ *                 type: string
+ *                 format: binary
  *               tags:
  *                 type: array
  *                 items:
@@ -89,7 +92,10 @@ export async function PATCH(req: NextRequest) {
   const authResult = await isAuthenticated(req);
   if (authResult) return authResult;
 
-  const uploadFields = [{ fileField: "image", bodyField: "image" }];
+  const uploadFields = [
+    { fileField: "image", bodyField: "image" },
+    { fileField: "authorImage", bodyField: "author.image" },
+  ];
   const jsonFields = ["tags", "categories", "author"];
   const numericFields = ["views"];
   const booleanFields = ["isVisible"];
