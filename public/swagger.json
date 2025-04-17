@@ -15,7 +15,9 @@
       "delete": {
         "summary": "Delete an ambassador by ID",
         "description": "This endpoint deletes an ambassador from the system based on the provided ID.",
-        "tags": ["Ambassador"],
+        "tags": [
+          "Ambassador"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -55,7 +57,9 @@
       "patch": {
         "summary": "Update an ambassador by ID",
         "description": "This endpoint updates an ambassador's information based on the provided ID.",
-        "tags": ["Ambassador"],
+        "tags": [
+          "Ambassador"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -113,7 +117,9 @@
       "post": {
         "summary": "Create a new ambassador",
         "description": "This endpoint allows the user to create a new ambassador.",
-        "tags": ["Ambassador"],
+        "tags": [
+          "Ambassador"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -210,7 +216,9 @@
       "get": {
         "summary": "Get all ambassadors",
         "description": "This endpoint retrieves all ambassadors in the system. With authentication, it returns all ambassadors; without authentication, it returns only visible ambassadors.",
-        "tags": ["Ambassador"],
+        "tags": [
+          "Ambassador"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -235,7 +243,9 @@
       "delete": {
         "summary": "Delete ambassadors by their IDs",
         "description": "Delete ambassadors based on their IDs.",
-        "tags": ["Ambassador"],
+        "tags": [
+          "Ambassador"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -274,11 +284,484 @@
         }
       }
     },
+    "/api/blogPost/{blogPostId}": {
+      "get": {
+        "summary": "Get blog post by ID",
+        "tags": [
+          "BlogPost"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "blogPostId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Blog post retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Blog post not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update blog post by ID (supports file uploads)",
+        "tags": [
+          "BlogPost"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "readTime": {
+                    "type": "string"
+                  },
+                  "author": {
+                    "type": "object"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "views": {
+                    "type": "integer"
+                  },
+                  "isVisible": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Blog post updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update blog post by ID (JSON only, e.g. `isVisible`)",
+        "tags": [
+          "BlogPost"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "readTime": {
+                    "type": "string"
+                  },
+                  "author": {
+                    "type": "object"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "views": {
+                    "type": "integer"
+                  },
+                  "isVisible": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Blog post updated successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a blog post by ID",
+        "tags": [
+          "BlogPost"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "blogPostId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Blog post deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Blog post not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/blogPost": {
+      "post": {
+        "summary": "Create a new blog post",
+        "description": "This endpoint creates a new blog post with title, content, author details, tags, categories, and other required information.",
+        "operationId": "createBlogPost",
+        "tags": [
+          "BlogPost"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image for the blog post (optional, processed later)"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the blog post"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Short description of the blog post"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date of the blog post"
+                  },
+                  "readTime": {
+                    "type": "string",
+                    "description": "Estimated read time of the blog post"
+                  },
+                  "author": {
+                    "type": "object",
+                    "description": "Author details (name, bio, etc.)",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Author's name"
+                      },
+                      "bio": {
+                        "type": "string",
+                        "description": "Short bio of the author"
+                      },
+                      "image": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Author's image URL"
+                      }
+                    }
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tags related to the blog post"
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Categories the blog post belongs to"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Content of the blog post"
+                  },
+                  "views": {
+                    "type": "integer",
+                    "description": "Number of views for the blog post (optional)"
+                  },
+                  "isVisible": {
+                    "type": "boolean",
+                    "description": "Whether the blog post is visible or not (optional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Blog post created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error"
+          },
+          "401": {
+            "description": "Unauthorized or invalid token"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve all blog posts or published blog posts",
+        "description": "Fetches all blog posts for authenticated users, or only published blog posts for unauthenticated users.",
+        "operationId": "getBlogPosts",
+        "tags": [
+          "BlogPost"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of blog posts (all blog posts for authenticated users, only published blog posts for unauthenticated)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "views": {
+                        "type": "integer"
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "categories": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete multiple blog posts",
+        "description": "This endpoint deletes multiple blog posts by their IDs, which are passed in the query parameters.",
+        "operationId": "deleteBlogPosts",
+        "tags": [
+          "BlogPost"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "blogPostIds",
+            "required": true,
+            "description": "Comma-separated list of blog post IDs to be deleted.",
+            "schema": {
+              "type": "string",
+              "example": "1,2,3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Blog posts deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message indicating the deletion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing blogPostIds"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/book-event/{bookEventId}": {
       "patch": {
         "summary": "Update a booked event",
         "description": "This endpoint allows you to update an existing booked event, including ticket number and accommodation details.",
-        "tags": ["Book Event"],
+        "tags": [
+          "Book Event"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -348,7 +831,9 @@
       "get": {
         "summary": "Get all booked events",
         "description": "Retrieve all booked events.",
-        "tags": ["Book Event"],
+        "tags": [
+          "Book Event"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -376,7 +861,9 @@
       "delete": {
         "summary": "Delete a booked event",
         "description": "Delete a booked event based on its ID.",
-        "tags": ["Book Event"],
+        "tags": [
+          "Book Event"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -418,7 +905,9 @@
       "post": {
         "summary": "Create a new event booking",
         "description": "This endpoint allows the bookEvent to create a new event booking.",
-        "tags": ["BookEvent"],
+        "tags": [
+          "BookEvent"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -500,7 +989,9 @@
       "get": {
         "summary": "Get all event bookings",
         "description": "This endpoint retrieves all event bookings in the system.",
-        "tags": ["BookEvent"],
+        "tags": [
+          "BookEvent"
+        ],
         "responses": {
           "200": {
             "description": "List of event bookings retrieved successfully"
@@ -513,7 +1004,9 @@
       "delete": {
         "summary": "Delete book-events by their IDs",
         "description": "Delete multiple book-events based on their book-event IDs.",
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -556,7 +1049,9 @@
       "get": {
         "summary": "Get cause by ID",
         "description": "Fetch cause details by its cause ID.",
-        "tags": ["Cause"],
+        "tags": [
+          "Cause"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -653,7 +1148,9 @@
       "patch": {
         "summary": "Update cause by ID",
         "description": "Update the cause's details based on its cause ID.",
-        "tags": ["Cause"],
+        "tags": [
+          "Cause"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -773,7 +1270,9 @@
       "put": {
         "summary": "Update cause by ID (non-file related updates)",
         "description": "Update cause details (only handles non-file related updates).",
-        "tags": ["Cause"],
+        "tags": [
+          "Cause"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -867,7 +1366,9 @@
       "delete": {
         "summary": "Delete cause by ID",
         "description": "Delete a cause based on its cause ID.",
-        "tags": ["Cause"],
+        "tags": [
+          "Cause"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -900,7 +1401,9 @@
         "summary": "Create a new cause",
         "description": "This endpoint creates a new cause with images, updates, goals, and other required information.",
         "operationId": "createCause",
-        "tags": ["Cause"],
+        "tags": [
+          "Cause"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -1049,7 +1552,9 @@
         "summary": "Retrieve all causes or published causes",
         "description": "Fetches all causes for authenticated users, or only published causes for unauthenticated users.",
         "operationId": "getCauses",
-        "tags": ["Cause"],
+        "tags": [
+          "Cause"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -1100,7 +1605,9 @@
         "summary": "Delete multiple causes",
         "description": "This endpoint deletes multiple causes by their IDs, which are passed in the query parameters.",
         "operationId": "deleteCauses",
-        "tags": ["Cause"],
+        "tags": [
+          "Cause"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -1163,7 +1670,9 @@
       "delete": {
         "summary": "Delete multiple contacts by their IDs",
         "description": "This endpoint deletes multiple contact entries based on the provided comma-separated list of contact IDs.",
-        "tags": ["Contact"],
+        "tags": [
+          "Contact"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1207,7 +1716,9 @@
       "get": {
         "summary": "Get all contacts",
         "description": "This endpoint retrieves all the contact entries in the system.",
-        "tags": ["Contact"],
+        "tags": [
+          "Contact"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -1235,7 +1746,9 @@
       "post": {
         "summary": "Create a new contact",
         "description": "This endpoint allows you to create a new contact entry in the system.",
-        "tags": ["Contact"],
+        "tags": [
+          "Contact"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1293,7 +1806,9 @@
       "get": {
         "summary": "Get course by ID",
         "description": "Fetch course details by its course ID.",
-        "tags": ["Course"],
+        "tags": [
+          "Course"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -1393,7 +1908,9 @@
       "patch": {
         "summary": "Update course by ID",
         "description": "Update the course's details based on its course ID.",
-        "tags": ["Course"],
+        "tags": [
+          "Course"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -1528,7 +2045,9 @@
       "put": {
         "summary": "Update course visibility by ID",
         "description": "Update only the visibility of the course based on its course ID.",
-        "tags": ["Course"],
+        "tags": [
+          "Course"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -1592,7 +2111,9 @@
       "delete": {
         "summary": "Delete course by ID",
         "description": "Delete a course based on its course ID.",
-        "tags": ["Course"],
+        "tags": [
+          "Course"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -1625,7 +2146,9 @@
         "summary": "Create a new course",
         "description": "This endpoint creates a new course with images, instructor data, modules, and other required information.",
         "operationId": "createCourse",
-        "tags": ["Course"],
+        "tags": [
+          "Course"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -1845,7 +2368,9 @@
         "summary": "Retrieve all courses or published courses",
         "description": "Fetches all courses for authenticated users, or only published courses for unauthenticated users.",
         "operationId": "getCourses",
-        "tags": ["Course"],
+        "tags": [
+          "Course"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -1892,7 +2417,9 @@
         "summary": "Delete multiple courses",
         "description": "This endpoint deletes multiple courses by their IDs, which are passed in the query parameters.",
         "operationId": "deleteCourses",
-        "tags": ["Course"],
+        "tags": [
+          "Course"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -1979,7 +2506,9 @@
       "delete": {
         "summary": "Delete a donation by its ID",
         "description": "This endpoint deletes a donation from the system based on the provided donation ID.",
-        "tags": ["Donation"],
+        "tags": [
+          "Donation"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -2025,7 +2554,9 @@
       "post": {
         "summary": "Create a new donation",
         "description": "This endpoint allows the user to create a new donation.",
-        "tags": ["Donation"],
+        "tags": [
+          "Donation"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2082,7 +2613,9 @@
       "get": {
         "summary": "Get all donations",
         "description": "This endpoint retrieves all donations in the system.",
-        "tags": ["Donation"],
+        "tags": [
+          "Donation"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -2110,7 +2643,9 @@
       "delete": {
         "summary": "Delete donations by their IDs",
         "description": "Delete donations based on their donation IDs.",
-        "tags": ["Donation"],
+        "tags": [
+          "Donation"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -2153,7 +2688,9 @@
       "get": {
         "summary": "Get event by ID",
         "description": "Fetch event details by its event ID.",
-        "tags": ["Event"],
+        "tags": [
+          "Event"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -2270,7 +2807,9 @@
       "patch": {
         "summary": "Update event by ID",
         "description": "Update the event's details based on its event ID.",
-        "tags": ["Event"],
+        "tags": [
+          "Event"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -2424,7 +2963,9 @@
       "put": {
         "summary": "Update event by ID(only for no file related updates, epcifically made for isvisible update)",
         "description": "Update the event's details based on its event ID, does not havndle any files",
-        "tags": ["Event"],
+        "tags": [
+          "Event"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -2578,7 +3119,9 @@
       "delete": {
         "summary": "Delete event by ID",
         "description": "Delete an event based on its event ID.",
-        "tags": ["Event"],
+        "tags": [
+          "Event"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -2611,7 +3154,9 @@
         "summary": "Create a new event",
         "description": "This endpoint creates a new event with images, schedule, teacher data, and other required information.",
         "operationId": "createEvent",
-        "tags": ["Event"],
+        "tags": [
+          "Event"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -2797,7 +3342,9 @@
         "summary": "Retrieve all events or published events",
         "description": "Fetches all events for authenticated users, or only published events for unauthenticated users.",
         "operationId": "getEvents",
-        "tags": ["Event"],
+        "tags": [
+          "Event"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -2844,7 +3391,9 @@
         "summary": "Delete multiple events",
         "description": "This endpoint deletes multiple events by their IDs, which are passed in the query parameters.",
         "operationId": "deleteEvents",
-        "tags": ["Event"],
+        "tags": [
+          "Event"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -2931,7 +3480,9 @@
       "get": {
         "summary": "Get a FAQ by ID",
         "description": "Retrieves a specific FAQ by its ID",
-        "tags": ["FAQ"],
+        "tags": [
+          "FAQ"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -2959,7 +3510,9 @@
       "patch": {
         "summary": "Update a FAQ",
         "description": "Updates a specific FAQ by its ID",
-        "tags": ["FAQ"],
+        "tags": [
+          "FAQ"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3030,7 +3583,9 @@
       "delete": {
         "summary": "Delete a FAQ",
         "description": "Deletes a specific FAQ by its ID",
-        "tags": ["FAQ"],
+        "tags": [
+          "FAQ"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3068,7 +3623,9 @@
       "post": {
         "summary": "Create a new FAQ",
         "description": "Creates a new FAQ entry in the system",
-        "tags": ["FAQ"],
+        "tags": [
+          "FAQ"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3080,7 +3637,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["question", "answer"],
+                "required": [
+                  "question",
+                  "answer"
+                ],
                 "properties": {
                   "question": {
                     "type": "string",
@@ -3126,7 +3686,9 @@
       "get": {
         "summary": "Get all FAQs",
         "description": "Retrieves all FAQs in the system, with an option to filter visible ones based on the user's authentication",
-        "tags": ["FAQ"],
+        "tags": [
+          "FAQ"
+        ],
         "responses": {
           "200": {
             "description": "List of FAQs retrieved successfully"
@@ -3139,7 +3701,9 @@
       "delete": {
         "summary": "Delete multiple FAQs",
         "description": "Deletes multiple FAQs based on their IDs",
-        "tags": ["FAQ"],
+        "tags": [
+          "FAQ"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3180,7 +3744,9 @@
       "get": {
         "summary": "Get a gallery item by ID",
         "description": "Retrieves a specific gallery item by its ID",
-        "tags": ["Gallery"],
+        "tags": [
+          "Gallery"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -3208,7 +3774,9 @@
       "patch": {
         "summary": "Update a gallery item",
         "description": "Updates a gallery item with the provided data",
-        "tags": ["Gallery"],
+        "tags": [
+          "Gallery"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3247,7 +3815,10 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["photo", "video"],
+                    "enum": [
+                      "photo",
+                      "video"
+                    ],
                     "description": "Type of the gallery item"
                   },
                   "image": {
@@ -3329,7 +3900,9 @@
       "delete": {
         "summary": "Delete a gallery item",
         "description": "Deletes a gallery item by its ID",
-        "tags": ["Gallery"],
+        "tags": [
+          "Gallery"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3367,7 +3940,9 @@
       "put": {
         "summary": "Update gallery item visibility",
         "description": "Updates the visibility status of a gallery item",
-        "tags": ["Gallery"],
+        "tags": [
+          "Gallery"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3391,7 +3966,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["isVisible"],
+                "required": [
+                  "isVisible"
+                ],
                 "properties": {
                   "isVisible": {
                     "type": "boolean",
@@ -3425,7 +4002,9 @@
       "post": {
         "summary": "Create a new gallery item",
         "description": "Creates a new gallery item (photo or video) with the provided data",
-        "tags": ["Gallery"],
+        "tags": [
+          "Gallery"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3437,7 +4016,12 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["title", "description", "type", "image"],
+                "required": [
+                  "title",
+                  "description",
+                  "type",
+                  "image"
+                ],
                 "properties": {
                   "title": {
                     "type": "string",
@@ -3453,7 +4037,10 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["photo", "video"],
+                    "enum": [
+                      "photo",
+                      "video"
+                    ],
                     "description": "Type of the gallery item"
                   },
                   "image": {
@@ -3532,7 +4119,9 @@
       "get": {
         "summary": "Get all gallery items",
         "description": "Retrieves all gallery items. With authentication, it returns all items; without authentication, it returns only visible items.",
-        "tags": ["Gallery"],
+        "tags": [
+          "Gallery"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -3557,7 +4146,9 @@
       "delete": {
         "summary": "Delete multiple gallery items",
         "description": "Deletes multiple gallery items based on their IDs",
-        "tags": ["Gallery"],
+        "tags": [
+          "Gallery"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3598,7 +4189,9 @@
       "patch": {
         "summary": "Update a course registration",
         "description": "Update details of an existing course registration, such as experience level or special requirements.",
-        "tags": ["Join Course"],
+        "tags": [
+          "Join Course"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -3673,7 +4266,9 @@
       "get": {
         "summary": "Get a specific course registration",
         "description": "Retrieve details of a specific course registration.",
-        "tags": ["Join Course"],
+        "tags": [
+          "Join Course"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -3713,7 +4308,9 @@
       "delete": {
         "summary": "Delete a course registration",
         "description": "Remove a specific course registration from the system.",
-        "tags": ["Join Course"],
+        "tags": [
+          "Join Course"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -3755,7 +4352,9 @@
       "post": {
         "summary": "Register for a course",
         "description": "This endpoint allows a user to register for a course.",
-        "tags": ["JoinCourse"],
+        "tags": [
+          "JoinCourse"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3838,7 +4437,9 @@
       "get": {
         "summary": "Get all course registrations",
         "description": "Retrieves all course registrations.",
-        "tags": ["JoinCourse"],
+        "tags": [
+          "JoinCourse"
+        ],
         "responses": {
           "200": {
             "description": "List of course registrations retrieved successfully."
@@ -3851,7 +4452,9 @@
       "delete": {
         "summary": "Delete course registrations by their IDs",
         "description": "Delete multiple course registrations based on their IDs.",
-        "tags": ["JoinCourse"],
+        "tags": [
+          "JoinCourse"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -3894,7 +4497,9 @@
       "get": {
         "summary": "Get a newsletter subscriber by ID",
         "description": "Retrieves a specific newsletter subscriber by ID (requires authentication)",
-        "tags": ["Newsletter"],
+        "tags": [
+          "Newsletter"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3930,7 +4535,9 @@
       "delete": {
         "summary": "Delete a newsletter subscriber",
         "description": "Deletes a specific newsletter subscriber by ID (requires authentication)",
-        "tags": ["Newsletter"],
+        "tags": [
+          "Newsletter"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3968,14 +4575,18 @@
       "post": {
         "summary": "Subscribe to newsletter",
         "description": "Allows users to subscribe to the newsletter with their email",
-        "tags": ["Newsletter"],
+        "tags": [
+          "Newsletter"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email"],
+                "required": [
+                  "email"
+                ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -4006,7 +4617,9 @@
       "get": {
         "summary": "Get all newsletter subscribers",
         "description": "Retrieves all newsletter subscribers (requires authentication)",
-        "tags": ["Newsletter"],
+        "tags": [
+          "Newsletter"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4027,7 +4640,9 @@
       "delete": {
         "summary": "Delete multiple newsletter subscribers",
         "description": "Deletes multiple newsletter subscribers based on their IDs (requires authentication)",
-        "tags": ["Newsletter"],
+        "tags": [
+          "Newsletter"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4068,7 +4683,9 @@
       "get": {
         "summary": "Get a page by ID",
         "description": "Retrieves a specific page by ID (requires authentication for draft pages)",
-        "tags": ["Pages"],
+        "tags": [
+          "Pages"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -4095,7 +4712,9 @@
       "patch": {
         "summary": "Update a page",
         "description": "Updates a specific page by ID (requires authentication)",
-        "tags": ["Pages"],
+        "tags": [
+          "Pages"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4127,7 +4746,10 @@
                   },
                   "location": {
                     "type": "string",
-                    "enum": ["header", "footer"]
+                    "enum": [
+                      "header",
+                      "footer"
+                    ]
                   },
                   "parentPage": {
                     "type": "string"
@@ -4137,7 +4759,10 @@
                   },
                   "status": {
                     "type": "string",
-                    "enum": ["draft", "published"]
+                    "enum": [
+                      "draft",
+                      "published"
+                    ]
                   },
                   "metaTitle": {
                     "type": "string"
@@ -4174,7 +4799,9 @@
       "delete": {
         "summary": "Delete a page",
         "description": "Deletes a specific page by ID (requires authentication)",
-        "tags": ["Pages"],
+        "tags": [
+          "Pages"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4211,7 +4838,9 @@
       "post": {
         "summary": "Create a new page",
         "description": "Creates a new page with the provided data (requires authentication)",
-        "tags": ["Pages"],
+        "tags": [
+          "Pages"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4223,7 +4852,13 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["title", "slug", "location", "content", "status"],
+                "required": [
+                  "title",
+                  "slug",
+                  "location",
+                  "content",
+                  "status"
+                ],
                 "properties": {
                   "title": {
                     "type": "string",
@@ -4235,7 +4870,10 @@
                   },
                   "location": {
                     "type": "string",
-                    "enum": ["header", "footer"],
+                    "enum": [
+                      "header",
+                      "footer"
+                    ],
                     "description": "Where the page should appear in navigation"
                   },
                   "parentPage": {
@@ -4248,7 +4886,10 @@
                   },
                   "status": {
                     "type": "string",
-                    "enum": ["draft", "published"],
+                    "enum": [
+                      "draft",
+                      "published"
+                    ],
                     "description": "Publication status of the page"
                   },
                   "metaTitle": {
@@ -4286,7 +4927,9 @@
       "get": {
         "summary": "Get all pages",
         "description": "Retrieves all pages (requires authentication for draft pages)",
-        "tags": ["Pages"],
+        "tags": [
+          "Pages"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -4309,7 +4952,9 @@
       "delete": {
         "summary": "Delete multiple pages",
         "description": "Deletes multiple pages based on their IDs (requires authentication)",
-        "tags": ["Pages"],
+        "tags": [
+          "Pages"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4350,7 +4995,9 @@
       "get": {
         "summary": "Get a page by slug",
         "description": "Retrieves a specific published page by its slug",
-        "tags": ["Pages"],
+        "tags": [
+          "Pages"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -4379,7 +5026,9 @@
       "get": {
         "summary": "Get philosophy topic by ID",
         "description": "Fetch philosophy topic details by its ID.",
-        "tags": ["Philosophy"],
+        "tags": [
+          "Philosophy"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -4462,7 +5111,9 @@
       "patch": {
         "summary": "Update philosophy topic by ID",
         "description": "Update the philosophy topic's details based on its ID.",
-        "tags": ["Philosophy"],
+        "tags": [
+          "Philosophy"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -4568,7 +5219,9 @@
       "delete": {
         "summary": "Delete philosophy topic by ID",
         "description": "Delete a philosophy topic based on its ID.",
-        "tags": ["Philosophy"],
+        "tags": [
+          "Philosophy"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -4601,7 +5254,9 @@
         "summary": "Create a new philosophy topic",
         "description": "This endpoint creates a new philosophy topic with necessary details like title, content, quotes, and practices.",
         "operationId": "createPhilosophyTopic",
-        "tags": ["PhilosophyTopic"],
+        "tags": [
+          "PhilosophyTopic"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4730,7 +5385,9 @@
         "summary": "Retrieve all philosophy topics or only visible ones",
         "description": "Fetches all philosophy topics for authenticated users or only visible ones for unauthenticated users.",
         "operationId": "getPhilosophyTopics",
-        "tags": ["PhilosophyTopic"],
+        "tags": [
+          "PhilosophyTopic"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4811,7 +5468,9 @@
         "summary": "Delete multiple philosophy topics",
         "description": "This endpoint deletes multiple philosophy topics by their IDs, which are passed in the query parameters.",
         "operationId": "deletePhilosophyTopics",
-        "tags": ["PhilosophyTopic"],
+        "tags": [
+          "PhilosophyTopic"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4886,7 +5545,9 @@
       "patch": {
         "summary": "Update a retreat registration",
         "description": "Update details of an existing retreat registration, such as accommodation type or dietary restrictions.",
-        "tags": ["Register Retreat"],
+        "tags": [
+          "Register Retreat"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -4971,7 +5632,9 @@
       "get": {
         "summary": "Get a specific retreat registration",
         "description": "Retrieve details of a specific retreat registration.",
-        "tags": ["Register Retreat"],
+        "tags": [
+          "Register Retreat"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -5011,7 +5674,9 @@
       "delete": {
         "summary": "Delete a retreat registration",
         "description": "Remove a specific retreat registration from the system.",
-        "tags": ["Register Retreat"],
+        "tags": [
+          "Register Retreat"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -5053,7 +5718,9 @@
       "post": {
         "summary": "Register for a retreat",
         "description": "This endpoint allows a user to register for a retreat.",
-        "tags": ["RegisterRetreat"],
+        "tags": [
+          "RegisterRetreat"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5141,7 +5808,9 @@
       "get": {
         "summary": "Get all retreat registrations",
         "description": "Retrieves all retreat registrations.",
-        "tags": ["RegisterRetreat"],
+        "tags": [
+          "RegisterRetreat"
+        ],
         "responses": {
           "200": {
             "description": "List of retreat registrations retrieved successfully."
@@ -5154,7 +5823,9 @@
       "delete": {
         "summary": "Delete retreat registrations by their IDs",
         "description": "Delete multiple retreat registrations based on their IDs.",
-        "tags": ["RegisterRetreat"],
+        "tags": [
+          "RegisterRetreat"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -5197,7 +5868,9 @@
       "delete": {
         "summary": "Delete a retreat by its ID",
         "description": "This endpoint deletes a retreat from the system based on the provided retreat ID.",
-        "tags": ["Retreat"],
+        "tags": [
+          "Retreat"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -5241,7 +5914,9 @@
       "patch": {
         "summary": "Update retreat information by its ID",
         "description": "This endpoint updates the retreat details based on the provided retreat ID.",
-        "tags": ["Retreat"],
+        "tags": [
+          "Retreat"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -5329,7 +6004,9 @@
       "post": {
         "summary": "Create a new retreat",
         "description": "This endpoint allows the user to create a new retreat.",
-        "tags": ["Retreat"],
+        "tags": [
+          "Retreat"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5429,7 +6106,9 @@
       "get": {
         "summary": "Get all retreats",
         "description": "This endpoint retrieves all retreats in the system, with an option to filter visible ones based on the user’s authentication.",
-        "tags": ["Retreat"],
+        "tags": [
+          "Retreat"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -5454,7 +6133,9 @@
       "delete": {
         "summary": "Delete retreats by their IDs",
         "description": "Delete multiple retreats based on their retreat IDs.",
-        "tags": ["Retreat"],
+        "tags": [
+          "Retreat"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -5497,7 +6178,9 @@
       "post": {
         "summary": "Create or update the system settings",
         "description": "This endpoint allows administrators to create or update the system settings.",
-        "tags": ["Setting"],
+        "tags": [
+          "Setting"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -5561,7 +6244,12 @@
                       "properties": {
                         "type": {
                           "type": "string",
-                          "enum": ["BANK", "ESEWA", "KHALTI", "OTHER"],
+                          "enum": [
+                            "BANK",
+                            "ESEWA",
+                            "KHALTI",
+                            "OTHER"
+                          ],
                           "example": "BANK"
                         },
                         "bank": {
@@ -5690,7 +6378,9 @@
       "get": {
         "summary": "Get the system settings",
         "description": "This endpoint retrieves the current system settings.",
-        "tags": ["Setting"],
+        "tags": [
+          "Setting"
+        ],
         "responses": {
           "200": {
             "description": "Settings retrieved successfully"
@@ -5706,7 +6396,9 @@
       "patch": {
         "summary": "Update the system settings",
         "description": "This endpoint allows administrators to update the system settings.",
-        "tags": ["Setting"],
+        "tags": [
+          "Setting"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -5764,7 +6456,12 @@
                       "properties": {
                         "type": {
                           "type": "string",
-                          "enum": ["BANK", "ESEWA", "KHALTI", "OTHER"]
+                          "enum": [
+                            "BANK",
+                            "ESEWA",
+                            "KHALTI",
+                            "OTHER"
+                          ]
                         },
                         "bank": {
                           "type": "object"
@@ -5833,7 +6530,9 @@
       "delete": {
         "summary": "Reset the system settings to defaults",
         "description": "This endpoint allows administrators to reset the system settings to default values.",
-        "tags": ["Setting"],
+        "tags": [
+          "Setting"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -5866,7 +6565,9 @@
       "get": {
         "summary": "Get user by ID",
         "description": "Fetch a user's details by their user ID.",
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -5925,7 +6626,9 @@
       "patch": {
         "summary": "Update user by ID",
         "description": "Update the user's details based on their user ID.",
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -6043,7 +6746,9 @@
       "delete": {
         "summary": "Delete user by ID",
         "description": "Delete a user based on their user ID.",
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -6075,7 +6780,9 @@
       "get": {
         "summary": "Initializes the admin user if it doesn't exist",
         "description": "Checks if an admin user exists in the database, and if not, creates one with the email and password specified in environment variables.",
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "responses": {
           "200": {
             "description": "Admin check complete. Admin user exists or has been created successfully.",
@@ -6116,7 +6823,9 @@
       "post": {
         "summary": "Login user and return JWT token",
         "description": "This endpoint allows a user to log in by providing their email and password. On successful login, a JWT token is returned.",
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -6191,7 +6900,9 @@
       "post": {
         "summary": "Create a new user",
         "description": "This endpoint creates a new user in the system.",
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -6213,7 +6924,12 @@
                   },
                   "role": {
                     "type": "string",
-                    "enum": ["user", "admin", "volunteer", "donator"],
+                    "enum": [
+                      "user",
+                      "admin",
+                      "volunteer",
+                      "donator"
+                    ],
                     "description": "Role of the user"
                   },
                   "password": {
@@ -6251,7 +6967,9 @@
       "get": {
         "summary": "Get all users",
         "description": "This endpoint retrieves all users in the system.",
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -6279,7 +6997,9 @@
       "delete": {
         "summary": "Delete users by their IDs",
         "description": "Delete multiple users based on their user IDs.",
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -6322,7 +7042,9 @@
       "delete": {
         "summary": "Delete a volunteer by its ID",
         "description": "This endpoint deletes a volunteer from the system based on the provided volunteer ID.",
-        "tags": ["Volunteer"],
+        "tags": [
+          "Volunteer"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -6368,7 +7090,9 @@
       "post": {
         "summary": "Create a new volunteer",
         "description": "This endpoint allows the user to create a new volunteer.",
-        "tags": ["Volunteer"],
+        "tags": [
+          "Volunteer"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -6432,7 +7156,9 @@
       "get": {
         "summary": "Get all volunteers",
         "description": "This endpoint retrieves all volunteers in the system.",
-        "tags": ["Volunteer"],
+        "tags": [
+          "Volunteer"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -6457,7 +7183,9 @@
       "delete": {
         "summary": "Delete volunteers by their IDs",
         "description": "Delete volunteers based on their volunteer IDs.",
-        "tags": ["Volunteer"],
+        "tags": [
+          "Volunteer"
+        ],
         "parameters": [
           {
             "in": "query",

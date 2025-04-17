@@ -12,6 +12,7 @@ import { CourseController } from "./courseController";
 import { JoinCourseController } from "./joinCourseController";
 import { AmbassadorController } from "./ambassadorController";
 import { PageController } from "./pageController";
+import { BlogPostController } from "./blogPostController";
 export {
   UserController,
   DonationController,
@@ -27,4 +28,5 @@ export {
   JoinCourseController,
   AmbassadorController,
   PageController,
+  BlogPostController,
 };
