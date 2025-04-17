@@ -254,3 +254,11 @@ export async function DELETE(req: NextRequest) {
   console.log("DELETE /api/philosophy - Processing request");
   return philosophyTopicController.deletePhilosophyTopics(req);
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "25mb", // or whatever limit you want
+    },
+  },
+};

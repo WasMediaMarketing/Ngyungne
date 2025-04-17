@@ -5,7 +5,7 @@ import { handleMultipartRequest } from "@/lib/utils/multipartHandler";
 
 /**
  * @openapi
- * /api/blogPost/{blogPostId}:
+ * /api/blogpost/{blogPostId}:
  *   get:
  *     summary: Get blog post by ID
  *     tags:
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * @openapi
- * /api/blogPost/{blogPostId}:
+ * /api/blogpost/{blogPostId}:
  *   patch:
  *     summary: Update blog post by ID (supports file uploads)
  *     tags:
@@ -113,7 +113,7 @@ export async function PATCH(req: NextRequest) {
 
 /**
  * @openapi
- * /api/blogPost/{blogPostId}:
+ * /api/blogpost/{blogPostId}:
  *   put:
  *     summary: Update blog post by ID (JSON only, e.g. `isVisible`)
  *     tags:
@@ -175,7 +175,7 @@ export async function PUT(req: NextRequest) {
 
 /**
  * @openapi
- * /api/blogPost/{blogPostId}:
+ * /api/blogpost/{blogPostId}:
  *   delete:
  *     summary: Delete a blog post by ID
  *     tags:
@@ -203,3 +203,11 @@ export async function DELETE(req: NextRequest) {
   const blogPostController = createBlogPostController();
   return blogPostController.deleteBlogPost(req);
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "25mb", // or whatever limit you want
+    },
+  },
+};
