@@ -475,9 +475,10 @@ export default function Blog() {
                             {post.readTime || "5 min read"}
                           </div>
                         </div>
-                        <p className="text-maroon-700 text-sm line-clamp-3 mb-4">
-                          {post.content.substring(0, 150)}...
-                        </p>
+                        <p
+                          className="text-maroon-700 text-sm line-clamp-3 mb-4"
+                          dangerouslySetInnerHTML={{ __html: post.content }}
+                        ></p>
                         <div className="flex flex-wrap gap-1 mb-2">
                           {Array.isArray(post.tags) &&
                             post.tags.slice(0, 2).map((tag) => (
