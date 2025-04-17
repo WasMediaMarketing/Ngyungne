@@ -115,9 +115,6 @@ export function EditBlogPostDialog({
   }, [blogPost]);
 
   // Keep the preview functionality using FileReader, but don't convert the actual file upload
-  // Only modify the handleImageChange and handleAuthorImageChange functions to separate preview from file handling
-
-  // In the handleImageChange function, keep the preview but don't modify the file
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -183,10 +180,12 @@ export function EditBlogPostDialog({
       // Handle tags and categories as arrays
       const tagsString = formData.get("tags") as string;
       const categoriesString = formData.get("categories") as string;
+      const metaKeywordsString = formData.get("metaKeywords") as string;
 
       // Remove original string values
       formData.delete("tags");
       formData.delete("categories");
+      formData.delete("metaKeywords");
 
       // Add as JSON strings
       formData.append(
@@ -199,14 +198,18 @@ export function EditBlogPostDialog({
           categoriesString.split(",").map((category) => category.trim())
         )
       );
+      formData.append(
+        "metaKeywords",
+        JSON.stringify(
+          metaKeywordsString.split(",").map((keyword) => keyword.trim())
+        )
+      );
 
       // Handle author as an object
       const author: IAuthor = {
         name: formData.get("authorName") as string,
         bio: formData.get("authorBio") as string,
-        image: authorImageChanged
-          ? (formData.get("authorImage") as string)
-          : blogPost.author?.image || "",
+        image: blogPost.author?.image || "", // Keep existing image if not changed
       };
 
       // Remove original author fields
@@ -349,6 +352,39 @@ export function EditBlogPostDialog({
 
                 <div className="pt-2 text-sm text-muted-foreground">
                   <p>Views: {blogPost.views || 0}</p>
+                </div>
+
+                {/* SEO Meta Information */}
+                <div className="space-y-4 border rounded-md p-4 mt-4">
+                  <h3 className="font-medium">SEO Information</h3>
+                  <div className="space-y-2">
+                    <Label htmlFor="metaTitle">Meta Title</Label>
+                    <Input
+                      id="metaTitle"
+                      name="metaTitle"
+                      placeholder="Enter SEO title (optional)"
+                      defaultValue={blogPost.metaTitle || ""}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="metaDescription">Meta Description</Label>
+                    <Textarea
+                      id="metaDescription"
+                      name="metaDescription"
+                      placeholder="Enter SEO description (optional)"
+                      rows={2}
+                      defaultValue={blogPost.metaDescription || ""}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="metaKeywords">Meta Keywords</Label>
+                    <Input
+                      id="metaKeywords"
+                      name="metaKeywords"
+                      placeholder="Enter keywords separated by commas (optional)"
+                      defaultValue={blogPost.metaKeywords?.join(", ") || ""}
+                    />
+                  </div>
                 </div>
               </div>
 

@@ -90,9 +90,6 @@ export function AddBlogPostDialog({
   );
 
   // Keep the preview functionality using FileReader, but don't convert the actual file upload
-  // Only modify the handleImageChange and handleAuthorImageChange functions to separate preview from file handling
-
-  // In the handleImageChange function, keep the preview but don't modify the file
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -150,10 +147,12 @@ export function AddBlogPostDialog({
       // Handle tags and categories as arrays
       const tagsString = formData.get("tags") as string;
       const categoriesString = formData.get("categories") as string;
+      const metaKeywordsString = formData.get("metaKeywords") as string;
 
       // Remove original string values
       formData.delete("tags");
       formData.delete("categories");
+      formData.delete("metaKeywords");
 
       // Add as JSON strings
       formData.append(
@@ -166,12 +165,18 @@ export function AddBlogPostDialog({
           categoriesString.split(",").map((category) => category.trim())
         )
       );
+      formData.append(
+        "metaKeywords",
+        JSON.stringify(
+          metaKeywordsString.split(",").map((keyword) => keyword.trim())
+        )
+      );
 
       // Handle author as an object
       const author: IAuthor = {
         name: formData.get("authorName") as string,
         bio: formData.get("authorBio") as string,
-        image: authorImagePreview || "", // Use the preview URL or an empty string
+        image: "", // This will be updated by the server when the authorImage is processed
       };
 
       // Remove original author fields
@@ -180,6 +185,11 @@ export function AddBlogPostDialog({
 
       // Add author as JSON string
       formData.append("author", JSON.stringify(author));
+
+      // Handle isVisible properly - convert "on" to true
+      const isVisibleValue = formData.get("isVisible");
+      formData.delete("isVisible");
+      formData.append("isVisible", isVisibleValue === "on" ? "true" : "false");
 
       // Add current date if not provided
       if (!formData.get("date")) {
@@ -287,6 +297,36 @@ export function AddBlogPostDialog({
                 <div className="flex items-center space-x-2 pt-4">
                   <Switch id="isVisible" name="isVisible" defaultChecked />
                   <Label htmlFor="isVisible">Publish immediately</Label>
+                </div>
+
+                {/* SEO Meta Information */}
+                <div className="space-y-4 border rounded-md p-4 mt-4">
+                  <h3 className="font-medium">SEO Information</h3>
+                  <div className="space-y-2">
+                    <Label htmlFor="metaTitle">Meta Title</Label>
+                    <Input
+                      id="metaTitle"
+                      name="metaTitle"
+                      placeholder="Enter SEO title (optional)"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="metaDescription">Meta Description</Label>
+                    <Textarea
+                      id="metaDescription"
+                      name="metaDescription"
+                      placeholder="Enter SEO description (optional)"
+                      rows={2}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="metaKeywords">Meta Keywords</Label>
+                    <Input
+                      id="metaKeywords"
+                      name="metaKeywords"
+                      placeholder="Enter keywords separated by commas (optional)"
+                    />
+                  </div>
                 </div>
               </div>
 

@@ -75,7 +75,7 @@ export default function AdminBlogPage() {
     setLoading(true);
     try {
       const blogPosts = await blogApi.getAdminBlogPosts();
-      setBlogPosts(blogPosts.data); // ✅ no `.data` here
+      setBlogPosts(blogPosts); // ✅ no `.data` here
     } catch (error) {
       console.error("Error fetching blog posts:", error);
     } finally {

@@ -6,6 +6,7 @@ const handleResponse = async (response: Response) => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     const errorMessage = errorData.message || "An error occurred";
+    toast.error("Error", { description: errorMessage });
     throw new Error(errorMessage);
   }
   return response;
@@ -26,7 +27,7 @@ const createAuthHeaders = (contentType = "application/json") => {
 
 export const blogApi = {
   // Get all blog posts (admin view - includes both visible and hidden posts)
-  getAdminBlogPosts: async (): Promise<{ data: IBlogPost[] }> => {
+  getAdminBlogPosts: async (): Promise<IBlogPost[]> => {
     try {
       const response = await fetch("/api/blogpost", {
         method: "GET",
@@ -34,7 +35,9 @@ export const blogApi = {
       });
 
       await handleResponse(response);
-      return await response.json(); // should be { data: IBlogPost[] }
+      const result = await response.json();
+      // Handle both { data: IBlogPost[] } and IBlogPost[] response formats
+      return Array.isArray(result) ? result : result.data || [];
     } catch (error) {
       console.error("Error fetching blog posts:", error);
       throw error;
@@ -42,14 +45,16 @@ export const blogApi = {
   },
 
   // Get all visible blog posts (public view - only includes published posts)
-  getPublicBlogPosts: async (): Promise<{ data: IBlogPost[] }> => {
+  getPublicBlogPosts: async (): Promise<IBlogPost[]> => {
     try {
       const response = await fetch("/api/blogpost", {
         method: "GET",
       });
 
       await handleResponse(response);
-      return await response.json();
+      const result = await response.json();
+      // Handle both { data: IBlogPost[] } and IBlogPost[] response formats
+      return Array.isArray(result) ? result : result.data || [];
     } catch (error) {
       console.error("Error fetching public blog posts:", error);
       throw error;
@@ -65,7 +70,9 @@ export const blogApi = {
       });
 
       await handleResponse(response);
-      return await response.json();
+      const result = await response.json();
+      // Handle both { data: IBlogPost } and IBlogPost response formats
+      return result.data || result;
     } catch (error) {
       console.error(`Error fetching blog post ${id}:`, error);
       throw error;
@@ -85,11 +92,12 @@ export const blogApi = {
       });
 
       await handleResponse(response);
-      const data = await response.json();
+      const result = await response.json();
       toast.success("Success", {
         description: "Blog post created successfully",
       });
-      return data;
+      // Handle both { data: IBlogPost } and IBlogPost response formats
+      return result.data || result;
     } catch (error) {
       console.error("Error creating blog post:", error);
       throw error;
@@ -112,11 +120,12 @@ export const blogApi = {
       });
 
       await handleResponse(response);
-      const data = await response.json();
+      const result = await response.json();
       toast.success("Success", {
         description: "Blog post updated successfully",
       });
-      return data;
+      // Handle both { data: IBlogPost } and IBlogPost response formats
+      return result.data || result;
     } catch (error) {
       console.error(`Error updating blog post ${id}:`, error);
       throw error;
@@ -136,11 +145,12 @@ export const blogApi = {
       });
 
       await handleResponse(response);
-      const data = await response.json();
+      const result = await response.json();
       toast.success("Success", {
         description: "Blog post updated successfully",
       });
-      return data;
+      // Handle both { data: IBlogPost } and IBlogPost response formats
+      return result.data || result;
     } catch (error) {
       console.error(`Error updating blog post ${id}:`, error);
       throw error;
