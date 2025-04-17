@@ -14,6 +14,7 @@ import { FaqService } from "./faqService";
 import { NewsletterService } from "./newsletterService";
 import { AmbassadorService } from "./ambassadorService";
 import { GalleryService } from "./galleryService";
+import { BlogPostService } from "./blogPostService";
 export {
   UserService,
   DonationService,
@@ -31,4 +32,5 @@ export {
   NewsletterService,
   AmbassadorService,
   GalleryService,
+  BlogPostService,
 };

@@ -16,6 +16,7 @@ import { Newsletter } from "./newsletter.model";
 import { AmbassadorModel } from "./ambassador.model";
 import { PageModel } from "./page.model";
 import { Gallery } from "./gallery.model";
+import { BlogPost } from "./blogPost.model";
 
 export {
   User,
@@ -35,4 +36,6 @@ export {
   SettingModel,
   AmbassadorModel,
   PageModel,
+  Gallery,
+  BlogPost,
 };

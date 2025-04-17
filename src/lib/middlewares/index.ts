@@ -22,6 +22,8 @@ import { validateJoinCourseInput } from "./validateJoinCourseInput";
 import { validateJoinCourseUpdate } from "./validateJoinCourseUpdate";
 import { validateAmbassadorInput } from "./validateAmbassadorInput";
 import { validatePageInput, validatePageUpdateInput } from "./validatePage";
+import { validateBlogPostInput } from "./validateBlogPost";
+import { validateBlogPostUpdate } from "./validateBlogPostUpdate";
 
 export {
   isAuthenticated,
@@ -49,4 +51,6 @@ export {
   validateAmbassadorInput,
   validatePageInput,
   validatePageUpdateInput,
+  validateBlogPostInput,
+  validateBlogPostUpdate,
 };

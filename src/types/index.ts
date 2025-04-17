@@ -54,6 +54,14 @@ import {
   CreateSettingInput,
   UpdateSettingInput,
 } from "./setting.types";
+
+import {
+  IBlogPost,
+  IAuthor,
+  IBlogPostInput,
+  IBlogPostUpdate,
+} from "./blogPost.types";
+import { IBlogPostService } from "./blogPostService.interface";
 export type {
   IUser,
   IUserInput,
@@ -115,4 +123,9 @@ export type {
   Setting,
   CreateSettingInput,
   UpdateSettingInput,
+  IBlogPost,
+  IAuthor,
+  IBlogPostInput,
+  IBlogPostUpdate,
+  IBlogPostService,
 };
