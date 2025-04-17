@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     { fileField: "image", bodyField: "image" },
     { fileField: "authorImage", bodyField: "author.image" },
   ];
-  const jsonFields = ["tags", "categories", "author"]; // Additional fields for blog post
+  const jsonFields = ["tags", "categories", "author", "metaKeywords"]; // Additional fields for blog post
   const numericFields = ["views"]; // Numeric fields for blog post
   const booleanFields = ["isVisible"]; // Optional visibility flag
 
