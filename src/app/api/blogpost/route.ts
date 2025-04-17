@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * @openapi
- * /api/blogPost:
+ * /api/blogpost:
  *   post:
  *     summary: Create a new blog post
  *     description: This endpoint creates a new blog post with title, content, author details, tags, categories, and other required information.
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
 
 /**
  * @openapi
- * /api/blogPost:
+ * /api/blogpost:
  *   get:
  *     summary: Retrieve all blog posts or published blog posts
  *     description: Fetches all blog posts for authenticated users, or only published blog posts for unauthenticated users.
@@ -183,7 +183,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * @openapi
- * /api/blogPost:
+ * /api/blogpost:
  *   delete:
  *     summary: Delete multiple blog posts
  *     description: This endpoint deletes multiple blog posts by their IDs, which are passed in the query parameters.
@@ -232,3 +232,11 @@ export async function DELETE(req: NextRequest) {
   const blogPostController = createBlogPostController();
   return blogPostController.deleteBlogPosts(req);
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "25mb", // or whatever limit you want
+    },
+  },
+};
