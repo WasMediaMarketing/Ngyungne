@@ -24,6 +24,10 @@ import { validateAmbassadorInput } from "./validateAmbassadorInput";
 import { validatePageInput, validatePageUpdateInput } from "./validatePage";
 import { validateBlogPostInput } from "./validateBlogPost";
 import { validateBlogPostUpdate } from "./validateBlogPostUpdate";
+import {
+  validateScriptureInput,
+  validateScriptureUpdate,
+} from "./validateScripture";
 
 export {
   isAuthenticated,
@@ -53,4 +57,6 @@ export {
   validatePageUpdateInput,
   validateBlogPostInput,
   validateBlogPostUpdate,
+  validateScriptureInput,
+  validateScriptureUpdate,
 };
