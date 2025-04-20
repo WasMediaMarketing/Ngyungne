@@ -10,6 +10,7 @@ export class UserController {
   constructor(userService: IUserService) {
     this.userService = userService;
   }
+
   async createUser(req: NextRequest): Promise<NextResponse> {
     try {
       const userData = await req.json();
@@ -75,7 +76,7 @@ export class UserController {
       return handleError();
     }
   }
-
+  
   async deleteUser(req: NextRequest): Promise<NextResponse> {
     try {
       const userId = req.nextUrl.pathname.split("/").pop();
@@ -88,6 +89,27 @@ export class UserController {
       return handleResponse(deletedUser);
     } catch (error) {
       console.error("deleteUserController error:", error);
+      return handleError();
+    }
+  }
+  async deleteUsers(req: NextRequest): Promise<NextResponse> {
+    try {
+      // Extract user IDs from query parameters
+      const url = req.nextUrl;
+      const userIds = url.searchParams.get("userIds");
+
+      if (!userIds) {
+        return handleError(httpMessages.BAD_REQUEST("User IDs are required"));
+      }
+
+      // Parse user IDs into an array
+      const userIdArray = userIds.split(",").map((id) => id.trim());
+
+      // Call the deleteUser method for each ID
+      const deletedUsers = await this.userService.deleteUsers(userIdArray);
+      return handleResponse(deletedUsers);
+    } catch (error) {
+      console.error("deleteUsersController error:", error);
       return handleError();
     }
   }

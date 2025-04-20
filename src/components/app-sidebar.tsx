@@ -10,6 +10,8 @@ import {
   FileText,
   Mail,
   UsersIcon,
+  FileQuestion,
+  HandCoins,
   LayoutDashboard,
 } from "lucide-react";
 
@@ -27,6 +29,7 @@ import {
 import Image from "next/image";
 // Import site config
 import { siteConfig } from "@/config/site";
+import { title } from "process";
 
 // Organization data
 const data = {
@@ -73,6 +76,15 @@ const data = {
         url: `/admin/${item.href}`,
       })),
     },
+    {
+      title: "Bookings",
+      url: "/admin/bookings",
+      icon: BookMarked,
+      items: siteConfig.mainNav.bookings.map((item) => ({
+        title: item.title,
+        url: `/admin/${item.href}`,
+      })),
+    },
   ],
 
   navSecondary: [
@@ -87,13 +99,23 @@ const data = {
       icon: UsersIcon,
     },
     {
+      title: "Enquiries",
+      url: "/admin/enquiries",
+      icon: FileQuestion,
+    },
+    {
+      title: "Donations",
+      url: "/admin/donations",
+      icon: HandCoins,
+    },
+    {
       title: "Newsletter",
       url: "/admin/newsletter",
       icon: Mail,
     },
     {
-      title: "Privacy Policy",
-      url: "/admin/privacy-policy",
+      title: "Pages",
+      url: "/admin/pages",
       icon: FileText,
     },
     {

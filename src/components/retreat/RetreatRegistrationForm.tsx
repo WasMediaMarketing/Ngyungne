@@ -16,8 +16,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -25,53 +23,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { retreatRegisterApi } from "@/utils/retreatRegisterApi";
+import { toast } from "sonner";
+import type { IRetreat } from "@/types";
+import Spinner from "../spinner";
 
+// Form validation schema
 const formSchema = z.object({
-  firstName: z.string().min(2, {
-    message: "First name must be at least 2 characters.",
-  }),
-  lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
   }),
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  phone: z.string().min(10, {
+  phoneNumber: z.string().min(10, {
     message: "Please enter a valid phone number.",
   }),
-  address: z.string().min(5, {
-    message: "Please enter your full address.",
+  address: z.string().optional(),
+  MeditationExperience: z.string().min(1, {
+    message: "Please select your meditation experience level.",
   }),
-  dietaryRestrictions: z.string().optional(),
-  meditationExperience: z.enum(["beginner", "intermediate", "advanced"]),
-  accommodationType: z.enum(["shared", "private"]),
-  specialRequests: z.string().optional(),
+  dietaryRestriction: z.string().optional(),
+  specialRequest: z.string().optional(),
+  accommodationType: z.string().min(1, {
+    message: "Please select an accomodation type.",
+  }),
   emergencyContactName: z.string().min(2, {
     message: "Emergency contact name must be at least 2 characters.",
   }),
-  emergencyContactPhone: z.string().min(10, {
+  emergencyContactNumber: z.string().min(10, {
     message: "Please enter a valid emergency contact phone number.",
-  }),
-  termsAccepted: z.boolean().refine((val) => val === true, {
-    message: "You must accept the terms and conditions.",
   }),
 });
 
-interface Retreat {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  duration: string;
-  location: string;
-  participants: string;
-  price: string;
-  type: string;
-  schedule: Array<{ time: string; activity: string }>;
-}
-
 interface RetreatRegistrationFormProps {
-  retreat: Retreat | null;
+  retreat: IRetreat | null;
 }
 
 export function RetreatRegistrationForm({
@@ -82,29 +68,59 @@ export function RetreatRegistrationForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      name: "",
       email: "",
-      phone: "",
+      phoneNumber: "",
       address: "",
-      dietaryRestrictions: "",
-      meditationExperience: "beginner",
+      MeditationExperience: "beginner",
+      dietaryRestriction: "",
+      specialRequest: "",
       accommodationType: "shared",
-      specialRequests: "",
       emergencyContactName: "",
-      emergencyContactPhone: "",
-      termsAccepted: false,
+      emergencyContactNumber: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!retreat) return;
+
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values);
+
+    try {
+      // Get the retreat ID as a string
+      const retreatId = retreat._id
+        ? retreat._id.toString()
+        : retreat.id.toString();
+
+      // Prepare the registration data
+      const registrationData = {
+        ...values,
+        retreatId,
+        page: window.location.pathname,
+        pageTitle: retreat.title,
+      };
+
+      // Submit the registration - the API will handle converting the string to ObjectId
+      const success = await retreatRegisterApi.registerForRetreat(
+        registrationData
+      );
+
+      if (success) {
+        // Reset the form on success
+        form.reset();
+        toast.success("Registration Successful", {
+          description: "You have successfully registered for the retreat.",
+        });
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("Registration Failed", {
+        description:
+          "There was an error submitting your registration. Please try again.",
+      });
+    } finally {
       setIsSubmitting(false);
-      alert("Registration submitted successfully!");
-    }, 2000);
+    }
   }
 
   if (!retreat) {
@@ -114,34 +130,20 @@ export function RetreatRegistrationForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Your Name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
@@ -162,7 +164,7 @@ export function RetreatRegistrationForm({
           />
           <FormField
             control={form.control}
-            name="phone"
+            name="phoneNumber"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Phone</FormLabel>
@@ -174,22 +176,24 @@ export function RetreatRegistrationForm({
             )}
           />
         </div>
+
         <FormField
           control={form.control}
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Address</FormLabel>
+              <FormLabel>Address (Optional)</FormLabel>
               <FormControl>
-                <Textarea placeholder="Enter your full address" {...field} />
+                <Textarea placeholder="Enter your address" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
-          name="dietaryRestrictions"
+          name="dietaryRestriction"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Dietary Restrictions</FormLabel>
@@ -203,52 +207,40 @@ export function RetreatRegistrationForm({
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
-          name="meditationExperience"
+          name="MeditationExperience"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Meditation Experience</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-col space-y-1"
-                >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="beginner" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Beginner</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="intermediate" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Intermediate</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="advanced" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Advanced</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your experience level" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="accommodationType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Accommodation Type</FormLabel>
+              <FormLabel>Accomodation Type</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select accommodation type" />
+                    <SelectValue placeholder="Select accomodation type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -260,15 +252,16 @@ export function RetreatRegistrationForm({
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
-          name="specialRequests"
+          name="specialRequest"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Special Requests</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Any special requests or accommodations"
+                  placeholder="Any special requests or accomodations"
                   {...field}
                 />
               </FormControl>
@@ -276,6 +269,7 @@ export function RetreatRegistrationForm({
             </FormItem>
           )}
         />
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
@@ -284,7 +278,7 @@ export function RetreatRegistrationForm({
               <FormItem>
                 <FormLabel>Emergency Contact Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Jane Doe" {...field} />
+                  <Input placeholder="Your Name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -292,7 +286,7 @@ export function RetreatRegistrationForm({
           />
           <FormField
             control={form.control}
-            name="emergencyContactPhone"
+            name="emergencyContactNumber"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Emergency Contact Phone</FormLabel>
@@ -304,29 +298,13 @@ export function RetreatRegistrationForm({
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="termsAccepted"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>I accept the terms and conditions</FormLabel>
-                <FormDescription>
-                  By checking this box, you agree to our Terms of Service and
-                  Privacy Policy.
-                </FormDescription>
-              </div>
-            </FormItem>
-          )}
-        />
+
         <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Register for Retreat"}
+          {isSubmitting ? (
+            <Spinner text="Submitting..." />
+          ) : (
+            "Register for Retreat"
+          )}
         </Button>
       </form>
     </Form>

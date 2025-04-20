@@ -16,14 +16,15 @@ import {
   User,
   Tag,
 } from "lucide-react";
-import type { Event } from "@/data/events";
+import type { IEvent } from "@/types/event.types";
 import { EventRegistrationForm } from "./EventRegistrationForm";
+import { ShareDialog } from "./ShareDialog";
 
 interface EventDetailProps {
-  event: Event;
+  event: IEvent;
   isFavorite: boolean;
   onToggleFavorite: () => void;
-  relatedEvents: Event[];
+  relatedEvents: IEvent[];
   onBack: () => void;
   onRegister?: () => void;
 }
@@ -40,6 +41,7 @@ export function EventDetail({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
   // Handle scroll for sticky header
   useEffect(() => {
@@ -51,10 +53,27 @@ export function EventDetail({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Calculate if event is sold out or has limited spots
-  const spotsLeft = event.capacity - event.attending;
-  const isSoldOut = spotsLeft <= 0;
-  const isAlmostSoldOut = spotsLeft <= 5;
+  // Check if event is sold out or has limited spots
+  const isSoldOut = event.availableTickets <= 0;
+  const isAlmostSoldOut = event.availableTickets <= 5;
+
+  // Check if event date has passed
+  const eventDate = new Date(event.date);
+  const currentDate = new Date();
+
+  // Set both dates to midnight for accurate date comparison
+  const eventDateOnly = new Date(
+    eventDate.getFullYear(),
+    eventDate.getMonth(),
+    eventDate.getDate()
+  );
+  const currentDateOnly = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    currentDate.getDate()
+  );
+
+  const isEventPassed = eventDateOnly < currentDateOnly;
 
   const handleSuccessfulRegistration = () => {
     setIsRegistered(true);
@@ -98,7 +117,7 @@ export function EventDetail({
               />
               {isFavorite ? "Saved" : "Save"}
             </Button>
-            {!isSoldOut && (
+            {!isSoldOut && !isEventPassed && (
               <Button
                 size="sm"
                 className="bg-crimson-600 hover:bg-crimson-700"
@@ -134,7 +153,7 @@ export function EventDetail({
             <div className="flex items-center gap-1">
               <CalendarDays className="h-4 w-4" />
               <span>
-                {event.date.toLocaleDateString("en-US", {
+                {new Date(event.date).toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
                   day: "numeric",
@@ -163,6 +182,7 @@ export function EventDetail({
                 <TabsList className="grid w-full grid-cols-3 mb-6">
                   <TabsTrigger value="details">Details</TabsTrigger>
                   <TabsTrigger value="teacher">Teacher</TabsTrigger>
+                  <TabsTrigger value="schedule">Schedule</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="details" className="space-y-6">
@@ -174,163 +194,124 @@ export function EventDetail({
                       {event.description}
                     </p>
 
-                    <div className="mt-6">
-                      <h3 className="font-medium mb-2">Tags</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {event.tags.map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="outline"
-                            className="bg-gray-50"
-                          >
-                            <Tag className="h-3 w-3 mr-1" />
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">
-                      What You'll Learn
-                    </h2>
-                    <ul className="space-y-2">
-                      <li className="flex gap-2">
-                        <div className="mt-1 flex-shrink-0 text-crimson-600">
-                          •
-                        </div>
-                        <div>
-                          Understand the core principles of {event.tags[0]}
-                        </div>
-                      </li>
-                      <li className="flex gap-2">
-                        <div className="mt-1 flex-shrink-0 text-crimson-600">
-                          •
-                        </div>
-                        <div>
-                          Develop practical techniques for daily practice
-                        </div>
-                      </li>
-                      <li className="flex gap-2">
-                        <div className="mt-1 flex-shrink-0 text-crimson-600">
-                          •
-                        </div>
-                        <div>
-                          Connect with a community of like-minded individuals
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Schedule</h2>
-                    <div className="space-y-4">
-                      <div className="flex gap-4">
-                        <div className="w-16 text-center">
-                          <div className="bg-crimson-100 text-crimson-700 rounded-md py-1 px-2 text-sm font-medium">
-                            Start
-                          </div>
-                        </div>
-                        <div>
-                          <p className="font-medium">
-                            Introduction and Welcome
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Overview of the event and introduction to the
-                            concepts
-                          </p>
+                    {event.tags && event.tags.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className="font-medium mb-2">Tags</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {event.tags.map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className="bg-gray-50"
+                            >
+                              <Tag className="h-3 w-3 mr-1" />
+                              {tag}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
-
-                      <div className="flex gap-4">
-                        <div className="w-16 text-center">
-                          <div className="bg-gray-100 text-gray-700 rounded-md py-1 px-2 text-sm font-medium">
-                            Mid
-                          </div>
-                        </div>
-                        <div>
-                          <p className="font-medium">Main Session</p>
-                          <p className="text-sm text-gray-600">
-                            In-depth exploration and guided practice
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-4">
-                        <div className="w-16 text-center">
-                          <div className="bg-gray-100 text-gray-700 rounded-md py-1 px-2 text-sm font-medium">
-                            End
-                          </div>
-                        </div>
-                        <div>
-                          <p className="font-medium">Q&A and Closing</p>
-                          <p className="text-sm text-gray-600">
-                            Address questions and provide resources for
-                            continued practice
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </TabsContent>
 
                 <TabsContent value="teacher">
                   <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center mb-6">
                     <Avatar className="w-20 h-20">
-                      <AvatarImage src="/avatar.png" />
+                      {event.teacher.image && (
+                        <AvatarImage
+                          src={event.teacher.image}
+                          alt={event.teacher.name}
+                        />
+                      )}
                       <AvatarFallback className="bg-crimson-100 text-crimson-700 text-xl">
-                        {event.teacher
+                        {event.teacher.name
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h2 className="text-xl font-semibold">{event.teacher}</h2>
-                      <p className="text-gray-600">
-                        Experienced instructor in {event.tags.join(", ")}
-                      </p>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        View Profile
-                      </Button>
+                      <h2 className="text-xl font-semibold">
+                        {event.teacher.name}
+                      </h2>
+                      {event.teacher.speciality && (
+                        <p className="text-gray-600">
+                          {event.teacher.speciality}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="font-medium">About the Teacher</h3>
-                    <p className="text-gray-700">
-                      {event.teacher} is a respected teacher with over 15 years
-                      of experience in {event.tags[0]}. Their approach combines
-                      traditional wisdom with contemporary practice, making
-                      complex concepts accessible to everyone.
-                    </p>
+                    {event.teacher.description && (
+                      <>
+                        <h3 className="font-medium">About the Teacher</h3>
+                        <p className="text-gray-700">
+                          {event.teacher.description}
+                        </p>
+                      </>
+                    )}
 
-                    <div>
-                      <h3 className="font-medium mb-2">Credentials</h3>
-                      <ul className="space-y-1 text-gray-700">
-                        <li className="flex gap-2">
-                          <div className="mt-1 flex-shrink-0 text-crimson-600">
-                            •
-                          </div>
-                          <div>Certified instructor in {event.tags[0]}</div>
-                        </li>
-                        <li className="flex gap-2">
-                          <div className="mt-1 flex-shrink-0 text-crimson-600">
-                            •
-                          </div>
-                          <div>Author of several books on the subject</div>
-                        </li>
-                        <li className="flex gap-2">
-                          <div className="mt-1 flex-shrink-0 text-crimson-600">
-                            •
-                          </div>
-                          <div>
-                            Featured speaker at international conferences
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
+                    {event.teacher.credentials &&
+                      event.teacher.credentials.length > 0 && (
+                        <div>
+                          <h3 className="font-medium mb-2">Credentials</h3>
+                          <ul className="space-y-1 text-gray-700">
+                            {event.teacher.credentials.map(
+                              (credential, index) => (
+                                <li key={index} className="flex gap-2">
+                                  <div className="mt-1 flex-shrink-0 text-crimson-600">
+                                    •
+                                  </div>
+                                  <div>{credential}</div>
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+                      )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="schedule">
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">
+                      Event Schedule
+                    </h2>
+                    {event.schedule &&
+                    Object.keys(event.schedule).length > 0 ? (
+                      <div className="space-y-4">
+                        {Object.entries(event.schedule).map(
+                          ([time, item], index) => (
+                            <div key={index} className="flex gap-4">
+                              <div className="w-24 text-center">
+                                <div
+                                  className={`${
+                                    index === 0
+                                      ? "bg-crimson-100 text-crimson-700"
+                                      : "bg-gray-100 text-gray-700"
+                                  } rounded-md py-1 px-2 text-sm font-medium`}
+                                >
+                                  {time}
+                                </div>
+                              </div>
+                              <div>
+                                <p className="font-medium">{item.title}</p>
+                                {item.description && (
+                                  <p className="text-sm text-gray-600">
+                                    {item.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-600">
+                        No detailed schedule available for this event.
+                      </p>
+                    )}
                   </div>
                 </TabsContent>
               </Tabs>
@@ -362,7 +343,7 @@ export function EventDetail({
                     <div>
                       <div className="font-medium">Date</div>
                       <div className="text-gray-600">
-                        {event.date.toLocaleDateString("en-US", {
+                        {new Date(event.date).toLocaleDateString("en-US", {
                           weekday: "long",
                           month: "long",
                           day: "numeric",
@@ -385,14 +366,6 @@ export function EventDetail({
                     <div>
                       <div className="font-medium">Location</div>
                       <div className="text-gray-600">{event.location}</div>
-                      {event.location !== "Online" && (
-                        <Button
-                          variant="link"
-                          className="h-auto p-0 text-crimson-600"
-                        >
-                          View on map
-                        </Button>
-                      )}
                     </div>
                   </div>
 
@@ -400,30 +373,33 @@ export function EventDetail({
                     <User className="h-5 w-5 text-gray-500 mt-0.5" />
                     <div>
                       <div className="font-medium">Teacher</div>
-                      <div className="text-gray-600">{event.teacher}</div>
+                      <div className="text-gray-600">{event.teacher.name}</div>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
                     <Users className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
+                    <div className="w-full">
                       <div className="font-medium">Attendance</div>
                       <div className="text-gray-600">
-                        {event.attending} / {event.capacity} registered
+                        {event.attending || 0} / {event.capacity || "∞"}{" "}
+                        registered
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-1 overflow-hidden">
                         <div
                           className="bg-crimson-600 h-2 rounded-full"
                           style={{
-                            width: `${
-                              (event.attending / event.capacity) * 100
-                            }%`,
+                            width: `${Math.min(
+                              ((event.attending || 0) / (event.capacity || 1)) *
+                                100,
+                              100
+                            )}%`,
                           }}
                         ></div>
                       </div>
                       {isAlmostSoldOut && !isSoldOut && (
                         <div className="text-sm text-amber-600 mt-1">
-                          Only {spotsLeft} spots left!
+                          Only {event.availableTickets} tickets left!
                         </div>
                       )}
                     </div>
@@ -436,7 +412,14 @@ export function EventDetail({
                       className="w-full bg-gray-600 hover:bg-gray-700"
                       disabled
                     >
-                      Registration Closed
+                      Sold Out
+                    </Button>
+                  ) : isEventPassed ? (
+                    <Button
+                      className="w-full bg-gray-600 hover:bg-gray-700"
+                      disabled
+                    >
+                      Event Has Passed
                     </Button>
                   ) : isRegistered ? (
                     <Button
@@ -467,7 +450,11 @@ export function EventDetail({
                       />
                       Save
                     </Button>
-                    <Button variant="outline" className="flex-1">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setIsShareDialogOpen(true)}
+                    >
                       <Share2 className="h-4 w-4 mr-1" />
                       Share
                     </Button>
@@ -483,7 +470,7 @@ export function EventDetail({
                 <div className="space-y-4">
                   {relatedEvents.slice(0, 3).map((relatedEvent) => (
                     <div
-                      key={relatedEvent.id}
+                      key={relatedEvent._id.toString()}
                       className="flex gap-3 pb-4 border-b last:border-b-0 last:pb-0"
                     >
                       <div className="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
@@ -499,10 +486,13 @@ export function EventDetail({
                         </h4>
                         <div className="text-xs text-gray-600 mt-1 flex items-center">
                           <CalendarDays className="h-3 w-3 mr-1" />
-                          {relatedEvent.date.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {new Date(relatedEvent.date).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
                         </div>
                         <div className="text-xs text-gray-600 mt-1 flex items-center">
                           <MapPin className="h-3 w-3 mr-1" />
@@ -532,6 +522,12 @@ export function EventDetail({
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         onSuccessfulRegistration={handleSuccessfulRegistration}
+      />
+      <ShareDialog
+        open={isShareDialogOpen}
+        onClose={() => setIsShareDialogOpen(false)}
+        title={event.title}
+        url={typeof window !== "undefined" ? window.location.href : ""}
       />
     </div>
   );

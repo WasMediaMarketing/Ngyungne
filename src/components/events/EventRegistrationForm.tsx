@@ -16,15 +16,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -32,41 +23,35 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "@/components/ui/use-toast";
-import {
-  AlertCircle,
-  ArrowRight,
-  CalendarDays,
-  MapPin,
-  User,
-} from "lucide-react";
-import { Event } from "@/data/events";
+import { toast } from "sonner";
+import { ArrowRight, CalendarDays, MapPin, User } from "lucide-react";
+import type { IEvent } from "@/types/event.types";
+import { bookingApi } from "@/utils/eventBookingsApi";
+import type { Types } from "mongoose";
+import Spinner from "../spinner";
 
 // Form schema
 const registrationSchema = z.object({
-  firstName: z
-    .string()
-    .min(2, { message: "First name must be at least 2 characters." }),
-  lastName: z
-    .string()
-    .min(2, { message: "Last name must be at least 2 characters." }),
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
-  tickets: z.string().min(1, { message: "Please select number of tickets." }),
-  dietary: z.string().optional(),
-  specialNeeds: z.string().optional(),
-  experience: z.enum(["beginner", "intermediate", "advanced"], {
-    required_error: "Please select your experience level.",
-  }),
-  hearAbout: z.string().optional(),
-  termsAccepted: z.boolean().refine((val) => val === true, {
-    message: "You must accept the terms and conditions.",
-  }),
-  marketingConsent: z.boolean().optional(),
+  phoneNumber: z
+    .string()
+    .min(10, { message: "Please enter a valid phone number." }),
+  TicketNumber: z.string().refine(
+    (val) => {
+      const num = Number.parseInt(val);
+      return !isNaN(num) && num > 0;
+    },
+    { message: "Please enter a valid number of tickets." }
+  ),
+  dietaryRequirements: z.string().optional(),
+  specialAccomodation: z.string().optional(),
+  page: z.string().optional(),
+  pageTitle: z.string().optional(),
 });
 
 interface EventRegistrationFormProps {
-  event: Event;
+  event: IEvent;
   isOpen: boolean;
   onClose: () => void;
   onSuccessfulRegistration: () => void;
@@ -84,44 +69,63 @@ export function EventRegistrationForm({
   const form = useForm<z.infer<typeof registrationSchema>>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      name: "",
       email: "",
-      phone: "",
-      tickets: "1",
-      dietary: "",
-      specialNeeds: "",
-      experience: "beginner",
-      hearAbout: "",
-      termsAccepted: false,
-      marketingConsent: false,
+      phoneNumber: "",
+      TicketNumber: "1",
+      dietaryRequirements: "",
+      specialAccomodation: "",
+      page: "event-registration",
+      pageTitle: `Registration for ${event.title}`,
     },
   });
 
-  // Calculate available spots
-  const spotsLeft = event.capacity - event.attending;
-  const ticketOptions = Array.from({ length: Math.min(spotsLeft, 5) }, (_, i) =>
-    (i + 1).toString()
-  );
-
   // Form submission handler
-  function onSubmit(values: z.infer<typeof registrationSchema>) {
+  async function onSubmit(values: z.infer<typeof registrationSchema>) {
     setIsSubmitting(true);
 
-    // Simulate API call with a timeout
-    setTimeout(() => {
-      console.log("Registration submitted:", values);
+    try {
+      const ticketNumber = Number.parseInt(values.TicketNumber);
 
-      // Show success toast
-      toast({
-        title: "Registration successful!",
-        description: `You have registered for "${event.title}". A confirmation email has been sent to ${values.email}.`,
-      });
+      // Check if requested tickets exceed available tickets
+      if (ticketNumber > event.availableTickets) {
+        toast.error("Not enough tickets available", {
+          description: `Only ${event.availableTickets} tickets are available for this event.`,
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
+      // Create booking data
+      const bookingData = {
+        name: values.name,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        TicketNumber: ticketNumber,
+        eventId: event._id as unknown as Types.ObjectId,
+        dietaryRequirements: values.dietaryRequirements,
+        specialAccomodation: values.specialAccomodation,
+        page: values.page || "event-registration",
+        pageTitle: values.pageTitle || `Registration for ${event.title}`,
+      };
+
+      // Submit booking
+      const success = await bookingApi.createBooking(bookingData);
+
+      if (success) {
+        // Show success toast
+        toast.success("Registration successful!", {
+          description: `You have registered for "${event.title}". A confirmation email has been sent to ${values.email}.`,
+        });
+
+        onSuccessfulRegistration();
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+    } finally {
       setIsSubmitting(false);
-      onSuccessfulRegistration();
-      onClose();
-    }, 1500);
+    }
   }
 
   return (
@@ -141,7 +145,7 @@ export function EventRegistrationForm({
             <div className="flex items-center gap-2 text-gray-600">
               <CalendarDays className="h-4 w-4" />
               <span>
-                {event.date.toLocaleDateString("en-US", {
+                {new Date(event.date).toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
                   day: "numeric",
@@ -157,41 +161,26 @@ export function EventRegistrationForm({
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <User className="h-4 w-4" />
-              <span>{event.teacher}</span>
+              <span>{event.teacher.name}</span>
             </div>
           </div>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your first name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your last name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your full name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -213,7 +202,7 @@ export function EventRegistrationForm({
               />
               <FormField
                 control={form.control}
-                name="phone"
+                name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number *</FormLabel>
@@ -226,70 +215,33 @@ export function EventRegistrationForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="tickets"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Number of Tickets *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select number of tickets" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {ticketOptions.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}{" "}
-                            {parseInt(option) === 1 ? "ticket" : "tickets"}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      {spotsLeft} spot{spotsLeft !== 1 ? "s" : ""} remaining
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="experience"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Experience Level *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your experience level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">
-                          Intermediate
-                        </SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="TicketNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number of Tickets *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="1"
+                      max={event.availableTickets.toString()}
+                      placeholder="Enter number of tickets"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {event.availableTickets} ticket
+                    {event.availableTickets !== 1 ? "s" : ""} available
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
-              name="dietary"
+              name="dietaryRequirements"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Dietary Requirements</FormLabel>
@@ -309,7 +261,7 @@ export function EventRegistrationForm({
 
             <FormField
               control={form.control}
-              name="specialNeeds"
+              name="specialAccomodation"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Special Accommodations</FormLabel>
@@ -328,94 +280,6 @@ export function EventRegistrationForm({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="hearAbout"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>How did you hear about us?</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an option" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="social">Social Media</SelectItem>
-                      <SelectItem value="friend">Friend/Family</SelectItem>
-                      <SelectItem value="search">Search Engine</SelectItem>
-                      <SelectItem value="email">Email Newsletter</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="termsAccepted"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Terms and Conditions *</FormLabel>
-                      <FormDescription>
-                        I agree to the{" "}
-                        <a
-                          href="#"
-                          className="text-crimson-600 hover:underline"
-                        >
-                          terms of service
-                        </a>{" "}
-                        and{" "}
-                        <a
-                          href="#"
-                          className="text-crimson-600 hover:underline"
-                        >
-                          privacy policy
-                        </a>
-                        .
-                      </FormDescription>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="marketingConsent"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Marketing Communications</FormLabel>
-                      <FormDescription>
-                        I would like to receive updates about similar events and
-                        promotions.
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
-
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
@@ -425,7 +289,11 @@ export function EventRegistrationForm({
                 className="bg-crimson-600 hover:bg-crimson-700"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Processing..." : "Complete Registration"}
+                {isSubmitting ? (
+                  <Spinner text="Processing..." />
+                ) : (
+                  "Complete Registration"
+                )}
                 {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </DialogFooter>

@@ -24,10 +24,7 @@ const options = {
   swaggerDefinition,
   apis: [
     // Add paths to your API files
-    path.join(__dirname, "../src/app/api/user/route.ts"),
-    path.join(__dirname, "../src/app/api/user/[userId]/route.ts"),
-    path.join(__dirname, "../src/app/api/user/login/route.ts"),
-    path.join(__dirname, "../src/app/api/user/admin-init/route.ts"),
+    path.join(__dirname, "../src/app/api/**/route.ts"),
   ],
 };
 console.log("Swagger API files being considered:");

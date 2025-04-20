@@ -12,9 +12,10 @@ import {
   Flame,
   Users,
   Newspaper,
-  Image,
+  ImageIcon,
   HelpCircle,
   BookMarked,
+  Mountain,
 } from "lucide-react";
 
 export const siteConfig = {
@@ -99,6 +100,12 @@ export const siteConfig = {
         icon: "Users",
       },
       {
+        title: "Volunteers",
+        href: "/resources/volunteers",
+        description: "Meet our dedicated volunteers and staff",
+        icon: "Users",
+      },
+      {
         title: "Blog",
         href: "/resources/blog",
         description: "Read articles on Buddhist philosophy and practice",
@@ -108,7 +115,7 @@ export const siteConfig = {
         title: "Gallery",
         href: "/resources/gallery",
         description: "View photos and videos of our events and retreats",
-        icon: "Image",
+        icon: "ImageIcon",
       },
       {
         title: "FAQ",
@@ -117,6 +124,28 @@ export const siteConfig = {
         icon: "HelpCircle",
       },
     ] as NavSection[],
+    bookings: [
+      {
+        title: "Event Bookings",
+        href: "/bookings/events",
+        description:
+          "Reserve your spot for upcoming events, teachings, and ceremonies.",
+        icon: CalendarDays, // More suitable for scheduling events
+      },
+      {
+        title: "Course Enrollments",
+        href: "/bookings/courses",
+        description:
+          "Enroll in our upcoming courses and expand your knowledge.",
+        icon: GraduationCap, // Represents education and learning
+      },
+      {
+        title: "Retreat Bookings",
+        href: "/bookings/retreats",
+        description: "Book your place for peaceful and rejuvenating retreats.",
+        icon: Mountain, // Symbolizes retreats, nature, and relaxation
+      },
+    ],
   },
   links: {
     facebook: "https://facebook.com/ngyungnepractice",

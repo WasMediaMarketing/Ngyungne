@@ -3,78 +3,90 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
-const userSchema = z.object({
-  name: z.string(),
+const isValidObjectId = (id: string) => {
+  return /^[0-9a-fA-F]{24}$/.test(id); // A valid ObjectId is a 24-character hex string
+};
 
-  email: z.string().email({ message: "Invalid email address" }),
+const userSchema = z
+  .object({
+    name: z.string(),
 
-  phoneNumber: z.string(),
+    email: z.string().email({ message: "Invalid email address" }),
 
-  role: z.enum(["user", "admin", "volunteer", "donator"]),
+    phoneNumber: z.string(),
 
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters long" })
-    .optional()
-    .refine(
-      (val) => {
-        if (val === "admin" && !val) {
-          return false;
+    role: z.enum(["user", "admin", "volunteer", "donator"]),
+
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters long" })
+      .optional()
+      .refine(
+        (val) => {
+          if (val === "admin" && !val) {
+            return false;
+          }
+          return true;
+        },
+        {
+          message: "Password is required for admin users",
         }
-        return true;
-      },
-      {
-        message: "Password is required for admin users",
-      }
-    ),
+      ),
 
-  page: z
-    .string()
-    .min(1, { message: "Page is required for non-admin users" })
-    .optional()
-    .refine(
-      (val) => {
-        if (val !== "admin" && !val) {
-          return false; // Page is required for non-admin users
+    page: z
+      .string()
+      .min(1, { message: "Page is required for non-admin users" })
+      .optional()
+      .refine(
+        (val) => {
+          if (val !== "admin" && !val) {
+            return false; // Page is required for non-admin users
+          }
+          return true;
+        },
+        {
+          message: "Page is required for non-admin users",
         }
-        return true;
-      },
-      {
-        message: "Page is required for non-admin users",
-      }
-    ),
+      ),
 
-  pageTitle: z
-    .string()
-    .min(1, { message: "Page title is required for non-admin users" })
-    .optional()
-    .refine(
-      (val) => {
-        if (val !== "admin" && !val) {
-          return false; // Page title is required for non-admin users
+    pageTitle: z
+      .string()
+      .min(1, { message: "Page title is required for non-admin users" })
+      .optional()
+      .refine(
+        (val) => {
+          if (val !== "admin" && !val) {
+            return false; // Page title is required for non-admin users
+          }
+          return true;
+        },
+        {
+          message: "Page title is required for non-admin users",
         }
-        return true;
-      },
-      {
-        message: "Page title is required for non-admin users",
-      }
-    ),
+      ),
+    pageId: z
+      .string()
+      .refine((id) => isValidObjectId(id), { message: "Invalid ID" })
+      .optional(),
 
-  address: z.string().optional(),
-});
+    address: z.string().optional(),
+  })
+  .strict();
 
 export const validateUserInput = async (
   req: NextRequest
 ): Promise<NextResponse | void> => {
   try {
-    const userData = await req.json();
+    const reqClone = req.clone();
+    const userData = await reqClone.json();
 
     const result = userSchema.safeParse(userData);
 
     if (!result.success) {
       const errorMessages = result.error.errors
-        .map((err) => err.message)
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
+
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

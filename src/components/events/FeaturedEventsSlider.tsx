@@ -13,31 +13,42 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarDays, Clock, MapPin, ArrowRight } from "lucide-react";
+import { CalendarDays, Clock, MapPin } from "lucide-react";
 import Link from "next/link";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Event } from "@/data/events";
+import type { IEvent } from "@/types/event.types";
 
 interface FeaturedEventsSliderProps {
-  events: Event[];
+  events: IEvent[];
 }
 
 export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
   const featuredRef = useRef(null);
   const isInView = useInView(featuredRef, { once: true });
 
+  if (!events || events.length === 0) {
+    return null;
+  }
+
+  // Filter out events without _id
+  const validEvents = events.filter((event) => event._id);
+
+  if (validEvents.length === 0) {
+    return null;
+  }
+
   return (
-    <section className="py-12 bg-white">
+    <section className="py-12 ">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-crimson-800">
+        <div className="flex flex-col justify-between items-center mb-8">
+          <span className="inline-block px-4 py-1 rounded-full bg-saffron-100 text-crimson-700 text-sm font-medium mb-4">
+            Our Upcoming Events
+          </span>
+          <h2 className="text-3xl font-bold text-crimson-800 text-center mx-auto">
             Featured Events
           </h2>
-          {/* <Button variant="link" className="text-crimson-600">
-            View All Featured <ArrowRight className="ml-2 h-4 w-4" />
-          </Button> */}
         </div>
 
         <motion.div
@@ -60,9 +71,9 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
             spaceBetween={30}
             className="pb-12"
           >
-            {events.map((event) => (
-              <SwiperSlide key={event.id}>
-                <Link href={`/programs/events/${event.id}`}>
+            {validEvents.map((event) => (
+              <SwiperSlide key={event._id.toString()}>
+                <Link href={`/programs/events/${event._id}`}>
                   <Card className="overflow-hidden h-full border-none shadow-md hover:shadow-xl transition-shadow duration-300">
                     <div className="aspect-video relative">
                       <img
@@ -78,7 +89,7 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
                         <div className="flex items-center gap-2 text-sm">
                           <CalendarDays className="h-4 w-4" />
                           <span>
-                            {event.date.toLocaleDateString("en-US", {
+                            {new Date(event.date).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
                             })}
@@ -92,16 +103,21 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
                       </CardTitle>
                       <div className="flex items-center mt-1">
                         <Avatar className="h-6 w-6 mr-2">
-                          <AvatarImage src="/avatar.png" />
+                          {event.teacher.image ? (
+                            <AvatarImage
+                              src={event.teacher.image}
+                              alt={event.teacher.name}
+                            />
+                          ) : null}
                           <AvatarFallback className="bg-crimson-100 text-crimson-700 text-xs">
-                            {event.teacher
+                            {event.teacher.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <span className="text-sm text-gray-600">
-                          {event.teacher}
+                          {event.teacher.name}
                         </span>
                       </div>
                     </CardHeader>
@@ -115,19 +131,10 @@ export function FeaturedEventsSlider({ events }: FeaturedEventsSliderProps) {
                         <span>{event.location}</span>
                       </div>
                       <div className="mt-3 flex items-center text-sm text-gray-600">
-                        <div className="flex -space-x-2 mr-2">
-                          {[...Array(3)].map((_, i) => (
-                            <Avatar
-                              key={i}
-                              className="h-6 w-6 border-2 border-white"
-                            >
-                              <AvatarFallback className="bg-gray-200 text-gray-600 text-xs">
-                                {String.fromCharCode(65 + i)}
-                              </AvatarFallback>
-                            </Avatar>
-                          ))}
-                        </div>
-                        <span>{event.attending} attending</span>
+                        <span>
+                          {event.attending || 0} / {event.capacity || "∞"}{" "}
+                          registered
+                        </span>
                       </div>
                     </CardContent>
                     <CardFooter>

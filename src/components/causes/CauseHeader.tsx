@@ -2,43 +2,37 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, CheckCircle2, Eye } from "lucide-react";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
+import { Clock, Eye } from "lucide-react";
 
 interface CauseHeaderProps {
   cause: {
     image: string;
     title: string;
     subtitle: string;
-    categories: string[];
-    daysLeft: number;
-    taxDeductible: boolean;
-    verified: boolean;
+    categories?: string[];
+    tags?: string[];
+    taxDeductible?: boolean;
+    verified?: boolean;
     gallery?: string[];
   };
   onOpenGallery: () => void;
 }
 
 export function CauseHeader({ cause, onOpenGallery }: CauseHeaderProps) {
+  // Use categories if available, otherwise use tags, or default to empty array
+  const displayCategories = cause.categories?.length
+    ? cause.categories
+    : cause.tags?.length
+    ? cause.tags
+    : [];
+
   return (
     <Card className="bg-white border-saffron-200 overflow-hidden shadow-sm mb-8">
-      <div className="bg-crimson-700 text-white px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center">
-          <Clock className="h-4 w-4 mr-2" />
-          <span className="text-sm font-medium">
-            {cause.daysLeft} days left
-          </span>
-        </div>
-      </div>
+      <div className="bg-crimson-700 text-white px-4 py-3 flex justify-between items-center"></div>
 
       <div className="relative aspect-video overflow-hidden">
         <Image
-          src={cause.image || "/placeholder.svg"}
+          src={cause.image || "/placeholder.svg?height=400&width=800"}
           alt={cause.title}
           layout="fill"
           objectFit="cover"
@@ -56,7 +50,7 @@ export function CauseHeader({ cause, onOpenGallery }: CauseHeaderProps) {
                   className="w-16 h-16 rounded-md overflow-hidden border-2 border-white/80 transition-all hover:border-white hover:scale-105"
                 >
                   <Image
-                    src={img || "/placeholder.svg"}
+                    src={img || "/placeholder.svg?height=64&width=64"}
                     alt={`Gallery image ${index + 1}`}
                     width={64}
                     height={64}
@@ -86,17 +80,19 @@ export function CauseHeader({ cause, onOpenGallery }: CauseHeaderProps) {
       </div>
 
       <CardHeader className="pb-2">
-        <div className="flex flex-wrap gap-2 mb-2">
-          {cause.categories.map((category, idx) => (
-            <Badge
-              key={idx}
-              variant="outline"
-              className="bg-saffron-100 text-maroon-700 border-saffron-200"
-            >
-              {category}
-            </Badge>
-          ))}
-        </div>
+        {displayCategories.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {displayCategories.map((category, idx) => (
+              <Badge
+                key={idx}
+                variant="outline"
+                className="bg-saffron-100 text-maroon-700 border-saffron-200"
+              >
+                {category}
+              </Badge>
+            ))}
+          </div>
+        )}
         <CardTitle className="text-2xl sm:text-3xl md:text-4xl text-crimson-800 font-bold">
           {cause.title}
         </CardTitle>

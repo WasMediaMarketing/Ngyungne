@@ -34,6 +34,9 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *                 email:
  *                   type: string
  *                   description: The user's email.
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: The user's phone number.
  *                 role:
  *                   type: string
  *                   description: The user's role (e.g., user, admin).
@@ -44,7 +47,7 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *       500:
  *         description: Internal server error.
  *
- * patch:
+ *   patch:
  *     summary: Update user by ID
  *     description: Update the user's details based on their user ID.
  *     tags:
@@ -75,11 +78,23 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *                 description: The updated phone number of the user.
  *               role:
  *                 type: string
- *                 enum: [user, admin, volunteer, donator]
+ *                 enum: [user, admin, donator, volunteer, event-participant]
  *                 description: The updated role of the user.
  *               password:
  *                 type: string
  *                 description: The updated password of the user (if provided).
+ *               address:
+ *                 type: string
+ *                 description: The updated address of the user.
+ *               page:
+ *                 type: string
+ *                 description: The updated page URL.
+ *               pageTitle:
+ *                 type: string
+ *                 description: The updated page title.
+ *               jobPostId:
+ *                 type: string
+ *                 description: The job post ID associated with the user.
  *     responses:
  *       200:
  *         description: User details updated successfully.
@@ -97,6 +112,9 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *                 email:
  *                   type: string
  *                   description: The updated email of the user.
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: The updated phone number of the user.
  *                 role:
  *                   type: string
  *                   description: The updated role of the user.
@@ -109,7 +127,7 @@ import { isAuthenticated, validateUserUpdate } from "@/lib/middlewares";
  *       500:
  *         description: Internal server error.
  *
- * delete:
+ *   delete:
  *     summary: Delete user by ID
  *     description: Delete a user based on their user ID.
  *     tags:

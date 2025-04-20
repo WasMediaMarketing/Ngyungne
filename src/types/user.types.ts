@@ -4,7 +4,7 @@ export interface IUserInput {
   name: string;
   email: string;
   phoneNumber: string;
-  role?: "user" | "admin" | "donator" | "volunteer";
+  role?: "user" | "admin" | "donator" | "volunteer" | "event-participant";
   password?: string;
   address?: string;
   page?: string;
@@ -15,7 +15,7 @@ export interface IUserUpdate {
   name?: string;
   email?: string;
   phoneNumber?: string;
-  role?: "user" | "admin" | "donator" | "volunteer";
+  role?: "user" | "admin" | "donator" | "volunteer" | "event-participant";
   password?: string;
   address?: string;
   page?: string;

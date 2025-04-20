@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { TeamMember } from "@/types/team-member";
+
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import {
@@ -11,9 +11,10 @@ import {
   Twitter,
 } from "lucide-react";
 import { Button } from "../ui/button";
+import { Ambassador } from "@/types/ambassador.types";
 
 const MemberCard: React.FC<{
-  member: TeamMember;
+  member: Ambassador;
   onClick: () => void;
   roleColor: string;
 }> = ({ member, onClick, roleColor }) => {

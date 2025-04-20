@@ -6,10 +6,10 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import type { Event } from "@/data/events";
+import type { IEvent } from "@/types/event.types";
 
 interface EventCalendarProps {
-  events: Event[];
+  events: IEvent[];
   selectedDate: Date | null;
   setSelectedDate: (date: Date | null) => void;
 }
@@ -20,7 +20,12 @@ export function EventCalendar({
   setSelectedDate,
 }: EventCalendarProps) {
   const getDatesWithEvents = () => {
-    return events.map((event) => event.date);
+    return events.map((event) => new Date(event.date));
+  };
+
+  // Handler that matches the expected type
+  const handleSelect = (date: Date | undefined) => {
+    setSelectedDate(date || null);
   };
 
   return (
@@ -34,8 +39,8 @@ export function EventCalendar({
       <CardContent>
         <Calendar
           mode="single"
-          selected={selectedDate || new Date()}
-          onSelect={(date) => setSelectedDate(date || null)}
+          selected={selectedDate || undefined}
+          onSelect={handleSelect}
           className="rounded-md border border-gray-200"
           modifiers={{ hasEvent: getDatesWithEvents() }}
           modifiersStyles={{
@@ -48,14 +53,16 @@ export function EventCalendar({
             Upcoming highlights
           </h3>
           <div className="space-y-3">
-            {events.slice(0, 3).map((event, index) => (
-              <div key={index} className="flex gap-3">
+            {events.slice(0, 3).map((event) => (
+              <div key={event._id.toString()} className="flex gap-3">
                 <div className="flex-shrink-0 w-12 h-12 rounded bg-crimson-100 text-crimson-700 flex flex-col items-center justify-center text-center">
                   <span className="text-xs font-medium">
-                    {event.date.toLocaleDateString("en-US", { month: "short" })}
+                    {new Date(event.date).toLocaleDateString("en-US", {
+                      month: "short",
+                    })}
                   </span>
                   <span className="text-lg font-bold">
-                    {event.date.getDate()}
+                    {new Date(event.date).getDate()}
                   </span>
                 </div>
                 <div>

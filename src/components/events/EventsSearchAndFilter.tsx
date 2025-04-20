@@ -34,7 +34,7 @@ export function EventsSearchAndFilter({
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 overflow-x-auto">
               <Button
                 variant={activeFilter === "all" ? "default" : "outline"}
                 className={

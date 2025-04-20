@@ -39,9 +39,10 @@ export function Header() {
               <Image
                 src="/logo.png"
                 alt="Ngyungne Logo"
-                height={100}
-                width={140}
+                height={0}
+                width={0}
                 priority
+                className="h-16 w-auto"
               />
             </Link>
           </div>

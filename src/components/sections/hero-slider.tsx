@@ -18,21 +18,24 @@ const slides = [
     date: "Dec 8, 2024",
     time: "08:30 AM-10:00 AM",
     subject: "Meditation",
-    image: "https://www.dharmaideal.org/api/image/1736165623116.jpeg",
+    image:
+      "https://cdn.pixabay.com/photo/2024/04/29/10/29/buddha-8727582_1280.png",
   },
   {
     title: "H.E. Choknyi Rinpoche",
     date: "Dec 8, 2024",
     time: "01:00 PM-02:30 PM",
     subject: "Teaching",
-    image: "https://www.dharmaideal.org/api/image/1736165623116.jpeg",
+    image:
+      "https://cdn.pixabay.com/photo/2024/04/29/10/29/buddha-8727582_1280.png",
   },
   {
     title: "Ven. Dolpo Tulku Rinpoche",
     date: "Dec 8, 2024",
     time: "07:00 PM-08:30 PM",
     subject: "Teaching",
-    image: "https://www.dharmaideal.org/api/image/1736165623116.jpeg",
+    image:
+      "https://cdn.pixabay.com/photo/2024/04/29/10/29/buddha-8727582_1280.png",
   },
 ];
 
