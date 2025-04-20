@@ -121,9 +121,7 @@ export const blogApi = {
 
       await handleResponse(response);
       const result = await response.json();
-      toast.success("Success", {
-        description: "Blog post updated successfully",
-      });
+
       // Handle both { data: IBlogPost } and IBlogPost response formats
       return result.data || result;
     } catch (error) {
@@ -146,9 +144,7 @@ export const blogApi = {
 
       await handleResponse(response);
       const result = await response.json();
-      toast.success("Success", {
-        description: "Blog post updated successfully",
-      });
+
       // Handle both { data: IBlogPost } and IBlogPost response formats
       return result.data || result;
     } catch (error) {
@@ -178,6 +174,28 @@ export const blogApi = {
       return true;
     } catch (error) {
       console.error(`Error toggling blog post visibility ${id}:`, error);
+      return false;
+    }
+  },
+
+  // Increment view count for a blog post
+  incrementViews: async (id: string): Promise<boolean> => {
+    try {
+      // First get the current blog post to get the current view count
+      const post = await blogApi.getBlogPost(id);
+      const currentViews = post.views || 0;
+
+      // Update the blog post with incremented view count
+      await blogApi.updateBlogPostJson(id, {
+        views: currentViews + 1,
+      });
+
+      return true;
+    } catch (error) {
+      console.error(
+        `Error incrementing view count for blog post ${id}:`,
+        error
+      );
       return false;
     }
   },

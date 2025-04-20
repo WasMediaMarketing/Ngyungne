@@ -6,9 +6,11 @@ import { motion } from "framer-motion";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MessageCircleQuestion } from "lucide-react";
-import { scriptures, type Scripture } from "@/data/scripture";
+import { createScriptureApi } from "@/utils/scriptureApi";
+import type { IScripture } from "@/types/scripture.types";
 import ScriptureInfo from "@/components/scripture/ScriptureInfo";
 import ScriptureContent from "@/components/scripture/ScriptureContent";
+import { toast } from "sonner";
 
 // Animation variants
 const containerVariants = {
@@ -21,20 +23,45 @@ const containerVariants = {
   },
 };
 
+const scriptureApi = createScriptureApi();
+
 export default function ScriptureDetail() {
   const router = useRouter();
   const params = useParams();
-  const [scripture, setScripture] = useState<Scripture | null>(null);
+  const [scripture, setScripture] = useState<IScripture | null>(null);
   const [loading, setLoading] = useState(true);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch the scripture data based on ID
   useEffect(() => {
-    if (params?.id) {
-      const foundScripture = scriptures.find((s) => s.id === params.id);
-      setScripture(foundScripture || null);
-      setLoading(false);
+    async function fetchScripture() {
+      if (!params?.id) return;
+
+      try {
+        setLoading(true);
+        const scriptureData = await scriptureApi.getScriptureById(
+          params.id as string
+        );
+        setScripture(scriptureData);
+
+        // Increment view count
+        try {
+          await scriptureApi.incrementViews(params.id as string);
+        } catch (viewError) {
+          console.error("Failed to increment view count:", viewError);
+          // Don't show error to user for this non-critical operation
+        }
+      } catch (err) {
+        console.error("Error fetching scripture:", err);
+        setError("Failed to load scripture. Please try again later.");
+        toast.error("Failed to load scripture");
+      } finally {
+        setLoading(false);
+      }
     }
+
+    fetchScripture();
   }, [params]);
 
   // Track reading progress
@@ -60,8 +87,10 @@ export default function ScriptureDetail() {
     return <LoadingState />;
   }
 
-  if (!scripture) {
-    return <NotFoundState onBackClick={handleBackToList} />;
+  if (error || !scripture) {
+    return (
+      <NotFoundState onBackClick={handleBackToList} errorMessage={error} />
+    );
   }
 
   return (
@@ -126,9 +155,10 @@ function LoadingState() {
 
 interface NotFoundStateProps {
   onBackClick: () => void;
+  errorMessage?: string | null;
 }
 
-function NotFoundState({ onBackClick }: NotFoundStateProps) {
+function NotFoundState({ onBackClick, errorMessage }: NotFoundStateProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 p-8">
       <Button variant="outline" onClick={onBackClick} className="mb-8">
@@ -138,10 +168,12 @@ function NotFoundState({ onBackClick }: NotFoundStateProps) {
       <div className="text-center py-12">
         <MessageCircleQuestion className="mx-auto h-16 w-16 text-crimson-300 mb-4" />
         <h2 className="text-2xl font-bold text-crimson-800 mb-2">
-          Scripture not found
+          {errorMessage || "Scripture not found"}
         </h2>
         <p className="text-maroon-600 mb-6">
-          We couldn't find the scripture you're looking for.
+          {errorMessage
+            ? "There was a problem loading this scripture."
+            : "We couldn't find the scripture you're looking for."}
         </p>
         <Button
           onClick={onBackClick}

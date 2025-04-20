@@ -17,6 +17,7 @@ import { AmbassadorModel } from "./ambassador.model";
 import { PageModel } from "./page.model";
 import { Gallery } from "./gallery.model";
 import { BlogPost } from "./blogPost.model";
+import { Meditation } from "./meditation.model";
 
 export {
   User,
@@ -38,4 +39,5 @@ export {
   PageModel,
   Gallery,
   BlogPost,
+  Meditation,
 };

@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarDays, Clock, Search } from "lucide-react";
+import { CalendarDays, Clock, Search, Eye } from "lucide-react";
 import { newsletterApi } from "@/utils/newsletterApi";
 import { toast } from "sonner";
 import {
@@ -302,7 +302,8 @@ export default function Blog() {
                         <Image
                           src={
                             blogPosts[0].image ||
-                            "/placeholder.svg?height=400&width=600"
+                            "/placeholder.svg?height=400&width=600" ||
+                            "/placeholder.svg"
                           }
                           alt={blogPosts[0].title}
                           layout="fill"
@@ -335,7 +336,8 @@ export default function Blog() {
                           <AvatarImage
                             src={
                               blogPosts[0].author?.image ||
-                              "/placeholder.svg?height=40&width=40"
+                              "/placeholder.svg?height=40&width=40" ||
+                              "/placeholder.svg"
                             }
                             alt={blogPosts[0].author?.name || "Author"}
                           />
@@ -357,6 +359,8 @@ export default function Blog() {
                             {formatDate(blogPosts[0].date)}
                             <Clock className="ml-3 mr-1 h-3 w-3" />
                             {blogPosts[0].readTime || "5 min read"}
+                            <Eye className="ml-3 mr-1 h-3 w-3" />
+                            {blogPosts[0].views || 0} views
                           </div>
                         </div>
                       </div>
@@ -433,7 +437,8 @@ export default function Blog() {
                           <Image
                             src={
                               post.image ||
-                              "/placeholder.svg?height=400&width=600"
+                              "/placeholder.svg?height=400&width=600" ||
+                              "/placeholder.svg"
                             }
                             alt={post.title}
                             layout="fill"
@@ -472,7 +477,8 @@ export default function Blog() {
                             <AvatarImage
                               src={
                                 post.author?.image ||
-                                "/placeholder.svg?height=40&width=40"
+                                "/placeholder.svg?height=40&width=40" ||
+                                "/placeholder.svg"
                               }
                               alt={post.author?.name || "Author"}
                             />
@@ -494,9 +500,15 @@ export default function Blog() {
                               {formatDate(post.date)}
                             </div>
                           </div>
-                          <div className="ml-auto text-xs text-maroon-600">
-                            <Clock className="inline-block mr-1 h-3 w-3" />
-                            {post.readTime || "5 min read"}
+                          <div className="ml-auto text-xs text-maroon-600 flex items-center gap-2">
+                            <div>
+                              <Clock className="inline-block mr-1 h-3 w-3" />
+                              {post.readTime || "5 min read"}
+                            </div>
+                            <div>
+                              <Eye className="inline-block mr-1 h-3 w-3" />
+                              {post.views || 0}
+                            </div>
                           </div>
                         </div>
                         <p

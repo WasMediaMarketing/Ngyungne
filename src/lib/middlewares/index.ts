@@ -25,6 +25,10 @@ import { validatePageInput, validatePageUpdateInput } from "./validatePage";
 import { validateBlogPostInput } from "./validateBlogPost";
 import { validateBlogPostUpdate } from "./validateBlogPostUpdate";
 import {
+  validateMeditationInput,
+  validateMeditationUpdate,
+} from "./validateMeditation";
+import {
   validateScriptureInput,
   validateScriptureUpdate,
 } from "./validateScripture";
@@ -59,4 +63,6 @@ export {
   validateBlogPostUpdate,
   validateScriptureInput,
   validateScriptureUpdate,
+  validateMeditationInput,
+  validateMeditationUpdate,
 };

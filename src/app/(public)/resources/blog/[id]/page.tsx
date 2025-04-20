@@ -9,7 +9,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarDays, Clock, Share2, Bookmark } from "lucide-react";
+import { CalendarDays, Clock, Share2, Bookmark, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { IBlogPost } from "@/types";
@@ -22,6 +22,7 @@ export default function BlogPost() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("article");
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [viewIncremented, setViewIncremented] = useState(false);
 
   useEffect(() => {
     const fetchBlogPost = async () => {
@@ -41,6 +42,32 @@ export default function BlogPost() {
       fetchBlogPost();
     }
   }, [params.id]);
+
+  // Increment view count once when the post is loaded
+  useEffect(() => {
+    const incrementViewCount = async () => {
+      if (post && !viewIncremented && params.id) {
+        try {
+          await blogApi.incrementViews(params.id as string);
+          // Update local state to reflect the incremented view count
+          setPost((prev) =>
+            prev
+              ? ({
+                  ...prev,
+                  views: (prev.views || 0) + 1,
+                } as IBlogPost)
+              : null
+          );
+          setViewIncremented(true);
+        } catch (error) {
+          console.error("Failed to increment view count:", error);
+          // Non-critical error, don't show to user
+        }
+      }
+    };
+
+    incrementViewCount();
+  }, [post, viewIncremented, params.id]);
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
@@ -94,7 +121,7 @@ export default function BlogPost() {
           The blog post you're looking for doesn't exist or has been removed.
         </p>
         <Button
-          onClick={() => router.push("/blog")}
+          onClick={() => router.push("/resources/blog")}
           variant="default"
           className="bg-crimson-600 hover:bg-crimson-700"
         >
@@ -161,7 +188,8 @@ export default function BlogPost() {
                       <AvatarImage
                         src={
                           post.author?.image ||
-                          "/placeholder.svg?height=40&width=40"
+                          "/placeholder.svg?height=40&width=40" ||
+                          "/placeholder.svg"
                         }
                         alt={post.author?.name || "Author"}
                       />
@@ -188,6 +216,8 @@ export default function BlogPost() {
                         <span className="mr-3">
                           {post.readTime || "5 min read"}
                         </span>
+                        <Eye className="mr-1 h-3 w-3" />
+                        <span>{post.views || 0} views</span>
                       </div>
                     </div>
                   </div>
@@ -242,7 +272,8 @@ export default function BlogPost() {
                           <Image
                             src={
                               post.author?.image ||
-                              "/placeholder.svg?height=128&width=128"
+                              "/placeholder.svg?height=128&width=128" ||
+                              "/placeholder.svg"
                             }
                             alt={post.author?.name || "Author"}
                             layout="fill"
@@ -310,7 +341,10 @@ export default function BlogPost() {
                 </div>
                 <div>
                   <h4 className="font-medium text-maroon-800 mb-1">Views</h4>
-                  <p className="text-maroon-600">{post.views || 0}</p>
+                  <p className="text-maroon-600 flex items-center">
+                    <Eye className="h-4 w-4 mr-2 text-maroon-400" />
+                    {post.views || 0}
+                  </p>
                 </div>
                 {post.metaTitle ||
                 post.metaDescription ||
@@ -369,7 +403,8 @@ export default function BlogPost() {
                     <AvatarImage
                       src={
                         post.author?.image ||
-                        "/placeholder.svg?height=40&width=40"
+                        "/placeholder.svg?height=40&width=40" ||
+                        "/placeholder.svg"
                       }
                       alt={post.author?.name || "Author"}
                     />

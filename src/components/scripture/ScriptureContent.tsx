@@ -1,95 +1,70 @@
-"use client";
-
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollText } from "lucide-react";
-import OverviewTab from "@/components/scripture/tabs/OverviewTab";
-import VersesTab from "@/components/scripture/tabs/VersesTab"; // ✅ Corrected import
-import HistoricalTab from "@/components/scripture/tabs/HistoricalTab";
-import StudyGuideTab from "@/components/scripture/tabs/StudyGuidTab"; // ✅ Corrected typo in import
-import TranslationsTab from "@/components/scripture/tabs/TranslationTab";
-import { Scripture } from "@/data/scripture";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Card } from "@/components/ui/card";
+import { Book } from "lucide-react";
+import type { IScripture } from "@/types/scripture.types";
 
 interface ScriptureContentProps {
-  scripture: Scripture;
+  scripture: IScripture;
 }
 
 export default function ScriptureContent({ scripture }: ScriptureContentProps) {
-  const [currentTab, setCurrentTab] = useState("overview");
-
   return (
-    <Card className="bg-white border-saffron-200 shadow-md">
-      <CardHeader className="border-b border-saffron-200 bg-white">
-        <div className="flex items-center gap-3 mb-2">
-          <ScrollText className="h-8 w-8 text-crimson-600" />
-          <div>
-            <CardTitle className="text-3xl text-crimson-700">
-              {scripture.title}
-            </CardTitle>
-          </div>
-        </div>
+    <div className="space-y-8">
+      <Card className="bg-white/80 border-saffron-200 p-6">
+        <h2 className="text-2xl font-bold text-crimson-800 mb-4 flex items-center gap-2">
+          <Book className="h-6 w-6" />
+          Overview
+        </h2>
+        <p className="text-maroon-700 leading-relaxed whitespace-pre-line">
+          {scripture.overview}
+        </p>
+      </Card>
 
-        {/* Navigation tabs */}
-        <Tabs
-          defaultValue="overview"
-          value={currentTab}
-          onValueChange={setCurrentTab}
-          className="mt-4"
+      <Card className="bg-white/80 border-saffron-200 p-6">
+        <h2 className="text-2xl font-bold text-crimson-800 mb-6">Verses</h2>
+
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full"
+          defaultValue="verse-0"
         >
-          <TabsList className="bg-saffron-100 p-1 rounded-lg w-full grid grid-cols-3 md:grid-cols-5">
-            <TabsTrigger
-              value="overview"
-              className="data-[state=active]:bg-saffron-300 data-[state=active]:text-crimson-800"
+          {scripture.verses.map((verse, index) => (
+            <AccordionItem
+              key={index}
+              value={`verse-${index}`}
+              className="border-saffron-200"
             >
-              Overview
-            </TabsTrigger>
-            <TabsTrigger
-              value="verses"
-              className="data-[state=active]:bg-saffron-300 data-[state=active]:text-crimson-800"
-            >
-              Verses
-            </TabsTrigger>
-            <TabsTrigger
-              value="historical"
-              className="data-[state=active]:bg-saffron-300 data-[state=active]:text-crimson-800"
-            >
-              Historical
-            </TabsTrigger>
-            <TabsTrigger
-              value="study"
-              className="data-[state=active]:bg-saffron-300 data-[state=active]:text-crimson-800"
-            >
-              Study Guide
-            </TabsTrigger>
-            <TabsTrigger
-              value="translations"
-              className="data-[state=active]:bg-saffron-300 data-[state=active]:text-crimson-800"
-            >
-              Translations
-            </TabsTrigger>
-          </TabsList>
-
-          {/* ✅ Moved `TabsContent` inside `Tabs` */}
-          <CardContent className="pt-6">
-            <TabsContent value="overview" className="mt-0">
-              <OverviewTab scripture={scripture} />
-            </TabsContent>
-            <TabsContent value="verses" className="mt-0">
-              <VersesTab scripture={scripture} />
-            </TabsContent>
-            <TabsContent value="historical" className="mt-0">
-              <HistoricalTab scripture={scripture} />
-            </TabsContent>
-            <TabsContent value="study" className="mt-0">
-              <StudyGuideTab scripture={scripture} />
-            </TabsContent>
-            <TabsContent value="translations" className="mt-0">
-              <TranslationsTab scripture={scripture} />
-            </TabsContent>
-          </CardContent>
-        </Tabs>
-      </CardHeader>
-    </Card>
+              <AccordionTrigger className="text-lg text-crimson-700 hover:text-crimson-800 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded-md text-sm">
+                    {verse.number}
+                  </span>
+                  {verse.chapter && (
+                    <span className="text-maroon-600">{verse.chapter}</span>
+                  )}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="text-maroon-800 space-y-4 py-4">
+                <p className="text-lg leading-relaxed">{verse.text}</p>
+                {verse.commentary && (
+                  <div className="bg-amber-50 p-4 rounded-md border-l-4 border-amber-300 mt-4">
+                    <h4 className="font-medium text-amber-800 mb-2">
+                      Commentary
+                    </h4>
+                    <p className="text-maroon-700">{verse.commentary}</p>
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </Card>
+    </div>
   );
 }

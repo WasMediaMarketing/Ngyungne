@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ScrollText,
   Search,
@@ -28,192 +28,15 @@ import {
   BookOpenText,
   History,
   MessageCircleQuestion,
+  RefreshCw,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { createScriptureApi } from "@/utils/scriptureApi";
+import type { IScripture } from "@/types/scripture.types";
+import { toast } from "sonner";
 
-const scriptures = [
-  {
-    id: "1",
-    title: "The Dhammapada",
-    tradition: "Theravada",
-    period: "3rd century BCE",
-    language: "Pali",
-    description:
-      "A collection of sayings of the Buddha in verse form, one of the most widely read and best known Buddhist scriptures.",
-    overview:
-      "The Dhammapada consists of 423 verses in 26 chapters, organized by topic. It covers ethical and spiritual principles such as the nature of mind, the importance of virtuous action, and the path to enlightenment. The text emphasizes the importance of training the mind and following the Noble Eightfold Path.",
-    verses: [
-      {
-        number: 1,
-        chapter: "Twin Verses",
-        text: "Mind precedes all mental states. Mind is their chief; they are all mind-wrought. If with an impure mind a person speaks or acts, suffering follows him like the wheel that follows the foot of the ox.",
-        commentary:
-          "This verse emphasizes that our thoughts shape our reality. When we act with a corrupted mind, negative consequences naturally follow, just as a cart wheel follows the ox that pulls it.",
-      },
-      {
-        number: 2,
-        chapter: "Twin Verses",
-        text: "Mind precedes all mental states. Mind is their chief; they are all mind-wrought. If with a pure mind a person speaks or acts, happiness follows him like his never-departing shadow.",
-        commentary:
-          "The counterpart to the first verse, this teaching shows that positive actions stemming from a pure mind create happiness that stays with us like our own shadow.",
-      },
-      {
-        number: 5,
-        chapter: "Twin Verses",
-        text: "Hatred is never appeased by hatred in this world. By non-hatred alone is hatred appeased. This is a law eternal.",
-        commentary:
-          "One of the Buddha's most famous teachings, this verse reminds us that responding to anger with more anger only creates a cycle of suffering. Only compassion and understanding can truly end hostility.",
-      },
-      {
-        number: 183,
-        chapter: "The Buddha",
-        text: "To avoid all evil, to cultivate good, and to cleanse one's mind — this is the teaching of the Buddhas.",
-        commentary:
-          "This verse summarizes the entirety of Buddhist practice in three simple principles: refrain from harmful actions, develop wholesome qualities, and purify the mind through meditation.",
-      },
-    ],
-    significance:
-      "The Dhammapada is often the first Buddhist text that newcomers encounter. Its clear, direct language and practical wisdom make it accessible and relevant across cultures and time periods. Many verses have become widely quoted even outside Buddhist contexts.",
-    historicalContext:
-      "Compiled after the Buddha's death as part of the effort to preserve his teachings, the Dhammapada represents some of the earliest recorded Buddhist teachings. Similar collections exist in Sanskrit and other languages, though the Pali version is the most well-known.",
-  },
-  {
-    id: "2",
-    title: "The Heart Sutra",
-    tradition: "Mahayana",
-    period: "1st century CE",
-    language: "Sanskrit",
-    description:
-      "One of the most popular and important sutras in Mahayana Buddhism, known for its profound teachings on emptiness (śūnyatā).",
-    overview:
-      "Despite being one of the shortest Buddhist sutras at only about 260 words in Sanskrit, the Heart Sutra contains the essence of Mahayana Buddhist wisdom. It presents the doctrine of emptiness (śūnyatā) through a dialogue between the bodhisattva Avalokiteśvara and the disciple Śāriputra.",
-    verses: [
-      {
-        number: 1,
-        chapter: "Introduction",
-        text: "Thus have I heard. Once the Blessed One was dwelling in Rajagriha at Vulture Peak mountain, together with a great gathering of the sangha of monks and a great gathering of the sangha of bodhisattvas. At that time the Blessed One entered the samadhi that expresses the dharma called profound illumination.",
-        commentary:
-          "The traditional opening establishes the setting and authority of the teaching, placing the Buddha in deep meditation on Vulture Peak, surrounded by both disciples and advanced practitioners.",
-      },
-      {
-        number: 2,
-        chapter: "Main Discourse",
-        text: "Form is emptiness, emptiness is form. Form is not other than emptiness, emptiness is not other than form. The same is true of feelings, perceptions, formations, and consciousness.",
-        commentary:
-          "This is the most famous passage in the sutra, expressing the non-duality of emptiness and form. It states that the five aggregates (skandhas) that constitute a person have no inherent, separate existence, yet they still functionally appear.",
-      },
-      {
-        number: 3,
-        chapter: "Main Discourse",
-        text: "Therefore, Śāriputra, in emptiness there is no form, no feelings, no perceptions, no formations, no consciousness; no eye, no ear, no nose, no tongue, no body, no mind; no appearance, no sound, no smell, no taste, no touch, no dharmas; no eye element up to no mind consciousness element.",
-        commentary:
-          "This passage systematically negates the components of experience, teaching that all phenomena lack inherent existence. It covers the five aggregates, six sense faculties, six sense objects, and eighteen elements of perception.",
-      },
-      {
-        number: 4,
-        chapter: "Conclusion",
-        text: "Therefore, Śāriputra, since bodhisattvas have no attainments, they rely on the perfection of wisdom and dwell without mental obstructions. Since there are no mental obstructions, they have no fear. They transcend falsity and attain complete nirvana.",
-        commentary:
-          "This concludes the practical implications of emptiness, explaining that realizing emptiness leads to freedom from suffering and fear. The bodhisattva path is presented as relying on wisdom rather than conceptual attainments.",
-      },
-    ],
-    significance:
-      "The Heart Sutra is recited daily in many Mahayana temples and is considered the essence of the larger Perfection of Wisdom literature. Its teaching on emptiness has profoundly influenced Buddhist philosophy, particularly in East Asian traditions.",
-    historicalContext:
-      "The Heart Sutra emerged during the development of Mahayana Buddhism, when new sutras were appearing that emphasized emptiness, compassion, and the bodhisattva path. It became especially prominent in China, Japan, and Korea.",
-  },
-  {
-    id: "3",
-    title: "The Diamond Sutra",
-    tradition: "Mahayana",
-    period: "1st-2nd century CE",
-    language: "Sanskrit",
-    description:
-      "A Mahayana sutra that teaches the practice of non-abiding and non-attachment to any concept, including those of Buddhism itself.",
-    overview:
-      "The Diamond Sutra (Vajracchedikā Prajñāpāramitā Sūtra) focuses on the practice of non-attachment. Through a dialogue between the Buddha and his disciple Subhuti, it systematically deconstructs notions of self, other beings, life, and teachings, showing that clinging to any fixed concept obstructs enlightenment.",
-    verses: [
-      {
-        number: 1,
-        chapter: "Introduction",
-        text: "Thus have I heard. At one time the Buddha was staying in the Jeta Grove, in Anathapindika's park, together with a large community of monks, 1,250 in all.",
-        commentary:
-          "The traditional opening establishes the historical context of the teaching, placing it at a monastery grove donated by the wealthy patron Anathapindika, with a large assembly of monks present.",
-      },
-      {
-        number: 8,
-        chapter: "The Merit of This Teaching",
-        text: "What do you think, Subhuti? If someone filled this billion-world galaxy with the seven treasures and gave it all away as a gift, would they create much merit by this act of giving?",
-        commentary:
-          "This passage begins a famous analogy comparing material generosity with the merit of understanding and sharing the sutra's wisdom. It establishes that spiritual wisdom surpasses even the most extravagant material generosity.",
-      },
-      {
-        number: 14,
-        chapter: "Dwelling in Peace",
-        text: "Subhuti, if bodhisattvas should have perception of either a dharma or a non-dharma, they would be grasping at a self, a being, a soul, or a person. Why? Because a bodhisattva should not grasp at a dharma or a non-dharma.",
-        commentary:
-          "This highlights the middle way between nihilism and eternalism. True understanding avoids both extremes, neither clinging to phenomena as real nor dismissing them as unreal.",
-      },
-      {
-        number: 32,
-        chapter: "Conclusion",
-        text: "All conditioned phenomena are like dreams, illusions, bubbles, shadows, like dew or a flash of lightning; thus we shall perceive them.",
-        commentary:
-          "This concluding verse beautifully summarizes the sutra's teaching on the impermanent, insubstantial nature of all phenomena, comparing them to various transient experiences. It reminds practitioners to maintain this perspective in daily life.",
-      },
-    ],
-    significance:
-      "The Diamond Sutra had enormous influence in East Asian Buddhism, particularly in the Chan/Zen tradition. A copy dated to 868 CE found in Dunhuang, China, is the oldest known printed book in the world, showing its historical importance.",
-    historicalContext:
-      "Like the Heart Sutra, the Diamond Sutra developed during the growth of Mahayana Buddhism in India and gained prominence as Buddhism spread throughout Asia. It was translated multiple times into Chinese, becoming particularly influential in Chinese Buddhism.",
-  },
-  {
-    id: "4",
-    title: "The Lotus Sutra",
-    tradition: "Mahayana",
-    period: "1st-2nd century CE",
-    language: "Sanskrit",
-    description:
-      "A revered Mahayana text that reveals the Buddha's most profound teachings on universal Buddhahood and the single vehicle to enlightenment.",
-    overview:
-      "The Lotus Sutra (Saddharmapuṇḍarīka Sūtra) is known for its parables and declarations that all beings have the potential for Buddhahood. It teaches that previous Buddhist teachings were skillful means to prepare disciples for the ultimate teaching of the One Vehicle (ekayāna), which unifies all Buddhist paths.",
-    verses: [
-      {
-        number: 1,
-        chapter: "Introduction",
-        text: "Thus have I heard. At one time the Buddha was staying at Rajagriha on Gridhrakuta Mountain with a great assembly of twelve thousand monks...",
-        commentary:
-          "The opening sets the scene on Vulture Peak with an assembly of disciples, bodhisattvas, and divine beings, establishing the cosmic significance of the teaching that follows.",
-      },
-      {
-        number: 2,
-        chapter: "Skillful Means",
-        text: "Shariputra, I use countless skillful means and various causes and conditions, along with similes, parables, and phrases to expound the teachings to sentient beings.",
-        commentary:
-          "This introduces the concept of 'upaya' or skillful means, explaining that the Buddha adapts his teaching methods according to the capacities of his listeners, rather than teaching a single rigid doctrine.",
-      },
-      {
-        number: 3,
-        chapter: "Parable of the Burning House",
-        text: "Imagine a dilapidated old house inhabited by many people. Suddenly it catches fire. A man standing outside realizes his children are inside playing, oblivious to the danger...",
-        commentary:
-          "This famous parable illustrates how the Buddha uses provisional teachings (like the promise of different carts to lure children from a burning house) to guide beings toward ultimate liberation, which is likened to a single magnificent cart.",
-      },
-      {
-        number: 4,
-        chapter: "Prophecies of Enlightenment",
-        text: "At that time the World-Honored One spoke to Shariputra, saying: 'In a future age, after innumerable, unlimited, and inconceivable kalpas, you will become a Buddha named Flower Light Tathagata...'",
-        commentary:
-          "The Buddha predicts the future Buddhahood of his disciples, illustrating the sutra's central teaching that all beings—including those previously thought to be incapable—have Buddha-nature and will eventually attain enlightenment.",
-      },
-    ],
-    significance:
-      "The Lotus Sutra became foundational for several important Buddhist schools, including Tendai in Japan and Tiantai in China. It is particularly revered in East Asian Buddhism, where entire schools are dedicated to its practice and study.",
-    historicalContext:
-      "Composed during the development of Mahayana Buddhism, the Lotus Sutra represents a shift toward universal soteriology—the idea that all beings can achieve complete enlightenment. It became especially influential as Buddhism spread throughout East Asia.",
-  },
-];
+const scriptureApi = createScriptureApi();
 
 // Animation variants
 const containerVariants = {
@@ -242,6 +65,29 @@ export default function Scriptures() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [viewMode, setViewMode] = useState("grid");
+  const [scriptures, setScriptures] = useState<IScripture[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch scriptures from API
+  useEffect(() => {
+    fetchScriptures();
+  }, []);
+
+  const fetchScriptures = async () => {
+    try {
+      setLoading(true);
+      const data = await scriptureApi.getScriptures();
+      setScriptures(data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching scriptures:", err);
+      setError("Failed to load scriptures. Please try again later.");
+      toast.error("Failed to load scriptures");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter scriptures based on search term and active tab
   const filteredScriptures = scriptures.filter((scripture) => {
@@ -258,6 +104,40 @@ export default function Scriptures() {
 
     return matchesSearch && matchesTab;
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <RefreshCw className="h-12 w-12 text-crimson-500 animate-spin mb-4" />
+          <h2 className="text-xl font-medium text-crimson-700">
+            Loading scriptures...
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <MessageCircleQuestion className="mx-auto h-16 w-16 text-crimson-300 mb-4" />
+          <h2 className="text-2xl font-bold text-crimson-800 mb-2">
+            Something went wrong
+          </h2>
+          <p className="text-maroon-600 mb-6">{error}</p>
+          <Button
+            onClick={fetchScriptures}
+            className="bg-crimson-600 hover:bg-crimson-700"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100">
@@ -390,9 +270,9 @@ export default function Scriptures() {
           }
         >
           {filteredScriptures.length > 0 ? (
-            filteredScriptures.map((scripture, index) => (
+            filteredScriptures.map((scripture) => (
               <motion.div
-                key={scripture.id}
+                key={scripture._id.toString()}
                 variants={itemVariants}
                 className={viewMode === "list" ? "w-full" : ""}
               >
@@ -466,7 +346,7 @@ export default function Scriptures() {
                     </h3>
 
                     <Accordion type="single" collapsible className="w-full">
-                      {scripture.verses.map((verse, verseIndex) => (
+                      {scripture.verses.slice(0, 3).map((verse, verseIndex) => (
                         <AccordionItem
                           key={verseIndex}
                           value={`verse-${verseIndex}`}
@@ -500,7 +380,7 @@ export default function Scriptures() {
 
                   <CardFooter className="bg-saffron-50 border-t border-saffron-200 p-4">
                     <div className="flex justify-between items-center w-full">
-                      <Link href={`/teachings/scriptures/${scripture.id}`}>
+                      <Link href={`/teachings/scriptures/${scripture._id}`}>
                         <Button
                           variant="ghost"
                           className="text-crimson-600 hover:text-crimson-800 hover:bg-saffron-100"
@@ -509,13 +389,18 @@ export default function Scriptures() {
                           Read Full Text
                         </Button>
                       </Link>
-                      <Button
-                        variant="outline"
-                        className="text-crimson-600 border-crimson-300 hover:bg-crimson-50"
-                      >
-                        <Bookmark className="mr-2 h-4 w-4" />
-                        Bookmark
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-maroon-600">
+                          {scripture.views || 0} views
+                        </span>
+                        <Button
+                          variant="outline"
+                          className="text-crimson-600 border-crimson-300 hover:bg-crimson-50"
+                        >
+                          <Bookmark className="mr-2 h-4 w-4" />
+                          Bookmark
+                        </Button>
+                      </div>
                     </div>
                   </CardFooter>
                 </Card>
