@@ -44,12 +44,6 @@ export default function MeditationDetailPage() {
         );
         setMeditation(meditationData);
 
-        // Increment views only if not already done
-        if (!viewIncremented) {
-          await meditationApi.incrementViews(params.id as string);
-          setViewIncremented(true);
-        }
-
         // Fetch related meditations if available
         if (
           meditationData.relatedMeditations &&
@@ -83,16 +77,39 @@ export default function MeditationDetailPage() {
     fetchMeditation();
   }, [params]);
 
+  // Increment view count once when the meditation is loaded
+  useEffect(() => {
+    const incrementViewCount = async () => {
+      if (meditation && !viewIncremented && params?.id) {
+        try {
+          const response = await meditationApi.incrementViews(
+            params.id as string
+          );
+          // Update local state to reflect the incremented view count
+          setMeditation((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  views: prev.views || 0,
+                }
+              : null
+          );
+          setViewIncremented(true);
+        } catch (error) {
+          console.error("Failed to increment view count:", error);
+          // Non-critical error, don't show to user
+        }
+      }
+    };
+
+    incrementViewCount();
+  }, [meditation, viewIncremented, params?.id]);
+
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
     toast.success(
       isBookmarked ? "Removed from favorites" : "Added to favorites"
     );
-  };
-
-  const handleDownload = () => {
-    // In a real app, this would download the meditation
-    toast.info("Downloading meditation for offline use...");
   };
 
   if (loading) {
