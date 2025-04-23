@@ -2,11 +2,13 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { getSettings } from "@/utils/settingsApi";
+import type { Setting, SocialLink } from "@/types/setting.types";
 import {
   Card,
   CardContent,
@@ -31,6 +33,23 @@ export default function ContactPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [settings, setSettings] = useState<Setting | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await getSettings();
+        setSettings(data);
+      } catch (error) {
+        console.error("Failed to fetch settings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +115,9 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Phone</h3>
-                    <p className="text-primary/60">+1 234 567 890</p>
+                    <p className="text-primary/60">
+                      {settings?.organizationInfo.phone}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -110,7 +131,9 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Email</h3>
-                    <p className="text-primary/60">contact@ngyungne.org</p>
+                    <p className="text-primary/60">
+                      {settings?.organizationInfo.email}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -125,7 +148,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold">Address</h3>
                     <p className="text-primary/60">
-                      123 Temple Street, City, Country
+                      {settings?.organizationInfo.address}
                     </p>
                   </div>
                 </div>

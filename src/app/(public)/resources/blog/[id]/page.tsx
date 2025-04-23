@@ -346,47 +346,6 @@ export default function BlogPost() {
                     {post.views || 0}
                   </p>
                 </div>
-                {post.metaTitle ||
-                post.metaDescription ||
-                (Array.isArray(post.metaKeywords) &&
-                  post.metaKeywords.length > 0) ? (
-                  <div>
-                    <h4 className="font-medium text-maroon-800 mb-1">
-                      SEO Information
-                    </h4>
-                    {post.metaTitle && (
-                      <p className="text-sm text-maroon-600">
-                        <span className="font-medium">Meta Title:</span>{" "}
-                        {post.metaTitle}
-                      </p>
-                    )}
-                    {post.metaDescription && (
-                      <p className="text-sm text-maroon-600 mt-1">
-                        <span className="font-medium">Meta Description:</span>{" "}
-                        {post.metaDescription}
-                      </p>
-                    )}
-                    {Array.isArray(post.metaKeywords) &&
-                      post.metaKeywords.length > 0 && (
-                        <div className="mt-1">
-                          <span className="text-sm font-medium text-maroon-600">
-                            Meta Keywords:
-                          </span>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {post.metaKeywords.map((keyword) => (
-                              <Badge
-                                key={keyword}
-                                variant="outline"
-                                className="text-xs bg-saffron-50 text-maroon-600"
-                              >
-                                {keyword}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                  </div>
-                ) : null}
               </CardContent>
             </Card>
 
@@ -396,6 +355,7 @@ export default function BlogPost() {
                 <CardTitle className="text-lg text-crimson-800">
                   About the Author
                 </CardTitle>
+                ``
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-4">
