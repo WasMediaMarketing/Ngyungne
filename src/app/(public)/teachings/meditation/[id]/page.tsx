@@ -355,12 +355,6 @@ export default function MeditationDetailPage() {
                   <span className="text-muted-foreground">Views:</span>
                   <span className="font-medium">{meditation.views || 0}</span>
                 </li>
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">Sessions:</span>
-                  <span className="font-medium">
-                    {meditation.sessions || 0}
-                  </span>
-                </li>
               </ul>
             </div>
           </div>

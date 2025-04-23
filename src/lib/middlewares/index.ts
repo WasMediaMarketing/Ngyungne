@@ -32,6 +32,12 @@ import {
   validateScriptureInput,
   validateScriptureUpdate,
 } from "./validateScripture";
+import { validateSliderInput, validateSliderUpdate } from "./validateSlider";
+import {
+  validateContentInput,
+  validateContentUpdate,
+  validateHeroSectionUpdate,
+} from "./validateAbout";
 
 export {
   isAuthenticated,
@@ -65,4 +71,9 @@ export {
   validateScriptureUpdate,
   validateMeditationInput,
   validateMeditationUpdate,
+  validateSliderInput,
+  validateSliderUpdate,
+  validateContentInput,
+  validateContentUpdate,
+  validateHeroSectionUpdate,
 };

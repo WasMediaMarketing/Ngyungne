@@ -13,6 +13,7 @@ import {
   FileQuestion,
   HandCoins,
   LayoutDashboard,
+  SlidersHorizontal,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -124,9 +125,9 @@ const data = {
       icon: Settings,
     },
     {
-      title: "Help",
-      url: "/admin/help",
-      icon: HelpCircle,
+      title: "Sliders",
+      url: "/admin/sliders",
+      icon: SlidersHorizontal,
     },
   ],
 };

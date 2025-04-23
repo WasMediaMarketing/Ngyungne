@@ -1,15 +1,33 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function AboutSection() {
   const ref = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const isInView = useInView(ref, { once: true });
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Handle dialog state changes
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+
+    // Pause video when dialog closes
+    if (!open && videoRef.current) {
+      videoRef.current.pause();
+    }
+  };
 
   return (
     <section id="about" className="py-20 relative overflow-hidden">
@@ -23,16 +41,37 @@ export function AboutSection() {
           className="grid md:grid-cols-2 gap-12 items-center"
         >
           <div className="relative h-[500px] rounded-lg overflow-hidden">
-            <Image
-              src="https://cdn.pixabay.com/photo/2024/04/29/10/29/buddha-8727582_1280.png"
-              alt="About Ngyungne"
-              fill
-              className="object-cover"
+            <video
+              src="/meditation_video.mp4"
+              className="w-full h-full object-cover"
+              controls={false}
+              muted
+              loop
+              autoPlay
+              playsInline
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
-              <Button variant="secondary" className="w-full">
-                Watch Introduction Video
-              </Button>
+              <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+                <DialogTrigger asChild>
+                  <Button variant="secondary" className="w-full">
+                    Watch Introduction Video
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle>Introduction to Ngyungne</DialogTitle>
+                  </DialogHeader>
+                  <div className="aspect-video w-full">
+                    <video
+                      ref={videoRef}
+                      src="/meditation_video.mp4"
+                      className="w-full h-full object-cover rounded-md"
+                      controls
+                      autoPlay
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           <div className="space-y-6">

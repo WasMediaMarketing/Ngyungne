@@ -18,7 +18,8 @@ import { PageModel } from "./page.model";
 import { Gallery } from "./gallery.model";
 import { BlogPost } from "./blogPost.model";
 import { Meditation } from "./meditation.model";
-
+import { Slider } from "./slider.model";
+import { AboutContent } from "./about.model";
 export {
   User,
   Event,
@@ -40,4 +41,6 @@ export {
   Gallery,
   BlogPost,
   Meditation,
+  Slider,
+  AboutContent,
 };
