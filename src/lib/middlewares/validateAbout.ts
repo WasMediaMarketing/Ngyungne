@@ -1,145 +1,133 @@
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import type { NextRequest, NextResponse } from "next/server";
-import { handleError } from "@/lib/utils/errorHandler";
-import { httpMessages } from "@/lib/utils/HttpMessage";
 import { ContentType } from "@/types/about.types";
 
-// Base schemas for different content types
-const statisticSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  value: z.string().min(1, "Value is required"),
-  icon: z.string().min(1, "Icon is required"),
-  description: z.string().min(1, "Description is required"),
-  order: z.number().int().nonnegative().optional(),
-});
-
-const historyItemSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  content: z.string().min(1, "Content is required"),
-  period: z.string().min(1, "Period is required"),
-  order: z.number().int().nonnegative().optional(),
-});
-
-const practiceElementSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  icon: z.string().min(1, "Icon is required"),
-  order: z.number().int().nonnegative().optional(),
-});
-
-const benefitItemSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  icon: z.string().min(1, "Icon is required"),
-  category: z.string().min(1, "Category is required"),
-  points: z.array(z.string()).min(1, "At least one point is required"),
-  order: z.number().int().nonnegative().optional(),
-});
-
-// Content input schema
-const contentInputSchema = z.object({
-  contentType: z.nativeEnum(ContentType),
-  data: z.union([
-    statisticSchema,
-    historyItemSchema,
-    practiceElementSchema,
-    benefitItemSchema,
-  ]),
-  isVisible: z.boolean().optional(),
-});
-
-// Content update schema
-const contentUpdateSchema = z.object({
-  contentType: z.nativeEnum(ContentType).optional(),
-  data: z
-    .union([
-      statisticSchema,
-      historyItemSchema,
-      practiceElementSchema,
-      benefitItemSchema,
-    ])
-    .optional(),
-  isVisible: z.boolean().optional(),
-});
-
-// Hero section schema
+// Schema for hero section validation
 const heroSectionSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  imageUrl: z.string().url("Image URL must be a valid URL"),
+  imageUrl: z.string().min(1, "Image URL is required"),
+  videoUrl: z.string().optional(),
+  buttonText: z.string().optional(),
+  buttonUrl: z.string().optional(),
 });
 
-// Hero section update schema
-const heroSectionUpdateSchema = z.object({
-  title: z.string().min(1, "Title is required").optional(),
-  description: z.string().min(1, "Description is required").optional(),
-  imageUrl: z.string().url("Image URL must be a valid URL").optional(),
+// Schema for about content validation
+const aboutContentSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  contentType: z.enum([
+    ContentType.HISTORY,
+    ContentType.PRACTICE,
+    ContentType.BENEFIT,
+    ContentType.STATISTIC,
+    ContentType.CTA,
+  ]),
+  order: z.number().optional(),
+  isVisible: z.boolean().optional(),
+  icon: z.string().optional(),
+  data: z.any().optional(),
 });
 
-// Validation handler function for content creation
-export const validateContentInput = async (
-  req: NextRequest
-): Promise<NextResponse | void> => {
-  try {
-    const contentData = await req.clone().json();
-
-    const result = contentInputSchema.safeParse(contentData);
-
-    if (!result.success) {
-      const errorMessages = result.error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
-        .join(", ");
-      return handleError(httpMessages.BAD_REQUEST(errorMessages));
-    }
-
-    return;
-  } catch (err) {
-    console.error("Error validating content input:", err);
-    return handleError();
-  }
-};
-
-// Validation handler function for content updates
-export const validateContentUpdate = async (
-  req: NextRequest
-): Promise<NextResponse | void> => {
-  try {
-    const contentData = await req.clone().json();
-
-    const result = contentUpdateSchema.safeParse(contentData);
-
-    if (!result.success) {
-      const errorMessages = result.error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
-        .join(", ");
-      return handleError(httpMessages.BAD_REQUEST(errorMessages));
-    }
-
-    return;
-  } catch (err) {
-    console.error("Error validating content update:", err);
-    return handleError();
-  }
-};
-
-// Validation handler function for hero section update
+// Validate hero section update
 export const validateHeroSectionUpdate = async (
   req: NextRequest
 ): Promise<NextResponse | void> => {
   try {
-    const heroData = await req.clone().json();
-
-    const result = heroSectionUpdateSchema.safeParse(heroData);
-
-    if (!result.success) {
-      const errorMessages = result.error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
-        .join(", ");
-      return handleError(httpMessages.BAD_REQUEST(errorMessages));
+    // Check if this is a multipart request
+    const contentType = req.headers.get("content-type") || "";
+    if (contentType.includes("multipart/form-data")) {
+      // Skip validation for multipart requests - will be handled by the controller
+      return;
     }
 
-    return;
-  } catch (err) {
-    console.error("Error validating hero section update:", err);
-    return handleError();
+    const heroData = await req.clone().json();
+
+    const result = heroSectionSchema.partial().safeParse(heroData);
+
+    if (!result.success) {
+      const errors = result.error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }));
+
+      return NextResponse.json(
+        {
+          message: "Validation error",
+          errors,
+        },
+        { status: 400 }
+      );
+    }
+  } catch (error) {
+    console.error("Error validating hero section update:", error);
+    return NextResponse.json(
+      { message: "Error validating request" },
+      { status: 400 }
+    );
+  }
+};
+
+// Validate about content creation
+export const validateAboutContentCreate = async (
+  req: NextRequest
+): Promise<NextResponse | void> => {
+  try {
+    const contentData = await req.clone().json();
+
+    const result = aboutContentSchema.safeParse(contentData);
+
+    if (!result.success) {
+      const errors = result.error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }));
+
+      return NextResponse.json(
+        {
+          message: "Validation error",
+          errors,
+        },
+        { status: 400 }
+      );
+    }
+  } catch (error) {
+    console.error("Error validating about content creation:", error);
+    return NextResponse.json(
+      { message: "Error validating request" },
+      { status: 400 }
+    );
+  }
+};
+
+// Validate about content update
+export const validateAboutContentUpdate = async (
+  req: NextRequest
+): Promise<NextResponse | void> => {
+  try {
+    const contentData = await req.clone().json();
+
+    const result = aboutContentSchema.partial().safeParse(contentData);
+
+    if (!result.success) {
+      const errors = result.error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }));
+
+      return NextResponse.json(
+        {
+          message: "Validation error",
+          errors,
+        },
+        { status: 400 }
+      );
+    }
+  } catch (error) {
+    console.error("Error validating about content update:", error);
+    return NextResponse.json(
+      { message: "Error validating request" },
+      { status: 400 }
+    );
   }
 };

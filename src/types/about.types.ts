@@ -1,94 +1,80 @@
 import type { Types } from "mongoose";
 
-// Enums for content types
 export enum ContentType {
-  HISTORY = "HISTORY",
-  PRACTICE = "PRACTICE",
-  BENEFIT = "BENEFIT",
-  STATISTIC = "STATISTIC",
+  HISTORY = "history",
+  PRACTICE = "practice",
+  BENEFIT = "benefit",
+  STATISTIC = "statistic",
+  CTA = "cta",
 }
 
-// Interface for statistics shown on the about page
-export interface IStatistic {
-  _id?: Types.ObjectId | string;
-  title: string;
-  value: string;
-  icon: string;
-  description: string;
-  order: number;
-}
-
-// Interface for history timeline items
-export interface IHistoryItem {
-  _id?: Types.ObjectId | string;
-  title: string;
-  content: string;
-  period: string;
-  order: number;
-}
-
-// Interface for practice elements (the orbiting items)
-export interface IPracticeElement {
-  _id?: Types.ObjectId | string;
+export interface IAboutContentBase {
   title: string;
   description: string;
-  icon: string;
-  order: number;
-}
-
-// Interface for benefit items
-export interface IBenefitItem {
-  _id?: Types.ObjectId | string;
-  title: string;
-  icon: string;
-  category: string;
-  points: string[];
-  order: number;
-}
-
-// Interface for the hero section
-export interface IHeroSection {
-  _id?: Types.ObjectId | string;
-  title: string;
-  description: string;
-  imageUrl: string;
-}
-
-// Interface for the about page content
-export interface IAboutContent {
-  _id?: Types.ObjectId | string;
   contentType: ContentType;
-  data: IStatistic | IHistoryItem | IPracticeElement | IBenefitItem;
-  isVisible: boolean;
+  order?: number;
+  isVisible?: boolean;
+  icon?: string;
+  data?: any;
+}
+
+export interface IAboutContent extends IAboutContentBase {
+  _id: Types.ObjectId | string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-// Input interfaces for creating content
-export interface IAboutContentInput {
-  contentType: ContentType;
-  data: IStatistic | IHistoryItem | IPracticeElement | IBenefitItem;
-  isVisible?: boolean;
+export interface IAboutContentInput extends IAboutContentBase {}
+
+export interface IAboutContentUpdate extends Partial<IAboutContentBase> {}
+
+export interface IHeroSection {
+  title: string;
+  description: string;
+  imageUrl: string;
+  videoUrl?: string;
+  buttonText?: string;
+  buttonUrl?: string;
 }
 
-// Update interfaces
-export interface IAboutContentUpdate extends Partial<IAboutContentInput> {}
+export interface IHistoryItem {
+  _id?: Types.ObjectId | string; // Added _id property
+  title: string;
+  description: string;
+  year?: string;
+  order: number;
+  isLeftSide?: boolean;
+}
 
-// Service interface
-export interface IAboutService {
-  createContent(contentData: IAboutContentInput): Promise<IAboutContent>;
-  getContent(
-    contentType?: ContentType,
-    isVisible?: boolean
-  ): Promise<IAboutContent[]>;
-  getContentById(contentId: Types.ObjectId): Promise<IAboutContent | null>;
-  updateContent(
-    contentId: Types.ObjectId,
-    contentData: IAboutContentUpdate
-  ): Promise<IAboutContent | null>;
-  deleteContent(contentId: Types.ObjectId): Promise<IAboutContent | null>;
-  updateHeroSection(
-    heroData: Partial<IHeroSection>
-  ): Promise<IHeroSection | null>;
-  getHeroSection(): Promise<IHeroSection | null>;
+export interface IPracticeItem {
+  _id?: Types.ObjectId | string; // Added _id property
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  order: number;
+}
+
+export interface IBenefitItem {
+  _id?: Types.ObjectId | string; // Added _id property
+  title: string;
+  icon: string;
+  items: string[];
+  order: number;
+}
+
+export interface IStatistic {
+  title: string;
+  value: string;
+  icon?: string;
+  description?: string;
+}
+
+export interface ICTASection {
+  title: string;
+  description: string;
+  primaryButtonText: string;
+  primaryButtonUrl: string;
+  secondaryButtonText?: string;
+  secondaryButtonUrl?: string;
 }

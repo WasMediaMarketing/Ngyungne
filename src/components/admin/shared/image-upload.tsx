@@ -22,6 +22,7 @@ export function ImageUpload({
 }: ImageUploadProps) {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [localValue, setLocalValue] = useState<string | null>(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -79,6 +80,7 @@ export function ImageUpload({
   };
 
   const handleRemove = () => {
+    setLocalValue(null);
     onChange(null);
     if (inputRef.current) {
       inputRef.current.value = "";
@@ -87,10 +89,10 @@ export function ImageUpload({
 
   return (
     <div className="space-y-2">
-      {value ? (
+      {localValue ? (
         <div className="relative aspect-video w-full max-w-md mx-auto border rounded-md overflow-hidden">
           <Image
-            src={value || "/placeholder.svg"}
+            src={localValue || "/placeholder.svg"}
             alt="Uploaded image"
             fill
             className="object-cover"

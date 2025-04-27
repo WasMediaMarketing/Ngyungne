@@ -1,68 +1,90 @@
+import { NextRequest, NextResponse } from "next/server";
 import { createAboutController } from "@/lib/factories/aboutFactory";
 import { isAuthenticated, validateHeroSectionUpdate } from "@/lib/middlewares";
-import type { NextRequest } from "next/server";
+import { handleMultipartRequest } from "@/lib/utils/multipartHandler";
 
 /**
- * @openapi
- * /api/about/hero:
- *   get:
- *     summary: Get hero section
- *     description: This endpoint retrieves the hero section for the about page.
- *     operationId: getAboutHero
- *     tags:
- *       - About
- *     responses:
- *       200:
- *         description: Hero section retrieved successfully
- *       500:
- *         description: Internal server error
+ * GET /api/about/hero
+ * Retrieves the hero section content
  */
 export async function GET() {
-  const aboutController = createAboutController();
-  return aboutController.getHeroSection();
+  try {
+    const aboutController = createAboutController();
+    return aboutController.getHeroSection();
+  } catch (error) {
+    console.error("Error in GET /api/about/hero:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
 
 /**
- * @openapi
- * /api/about/hero:
- *   put:
- *     summary: Update hero section
- *     description: This endpoint updates the hero section for the about page.
- *     operationId: updateAboutHero
- *     tags:
- *       - About
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               imageUrl:
- *                 type: string
- *     responses:
- *       200:
- *         description: Hero section updated successfully
- *       400:
- *         description: Invalid input
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
+ * PUT /api/about/hero
+ * Updates the hero section content
  */
 export async function PUT(req: NextRequest) {
-  const authResult = await isAuthenticated(req);
-  if (authResult) return authResult;
+  try {
+    // Check authentication
+    const authResult = await isAuthenticated(req);
+    if (authResult) return authResult;
 
-  const validationResult = await validateHeroSectionUpdate(req);
-  if (validationResult) return validationResult;
+    // Determine if this is a multipart request
+    const contentType = req.headers.get("content-type") || "";
+    const isMultipart = contentType.includes("multipart/form-data");
 
-  const aboutController = createAboutController();
-  return aboutController.updateHeroSection(req);
+    let heroData;
+
+    if (isMultipart) {
+      // Handle multipart/form-data request with file uploads
+      const uploadFields = [
+        { fileField: "image", bodyField: "imageFile" },
+        { fileField: "video", bodyField: "videoFile" },
+      ];
+
+      heroData = await handleMultipartRequest(
+        req,
+        uploadFields,
+        [], // No JSON fields
+        [], // No numeric fields
+        ["isVisible"] // Boolean fields
+      );
+
+      if (heroData instanceof NextResponse) return heroData;
+    } else {
+      // Handle JSON request
+      try {
+        heroData = await req.json();
+
+        // Validate the JSON data
+        const validationResult = await validateHeroSectionUpdate(req);
+        if (validationResult) return validationResult;
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        return NextResponse.json(
+          { message: "Invalid JSON format" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Process the hero section update
+    const aboutController = createAboutController();
+    return aboutController.updateHeroSection(heroData);
+  } catch (error) {
+    console.error("Error in PUT /api/about/hero:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "25mb",
+    },
+  },
+};

@@ -1,123 +1,42 @@
 import mongoose, { Schema, type Document } from "mongoose";
-import { ContentType } from "@/types/about.types";
-import type { IAboutContent, IHeroSection } from "@/types/about.types";
+import {
+  ContentType,
+  type IAboutContent,
+  type IHeroSection,
+} from "@/types/about.types";
 
-// Schema for statistics
-const StatisticSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  value: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  icon: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  description: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  order: {
-    type: Number,
-    default: 0,
-  },
-});
-
-// Schema for history items
-const HistoryItemSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  content: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  period: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  order: {
-    type: Number,
-    default: 0,
-  },
-});
-
-// Schema for practice elements
-const PracticeElementSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  description: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  icon: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  order: {
-    type: Number,
-    default: 0,
-  },
-});
-
-// Schema for benefit items
-const BenefitItemSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  icon: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  category: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  points: {
-    type: [String],
-    default: [],
-  },
-  order: {
-    type: Number,
-    default: 0,
-  },
-});
-
-// Schema for about content
+// Define the schema for the About Content model
 const AboutContentSchema = new Schema(
   {
+    title: {
+      type: String,
+      required: [true, "Title is required"],
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: [true, "Description is required"],
+      trim: true,
+    },
     contentType: {
       type: String,
       enum: Object.values(ContentType),
-      required: true,
+      required: [true, "Content type is required"],
     },
-    data: {
-      type: Schema.Types.Mixed,
-      required: true,
+    order: {
+      type: Number,
+      default: 0,
     },
     isVisible: {
       type: Boolean,
       default: true,
+    },
+    icon: {
+      type: String,
+      trim: true,
+    },
+    data: {
+      type: Schema.Types.Mixed,
     },
   },
   {
@@ -126,22 +45,34 @@ const AboutContentSchema = new Schema(
   }
 );
 
-// Schema for hero section
+// Define the schema for the Hero Section model
 const HeroSectionSchema = new Schema(
   {
     title: {
       type: String,
-      required: true,
+      required: [true, "Title is required"],
       trim: true,
     },
     description: {
       type: String,
-      required: true,
+      required: [true, "Description is required"],
       trim: true,
     },
     imageUrl: {
       type: String,
-      required: true,
+      required: [true, "Image URL is required"],
+      trim: true,
+    },
+    videoUrl: {
+      type: String,
+      trim: true,
+    },
+    buttonText: {
+      type: String,
+      trim: true,
+    },
+    buttonUrl: {
+      type: String,
       trim: true,
     },
   },
@@ -159,23 +90,53 @@ export const HeroSection =
   mongoose.models.HeroSection ||
   mongoose.model<IHeroSection & Document>("HeroSection", HeroSectionSchema);
 
-// Create discriminator models for different content types
-export const StatisticModel = AboutContent.discriminator(
-  ContentType.STATISTIC,
-  StatisticSchema
-);
+// Create discriminator models for specific content types
+// Check if discriminators already exist before creating them
+export const HistoryContent =
+  AboutContent.discriminators?.[ContentType.HISTORY] ||
+  AboutContent.discriminator(
+    ContentType.HISTORY,
+    new Schema({
+      year: String,
+      isLeftSide: Boolean,
+    })
+  );
 
-export const HistoryItemModel = AboutContent.discriminator(
-  ContentType.HISTORY,
-  HistoryItemSchema
-);
+export const PracticeContent =
+  AboutContent.discriminators?.[ContentType.PRACTICE] ||
+  AboutContent.discriminator(
+    ContentType.PRACTICE,
+    new Schema({
+      id: String,
+    })
+  );
 
-export const PracticeElementModel = AboutContent.discriminator(
-  ContentType.PRACTICE,
-  PracticeElementSchema
-);
+export const BenefitContent =
+  AboutContent.discriminators?.[ContentType.BENEFIT] ||
+  AboutContent.discriminator(
+    ContentType.BENEFIT,
+    new Schema({
+      items: [String],
+    })
+  );
 
-export const BenefitItemModel = AboutContent.discriminator(
-  ContentType.BENEFIT,
-  BenefitItemSchema
-);
+export const StatisticContent =
+  AboutContent.discriminators?.[ContentType.STATISTIC] ||
+  AboutContent.discriminator(
+    ContentType.STATISTIC,
+    new Schema({
+      value: String,
+    })
+  );
+
+export const CTAContent =
+  AboutContent.discriminators?.[ContentType.CTA] ||
+  AboutContent.discriminator(
+    ContentType.CTA,
+    new Schema({
+      primaryButtonText: String,
+      primaryButtonUrl: String,
+      secondaryButtonText: String,
+      secondaryButtonUrl: String,
+    })
+  );

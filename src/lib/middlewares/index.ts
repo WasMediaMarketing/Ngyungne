@@ -34,8 +34,8 @@ import {
 } from "./validateScripture";
 import { validateSliderInput, validateSliderUpdate } from "./validateSlider";
 import {
-  validateContentInput,
-  validateContentUpdate,
+  validateAboutContentCreate,
+  validateAboutContentUpdate,
   validateHeroSectionUpdate,
 } from "./validateAbout";
 
@@ -73,7 +73,7 @@ export {
   validateMeditationUpdate,
   validateSliderInput,
   validateSliderUpdate,
-  validateContentInput,
-  validateContentUpdate,
+  validateAboutContentCreate,
+  validateAboutContentUpdate,
   validateHeroSectionUpdate,
 };

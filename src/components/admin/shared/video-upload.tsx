@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +22,12 @@ export function VideoUpload({
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [videoName, setVideoName] = useState<string | null>(null);
+  const [localValue, setLocalValue] = useState<string | null>(value);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -82,6 +87,7 @@ export function VideoUpload({
   };
 
   const handleRemove = () => {
+    setLocalValue(null);
     onChange(null);
     setVideoName(null);
     if (inputRef.current) {
@@ -91,7 +97,7 @@ export function VideoUpload({
 
   return (
     <div className="space-y-2">
-      {value ? (
+      {localValue ? (
         <div className="border rounded-md p-4 bg-muted/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -101,7 +107,7 @@ export function VideoUpload({
               <div>
                 <p className="font-medium">{videoName || "Video file"}</p>
                 <video controls className="mt-2 max-w-full max-h-[200px]">
-                  <source src={value} type="video/mp4" />
+                  <source src={localValue} type="video/mp4" />
                   Your browser does not support the video element.
                 </video>
               </div>

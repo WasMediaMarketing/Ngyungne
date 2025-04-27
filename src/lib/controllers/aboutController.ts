@@ -1,9 +1,9 @@
-import type { NextRequest, NextResponse } from "next/server";
-import { handleError } from "@/lib/utils/errorHandler";
-import { handleResponse } from "@/lib/utils/responseHandler";
-import { httpMessages } from "@/lib/utils/HttpMessage";
-import { Types } from "mongoose";
 import type { AboutService } from "@/lib/services/aboutService";
+import type { NextRequest, NextResponse } from "next/server";
+import { handleError } from "../utils/errorHandler";
+import { handleResponse } from "../utils/responseHandler";
+import { httpMessages } from "../utils/HttpMessage";
+import { Types } from "mongoose";
 import type { ContentType } from "@/types/about.types";
 
 export class AboutController {
@@ -14,7 +14,7 @@ export class AboutController {
   }
 
   /**
-   * @summary Create new about content
+   * @summary Create new content
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the created content
    */
@@ -24,42 +24,40 @@ export class AboutController {
       const content = await this.aboutService.createContent(contentData);
       return handleResponse(content, httpMessages.CREATED());
     } catch (error) {
-      console.error("createContentController error", error);
+      console.log("createContentController error", error);
       return handleError();
     }
   }
 
   /**
-   * @summary Get all about content
+   * @summary Get all content or filtered by type and visibility
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the list of content
    */
   async getContent(req: NextRequest): Promise<NextResponse> {
     try {
-      const url = req.nextUrl;
-      const contentType = url.searchParams.get(
-        "contentType"
-      ) as ContentType | null;
+      const url = new URL(req.url);
+      const contentType = url.searchParams.get("contentType") as
+        | ContentType
+        | undefined;
       const isVisible =
-        url.searchParams.get("isVisible") === "true"
-          ? true
-          : url.searchParams.get("isVisible") === "false"
-          ? false
+        url.searchParams.get("isVisible") !== null
+          ? url.searchParams.get("isVisible") === "true"
           : undefined;
 
       const content = await this.aboutService.getContent(
-        contentType || undefined,
+        contentType,
         isVisible
       );
       return handleResponse(content);
     } catch (error) {
-      console.error("getContentController error", error);
+      console.log("getContentController error", error);
       return handleError();
     }
   }
 
   /**
-   * @summary Get about content by ID
+   * @summary Get content by ID
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the content details
    */
@@ -72,18 +70,16 @@ export class AboutController {
         );
       }
 
-      const content = await this.aboutService.getContentById(
-        new Types.ObjectId(contentId)
-      );
+      const content = await this.aboutService.getContentById(contentId);
       return handleResponse(content);
     } catch (error) {
-      console.error("getContentByIdController error", error);
+      console.log("getContentByIdController error", error);
       return handleError();
     }
   }
 
   /**
-   * @summary Update about content by ID
+   * @summary Update content by ID
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response with the updated content
    */
@@ -98,18 +94,18 @@ export class AboutController {
 
       const contentData = await req.json();
       const updatedContent = await this.aboutService.updateContent(
-        new Types.ObjectId(contentId),
+        contentId,
         contentData
       );
       return handleResponse(updatedContent);
     } catch (error) {
-      console.error("updateContentController error", error);
+      console.log("updateContentController error", error);
       return handleError();
     }
   }
 
   /**
-   * @summary Delete about content by ID
+   * @summary Delete content by ID
    * @param {NextRequest} req - The request object
    * @returns {NextResponse} The response indicating whether the content was deleted successfully
    */
@@ -122,12 +118,10 @@ export class AboutController {
         );
       }
 
-      const deletedContent = await this.aboutService.deleteContent(
-        new Types.ObjectId(contentId)
-      );
+      const deletedContent = await this.aboutService.deleteContent(contentId);
       return handleResponse(deletedContent);
     } catch (error) {
-      console.error("deleteContentController error", error);
+      console.log("deleteContentController error", error);
       return handleError();
     }
   }
@@ -141,7 +135,7 @@ export class AboutController {
       const heroSection = await this.aboutService.getHeroSection();
       return handleResponse(heroSection);
     } catch (error) {
-      console.error("getHeroSectionController error", error);
+      console.log("getHeroSectionController error", error);
       return handleError();
     }
   }
@@ -154,10 +148,12 @@ export class AboutController {
   async updateHeroSection(req: NextRequest): Promise<NextResponse> {
     try {
       const heroData = await req.json();
-      const updatedHero = await this.aboutService.updateHeroSection(heroData);
-      return handleResponse(updatedHero);
+      const updatedHeroSection = await this.aboutService.updateHeroSection(
+        heroData
+      );
+      return handleResponse(updatedHeroSection);
     } catch (error) {
-      console.error("updateHeroSectionController error", error);
+      console.log("updateHeroSectionController error", error);
       return handleError();
     }
   }

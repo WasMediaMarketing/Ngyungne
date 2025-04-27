@@ -1,5 +1,5 @@
 import { createAboutController } from "@/lib/factories/aboutFactory";
-import { isAuthenticated, validateContentInput } from "@/lib/middlewares";
+import { validateAboutContentCreate, isAuthenticated } from "@/lib/middlewares";
 import type { NextRequest } from "next/server";
 
 /**
@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
  * /api/about/content:
  *   post:
  *     summary: Create new about content
- *     description: This endpoint creates new content for the about page.
+ *     description: This endpoint creates new content for the about page
  *     operationId: createAboutContent
  *     tags:
  *       - About
@@ -20,20 +20,28 @@ import type { NextRequest } from "next/server";
  *           schema:
  *             type: object
  *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
  *               contentType:
  *                 type: string
- *                 enum: [HISTORY, PRACTICE, BENEFIT, STATISTIC]
- *               data:
- *                 type: object
+ *                 enum: [history, practice, benefit, statistic, cta]
+ *               order:
+ *                 type: integer
  *               isVisible:
  *                 type: boolean
+ *               icon:
+ *                 type: string
+ *               data:
+ *                 type: object
  *     responses:
  *       201:
  *         description: Content created successfully
  *       400:
- *         description: Invalid input
+ *         description: Invalid input or validation error
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized or invalid token
  *       500:
  *         description: Internal server error
  */
@@ -41,8 +49,8 @@ export async function POST(req: NextRequest) {
   const authResult = await isAuthenticated(req);
   if (authResult) return authResult;
 
-  const validationResult = await validateContentInput(req);
-  if (validationResult) return validationResult;
+  const validationResponse = await validateAboutContentCreate(req);
+  if (validationResponse) return validationResponse;
 
   const aboutController = createAboutController();
   return aboutController.createContent(req);
@@ -53,7 +61,7 @@ export async function POST(req: NextRequest) {
  * /api/about/content:
  *   get:
  *     summary: Get about content
- *     description: This endpoint retrieves content for the about page, optionally filtered by type and visibility.
+ *     description: Fetches all about content or filtered by type and visibility
  *     operationId: getAboutContent
  *     tags:
  *       - About
@@ -62,7 +70,7 @@ export async function POST(req: NextRequest) {
  *         name: contentType
  *         schema:
  *           type: string
- *           enum: [HISTORY, PRACTICE, BENEFIT, STATISTIC]
+ *           enum: [history, practice, benefit, statistic, cta]
  *         description: Filter by content type
  *       - in: query
  *         name: isVisible
@@ -71,7 +79,7 @@ export async function POST(req: NextRequest) {
  *         description: Filter by visibility
  *     responses:
  *       200:
- *         description: Content retrieved successfully
+ *         description: List of content
  *       500:
  *         description: Internal server error
  */

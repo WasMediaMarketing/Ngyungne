@@ -1,12 +1,12 @@
-import { createAboutController } from "@/lib/factories/aboutFactory";
-import { isAuthenticated, validateContentUpdate } from "@/lib/middlewares";
 import type { NextRequest } from "next/server";
+import { createAboutController } from "@/lib/factories/aboutFactory";
+import { isAuthenticated, validateAboutContentCreate } from "@/lib/middlewares";
 
 /**
  * @openapi
  * /api/about/content/{contentId}:
  *   get:
- *     summary: Get about content by ID
+ *     summary: Get content by ID
  *     tags:
  *       - About
  *     parameters:
@@ -32,11 +32,9 @@ export async function GET(req: NextRequest) {
  * @openapi
  * /api/about/content/{contentId}:
  *   put:
- *     summary: Update about content by ID
+ *     summary: Update content by ID
  *     tags:
  *       - About
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: contentId
@@ -59,14 +57,14 @@ export async function GET(req: NextRequest) {
  *       404:
  *         description: Content not found
  *       500:
- *         description: Internal server error
+ *         description: Server error
  */
 export async function PUT(req: NextRequest) {
   const authResult = await isAuthenticated(req);
   if (authResult) return authResult;
 
-  const validationResult = await validateContentUpdate(req);
-  if (validationResult) return validationResult;
+  const validationResponse = await validateAboutContentCreate(req);
+  if (validationResponse) return validationResponse;
 
   const aboutController = createAboutController();
   return aboutController.updateContent(req);
@@ -76,11 +74,9 @@ export async function PUT(req: NextRequest) {
  * @openapi
  * /api/about/content/{contentId}:
  *   delete:
- *     summary: Delete about content by ID
+ *     summary: Delete content by ID
  *     tags:
  *       - About
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: contentId
@@ -95,7 +91,7 @@ export async function PUT(req: NextRequest) {
  *       404:
  *         description: Content not found
  *       500:
- *         description: Internal server error
+ *         description: Server error
  */
 export async function DELETE(req: NextRequest) {
   const authResult = await isAuthenticated(req);

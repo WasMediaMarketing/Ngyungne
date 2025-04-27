@@ -1,9 +1,7 @@
-import type {
-  IAboutContent,
-  IAboutContentInput,
-  IAboutContentUpdate,
+import {
+  type IAboutContent,
+  type IHeroSection,
   ContentType,
-  IHeroSection,
 } from "@/types/about.types";
 import { toast } from "sonner";
 
@@ -32,8 +30,72 @@ const createAuthHeaders = (contentType = "application/json") => {
 };
 
 export const aboutApi = {
-  // Get all content or filtered by type
-  getContent: async (
+  // Hero Section API
+  getHeroSection: async (): Promise<IHeroSection> => {
+    try {
+      const response = await fetch("/api/about/hero", {
+        method: "GET",
+      });
+
+      await handleResponse(response);
+      const result = await response.json();
+      return result.data || result;
+    } catch (error) {
+      console.error("Error fetching hero section:", error);
+      throw error;
+    }
+  },
+
+  updateHeroSection: async (
+    heroData: Partial<IHeroSection>
+  ): Promise<IHeroSection> => {
+    try {
+      const response = await fetch("/api/about/hero", {
+        method: "PUT",
+        headers: createAuthHeaders(),
+        body: JSON.stringify(heroData),
+      });
+
+      await handleResponse(response);
+      const result = await response.json();
+      toast.success("Success", {
+        description: "Hero section updated successfully",
+      });
+      return result.data || result;
+    } catch (error) {
+      console.error("Error updating hero section:", error);
+      throw error;
+    }
+  },
+
+  // New method for file uploads
+  updateHeroSectionWithFiles: async (
+    formData: FormData
+  ): Promise<IHeroSection> => {
+    try {
+      // Add authentication header to FormData request
+      const response = await fetch("/api/about/hero", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${getAdminToken()}`,
+        },
+        body: formData,
+      });
+
+      await handleResponse(response);
+      const result = await response.json();
+      toast.success("Success", {
+        description: "Hero section updated successfully",
+      });
+      return result.data || result;
+    } catch (error) {
+      console.error("Error updating hero section with files:", error);
+      throw error;
+    }
+  },
+
+  // About Content API
+  getAboutContents: async (
     contentType?: ContentType,
     isVisible?: boolean
   ): Promise<IAboutContent[]> => {
@@ -61,30 +123,29 @@ export const aboutApi = {
       const result = await response.json();
       return Array.isArray(result) ? result : result.data || [];
     } catch (error) {
-      console.error("Error fetching about content:", error);
+      console.error("Error fetching about contents:", error);
       throw error;
     }
   },
 
-  // Get content by ID
-  getContentById: async (id: string): Promise<IAboutContent> => {
+  getAboutContent: async (id: string): Promise<IAboutContent> => {
     try {
       const response = await fetch(`/api/about/content/${id}`, {
         method: "GET",
+        headers: createAuthHeaders(),
       });
 
       await handleResponse(response);
       const result = await response.json();
       return result.data || result;
     } catch (error) {
-      console.error(`Error fetching content ${id}:`, error);
+      console.error(`Error fetching about content ${id}:`, error);
       throw error;
     }
   },
 
-  // Create new content
-  createContent: async (
-    contentData: IAboutContentInput
+  createAboutContent: async (
+    contentData: IAboutContent
   ): Promise<IAboutContent> => {
     try {
       const response = await fetch("/api/about/content", {
@@ -100,15 +161,14 @@ export const aboutApi = {
       });
       return result.data || result;
     } catch (error) {
-      console.error("Error creating content:", error);
+      console.error("Error creating about content:", error);
       throw error;
     }
   },
 
-  // Update content
-  updateContent: async (
+  updateAboutContent: async (
     id: string,
-    contentData: IAboutContentUpdate
+    contentData: Partial<IAboutContent>
   ): Promise<IAboutContent> => {
     try {
       const response = await fetch(`/api/about/content/${id}`, {
@@ -124,13 +184,12 @@ export const aboutApi = {
       });
       return result.data || result;
     } catch (error) {
-      console.error(`Error updating content ${id}:`, error);
+      console.error(`Error updating about content ${id}:`, error);
       throw error;
     }
   },
 
-  // Delete content
-  deleteContent: async (id: string): Promise<boolean> => {
+  deleteAboutContent: async (id: string): Promise<boolean> => {
     try {
       const response = await fetch(`/api/about/content/${id}`, {
         method: "DELETE",
@@ -143,47 +202,30 @@ export const aboutApi = {
       });
       return true;
     } catch (error) {
-      console.error(`Error deleting content ${id}:`, error);
+      console.error(`Error deleting about content ${id}:`, error);
       return false;
     }
   },
 
-  // Get hero section
-  getHeroSection: async (): Promise<IHeroSection | null> => {
+  reorderAboutContents: async (
+    contentType: ContentType,
+    items: { id: string; order: number }[]
+  ): Promise<boolean> => {
     try {
-      const response = await fetch("/api/about/hero", {
-        method: "GET",
-      });
-
-      await handleResponse(response);
-      const result = await response.json();
-      return result.data || result;
-    } catch (error) {
-      console.error("Error fetching hero section:", error);
-      return null;
-    }
-  },
-
-  // Update hero section
-  updateHeroSection: async (
-    heroData: Partial<IHeroSection>
-  ): Promise<IHeroSection | null> => {
-    try {
-      const response = await fetch("/api/about/hero", {
-        method: "PUT",
+      const response = await fetch("/api/about/content/reorder", {
+        method: "POST",
         headers: createAuthHeaders(),
-        body: JSON.stringify(heroData),
+        body: JSON.stringify({ contentType, items }),
       });
 
       await handleResponse(response);
-      const result = await response.json();
       toast.success("Success", {
-        description: "Hero section updated successfully",
+        description: "Content reordered successfully",
       });
-      return result.data || result;
+      return true;
     } catch (error) {
-      console.error("Error updating hero section:", error);
-      return null;
+      console.error("Error reordering about contents:", error);
+      return false;
     }
   },
 };
