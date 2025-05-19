@@ -26,7 +26,6 @@ export class MeditationController {
       );
       return handleResponse(meditation, httpMessages.CREATED());
     } catch (error) {
-      console.log("createMeditationController error", error);
       return handleError(undefined, req);
     }
   }
@@ -41,7 +40,6 @@ export class MeditationController {
       const meditations = await this.meditationService.getMeditations();
       return handleResponse(meditations);
     } catch (error) {
-      console.log("getMeditationsController error", error);
       return handleError();
     }
   }
@@ -56,7 +54,6 @@ export class MeditationController {
       const meditations = await this.meditationService.getMeditations(true);
       return handleResponse(meditations);
     } catch (error) {
-      console.log("getPublishedMeditationsController error", error);
       return handleError();
     }
   }
@@ -80,7 +77,6 @@ export class MeditationController {
       );
       return handleResponse(meditation);
     } catch (error) {
-      console.log("getMeditationByIdController error", error);
       return handleError();
     }
   }
@@ -108,7 +104,6 @@ export class MeditationController {
       );
       return handleResponse(updatedMeditation);
     } catch (error) {
-      console.log("updateMeditationController error", error);
       return req instanceof ExtendedNextRequest
         ? handleError(undefined, req)
         : handleError();
@@ -136,7 +131,6 @@ export class MeditationController {
       );
       return handleResponse(updatedMeditation);
     } catch (error) {
-      console.log("incrementViewsController error", error);
       return handleError();
     }
   }
@@ -160,7 +154,6 @@ export class MeditationController {
       );
       return handleResponse(deletedMeditation);
     } catch (error) {
-      console.log("deleteMeditationController error", error);
       return handleError();
     }
   }
@@ -192,7 +185,6 @@ export class MeditationController {
 
       const objectIds = meditationIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Meditation IDs (ObjectId format):", objectIds);
       const isDeleted = await this.meditationService.deleteMeditations(
         objectIds
       );

@@ -38,10 +38,6 @@ export function DeleteMultipleUsersAlert({
   const handleDelete = async () => {
     setIsLoading(true);
     try {
-      console.log(
-        "DeleteMultipleUsersAlert - Deleting users with IDs:",
-        userIds
-      );
       await deleteMultipleUsers(userIds);
       onUsersDeleted(userIds);
       await refreshUsers(); // Refresh the user list

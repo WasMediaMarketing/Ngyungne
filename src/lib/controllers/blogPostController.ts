@@ -23,7 +23,6 @@ export class BlogPostController {
       const blogPost = await this.blogPostService.createBlogPost(blogPostData);
       return handleResponse(blogPost, httpMessages.CREATED());
     } catch (error) {
-      console.log("createBlogPostController error", error);
       return handleError(undefined, req);
     }
   }
@@ -37,10 +36,8 @@ export class BlogPostController {
   async getBlogPosts(): Promise<NextResponse> {
     try {
       const blogPosts = await this.blogPostService.getBlogPosts();
-      console.log("result of blogPost controller get", blogPosts);
       return handleResponse(blogPosts);
     } catch (error) {
-      console.log("getBlogPostsController error", error);
       return handleError();
     }
   }
@@ -54,10 +51,8 @@ export class BlogPostController {
   async getPublishedBlogPosts(): Promise<NextResponse> {
     try {
       const blogPosts = await this.blogPostService.getBlogPosts(true);
-      console.log("result of blogPost servoce get", blogPosts); // Assuming true means published
       return handleResponse(blogPosts);
     } catch (error) {
-      console.log("getPublishedBlogPostsController error", error);
       return handleError();
     }
   }
@@ -82,7 +77,6 @@ export class BlogPostController {
       );
       return handleResponse(blogPost);
     } catch (error) {
-      console.log("getBlogPostByIdController error", error);
       return handleError();
     }
   }
@@ -110,7 +104,6 @@ export class BlogPostController {
       );
       return handleResponse(updatedBlogPost);
     } catch (error) {
-      console.log("updateBlogPostController error", error);
       return req instanceof ExtendedNextRequest
         ? handleError(undefined, req)
         : handleError();
@@ -136,7 +129,6 @@ export class BlogPostController {
       );
       return handleResponse(deletedBlogPost);
     } catch (error) {
-      console.log("deleteBlogPostController error", error);
       return handleError();
     }
   }
@@ -168,7 +160,6 @@ export class BlogPostController {
 
       const objectIds = blogPostIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Blog Post IDs (ObjectId format):", objectIds);
       const isDeleted = await this.blogPostService.deleteBlogPosts(objectIds);
       return handleResponse(isDeleted);
     } catch (error) {

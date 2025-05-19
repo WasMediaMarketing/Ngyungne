@@ -126,7 +126,6 @@ export const galleryApi = {
     try {
       // Validate ID
       const validId = validateId(id);
-      console.log("Fetching gallery item with validated ID:", validId);
 
       const response = await fetch(`/api/gallery/${validId}`, {
         method: "GET",
@@ -182,7 +181,6 @@ export const galleryApi = {
     try {
       // Validate ID
       const validId = validateId(id);
-      console.log("Updating gallery item with validated ID:", validId);
 
       const response = await fetch(`/api/gallery/${validId}`, {
         method: "PATCH",
@@ -219,10 +217,6 @@ export const galleryApi = {
     try {
       // Validate ID
       const validId = validateId(id);
-      console.log(
-        "Toggling visibility for gallery item with validated ID:",
-        validId
-      );
 
       const response = await fetch(`/api/gallery/${validId}`, {
         method: "PUT",
@@ -259,7 +253,6 @@ export const galleryApi = {
     try {
       // Validate ID
       const validId = validateId(id);
-      console.log("Deleting gallery item with validated ID:", validId);
 
       const response = await fetch(`/api/gallery/${validId}`, {
         method: "DELETE",

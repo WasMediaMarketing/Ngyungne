@@ -41,7 +41,6 @@ export const validateBlogPostInput = async (
 ): Promise<NextResponse | void> => {
   try {
     const blogPostData = await req.clone().json();
-    console.log("blog post update", blogPostData);
 
     const result = blogPostSchema.safeParse(blogPostData);
 
@@ -49,7 +48,6 @@ export const validateBlogPostInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

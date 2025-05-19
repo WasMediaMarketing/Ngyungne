@@ -29,7 +29,6 @@ export function EditGalleryItemDialog({
 
       setIsLoading(true);
       try {
-        console.log("Fetching gallery item with ID:", galleryItemId);
         const item = await galleryApi.getGalleryItemById(galleryItemId);
         setGalleryItem(item);
       } catch (error) {

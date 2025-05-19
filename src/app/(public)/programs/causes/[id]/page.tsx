@@ -34,8 +34,6 @@ export default function CauseDetail() {
             ? params.id[0]
             : "";
 
-        console.log("Fetching cause with ID:", id);
-
         if (!id) {
           setError("Invalid cause ID");
           setIsLoading(false);
@@ -43,7 +41,6 @@ export default function CauseDetail() {
         }
 
         const causeData = await causeApi.getCauseById(id);
-        console.log("API returned cause data:", causeData);
 
         if (!causeData) {
           setError("Cause not found");

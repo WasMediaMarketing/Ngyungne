@@ -83,7 +83,6 @@ export default function DonatePage() {
 
     fetchPaymentInfo();
   }, []);
-  console.log("Payment Methods:", paymentMethods); // Debugging log
 
   const handleAmountSelect = (value: string) => {
     setAmount(value);

@@ -24,7 +24,6 @@ export class EventController {
       const event = await this.eventService.createEvent(eventData);
       return handleResponse(event, httpMessages.CREATED());
     } catch (error) {
-      console.log("createEventController error", error);
       return handleError(undefined, req);
     }
   }
@@ -40,7 +39,6 @@ export class EventController {
       const events = await this.eventService.getEvents();
       return handleResponse(events);
     } catch (error) {
-      console.log("getEventsController error", error);
       return handleError();
     }
   }
@@ -56,7 +54,6 @@ export class EventController {
       const events = await this.eventService.getEvents(true);
       return handleResponse(events);
     } catch (error) {
-      console.log("getEventsController error", error);
       return handleError();
     }
   }
@@ -81,7 +78,6 @@ export class EventController {
       );
       return handleResponse(event);
     } catch (error) {
-      console.log("getEventsController error", error);
       return handleError();
     }
   }
@@ -96,7 +92,6 @@ export class EventController {
       const events = await this.eventService.getEvents();
       return { data: events };
     } catch (error) {
-      console.log("getEventsController error", error);
       return { error: error as Error };
     }
   }
@@ -118,7 +113,6 @@ export class EventController {
       );
       return { data: event };
     } catch (error) {
-      console.log("getEventsController error", error);
       return { error: error };
     }
   }
@@ -146,7 +140,6 @@ export class EventController {
       );
       return handleResponse(updatedEvent);
     } catch (error) {
-      console.log("updateEventController error", error);
       return req instanceof ExtendedNextRequest
         ? handleError(undefined, req)
         : handleError();
@@ -172,7 +165,6 @@ export class EventController {
       );
       return handleResponse(deletedEvent);
     } catch (error) {
-      console.log("deleteEventController error", error);
       return handleError();
     }
   }
@@ -202,7 +194,6 @@ export class EventController {
 
       const objectIds = eventIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Event IDs (ObjectId format):", objectIds);
       const isDeleted = await this.eventService.deleteEvents(objectIds);
       return handleResponse(isDeleted);
     } catch (error) {

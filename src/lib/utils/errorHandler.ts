@@ -22,8 +22,6 @@ export const handleError = (
   req?: ExtendedNextRequest,
   fileUrls?: Record<string, string | string[]>
 ) => {
-  console.log("Handling Error......");
-
   const message = error.message;
   const statusCode = error.statusCode;
 
@@ -52,7 +50,5 @@ export const handleError = (
     });
   }
 
-  // Return a JSON response with the error message and status code
-  console.log("Error message:", message);
   return NextResponse.json({ message }, { status: statusCode });
 };

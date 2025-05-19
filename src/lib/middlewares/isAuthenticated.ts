@@ -25,7 +25,6 @@ export const isAuthenticated = async (
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log(decoded);
 
     return;
   } catch {

@@ -36,7 +36,6 @@ export function DeleteUserAlert({
   const handleDelete = async () => {
     setIsLoading(true);
     try {
-      console.log("DeleteUserAlert - Deleting user with ID:", user.id);
       await deleteUser(user.id);
       onUserDeleted(user.id);
       await refreshUsers(); // Refresh the user list

@@ -148,7 +148,6 @@ export class NewsletterController {
 
       const objectIds = subscriberIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Subscriber IDs to delete:", objectIds);
       const result = await this.newsletterService.deleteSubscriptions(
         objectIds
       );

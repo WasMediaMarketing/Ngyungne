@@ -71,7 +71,6 @@ export function UserTable({
   const [roleFilter, setRoleFilter] = useState("");
 
   const handleAddUser = (newUser: IUser) => {
-    console.log("UserTable - handleAddUser called with:", newUser);
     onUserAdded(newUser);
     toast({
       title: "Success",
@@ -80,7 +79,6 @@ export function UserTable({
   };
 
   const handleUpdateUser = (updatedUser: IUser) => {
-    console.log("UserTable - handleUpdateUser called with:", updatedUser);
     onUserUpdated(updatedUser);
     toast({
       title: "Success",
@@ -89,7 +87,6 @@ export function UserTable({
   };
 
   const handleDeleteUser = (userId: string) => {
-    console.log("UserTable - handleDeleteUser called with:", userId);
     onUserDeleted(userId);
     toast({
       title: "Success",
@@ -98,7 +95,6 @@ export function UserTable({
   };
 
   const handleDeleteMultipleUsers = (userIds: string[]) => {
-    console.log("UserTable - handleDeleteMultipleUsers called with:", userIds);
     userIds.forEach((id) => onUserDeleted(id));
     setSelectedRows([]);
     toast({

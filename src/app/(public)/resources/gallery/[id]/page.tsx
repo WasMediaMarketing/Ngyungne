@@ -55,8 +55,6 @@ export default function GalleryDetail() {
           ? params.id[0]
           : params.id.toString();
 
-        console.log("Fetching gallery item with ID:", id);
-
         const data = await galleryApi.getGalleryItemById(id);
         setItem(data);
         setError(null);

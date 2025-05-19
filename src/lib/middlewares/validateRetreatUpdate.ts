@@ -45,7 +45,6 @@ export const validateRetreatUpdate = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

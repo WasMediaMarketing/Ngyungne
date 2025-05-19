@@ -35,7 +35,6 @@ export const validateVolunteerInput = async (
   try {
     const reqClone = req.clone();
     const volunteerData = await reqClone.json();
-    console.log(volunteerData);
     // Parse the volunteer input using the zod schema
     const result = volunteerSchema.safeParse(volunteerData);
 
@@ -43,7 +42,6 @@ export const validateVolunteerInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log(errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

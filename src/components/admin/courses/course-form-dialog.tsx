@@ -176,10 +176,7 @@ export default function CourseFormDialog({
         // If we have a new file, append it directly
         formData.append("instructorImage", instructorImage);
       }
-      // Log the FormData for debugging
-      console.log("Form data entries:");
       for (const pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
       }
 
       let result;

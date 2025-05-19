@@ -66,7 +66,6 @@ export const validateMeditationInput = async (
 ): Promise<NextResponse | void> => {
   try {
     const meditationData = await req.clone().json();
-    console.log("meditation input", meditationData);
 
     const result = meditationSchema.safeParse(meditationData);
 
@@ -74,7 +73,6 @@ export const validateMeditationInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 
@@ -91,7 +89,6 @@ export const validateMeditationUpdate = async (
 ): Promise<NextResponse | void> => {
   try {
     const meditationData = await req.clone().json();
-    console.log("meditation update", meditationData);
 
     const result = meditationUpdateSchema.safeParse(meditationData);
 
@@ -99,7 +96,6 @@ export const validateMeditationUpdate = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

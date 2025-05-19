@@ -24,7 +24,6 @@ export class CourseController {
       const course = await this.courseService.createCourse(courseData);
       return handleResponse(course, httpMessages.CREATED());
     } catch (error) {
-      console.log("createCourseController error", error);
       return handleError(undefined, req);
     }
   }
@@ -40,7 +39,6 @@ export class CourseController {
       const courses = await this.courseService.getCourses();
       return handleResponse(courses);
     } catch (error) {
-      console.log("getCoursesController error", error);
       return handleError();
     }
   }
@@ -57,7 +55,6 @@ export class CourseController {
       // You could filter here by visibility if needed
       return handleResponse(courses);
     } catch (error) {
-      console.log("getPublishedCoursesController error", error);
       return handleError();
     }
   }
@@ -82,7 +79,6 @@ export class CourseController {
       );
       return handleResponse(course);
     } catch (error) {
-      console.log("getCourseByIdController error", error);
       return handleError();
     }
   }
@@ -98,7 +94,6 @@ export class CourseController {
   //       const courses = await this.courseService.getCourses();
   //       return { data: courses };
   //     } catch (error) {
-  //       console.log("getCoursesForPropsController error", error);
   //       return { error: error as Error };
   //     }
   //   }
@@ -120,7 +115,6 @@ export class CourseController {
   //       );
   //       return { data: course };
   //     } catch (error) {
-  //       console.log("getCourseByIdForPropsController error", error);
   //       return { error: error };
   //     }
   //   }
@@ -148,7 +142,6 @@ export class CourseController {
       );
       return handleResponse(updatedCourse);
     } catch (error) {
-      console.log("updateCourseController error", error);
       return req instanceof ExtendedNextRequest
         ? handleError(undefined, req)
         : handleError();
@@ -174,7 +167,6 @@ export class CourseController {
       );
       return handleResponse(deletedCourse);
     } catch (error) {
-      console.log("deleteCourseController error", error);
       return handleError();
     }
   }
@@ -204,7 +196,6 @@ export class CourseController {
 
       const objectIds = courseIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Course IDs (ObjectId format):", objectIds);
       const isDeleted = await this.courseService.deleteCourses(objectIds);
       return handleResponse(isDeleted);
     } catch (error) {

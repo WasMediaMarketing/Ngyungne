@@ -70,13 +70,11 @@ export const eventApi = {
   createEvent: async (eventData: FormData): Promise<boolean> => {
     try {
       // Log FormData for debugging
-      console.log("Creating event with FormData:");
       for (const pair of eventData.entries()) {
         const value =
           pair[1] instanceof File
             ? `File: ${pair[1].name} (${pair[1].size} bytes)`
             : pair[1];
-        console.log(`${pair[0]}: ${value}`);
       }
 
       const response = await fetch("/api/event", {

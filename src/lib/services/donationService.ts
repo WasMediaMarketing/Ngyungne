@@ -66,7 +66,6 @@ export class DonationService implements IDonationService {
 
   async deleteDonation(donationId: string): Promise<boolean> {
     await this.initializeDbConnection();
-    console.log(Donation.schema.pre);
     const donation = await Donation.findById(donationId);
     if (!donation) return false;
     deleteFile(donation.screenshot);

@@ -13,8 +13,6 @@ export async function generateMetadata({
   const slug = params?.slug;
   const child = params?.child;
 
-  console.log(`Generating metadata for child page: ${child} (parent: ${slug})`);
-
   // Find the child page by slug
   const childPage = await pageApi.getPageBySlug(child);
 
@@ -42,19 +40,15 @@ export default async function NestedDynamicPage({
   const slug = params?.slug;
   const child = params?.child;
 
-  console.log(`Rendering nested page with child: ${child}, parent: ${slug}`);
-
   // Find the child page by slug
   const childPage = await pageApi.getPageBySlug(child);
   if (!childPage) {
-    console.log(`Child page not found: ${child}`);
     notFound();
   }
 
   // Also verify that the parent page exists with the given slug
   const parentPage = await pageApi.getPageBySlug(slug);
   if (!parentPage) {
-    console.log(`Parent page not found: ${slug}`);
     notFound();
   }
 
@@ -64,9 +58,6 @@ export default async function NestedDynamicPage({
     childPage.parentPage === "none" ||
     parentPage.id !== childPage.parentPage
   ) {
-    console.log(
-      `Invalid parent-child relationship between ${slug} and ${child}`
-    );
     notFound();
   }
 

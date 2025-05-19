@@ -104,7 +104,6 @@ export function EditUserDialog({
   const isAdmin = selectedRole === "admin";
 
   const onSubmit = async (data: UserFormValues) => {
-    console.log("EditUserDialog - onSubmit called with data:", data);
     setFormError(null);
     setIsLoading(true);
 
@@ -125,10 +124,7 @@ export function EditUserDialog({
         updateData.password = data.password;
       }
 
-      console.log("Calling updateUser with:", updateData);
-
       const updatedUser = await updateUser(user.id, updateData);
-      console.log("User updated successfully:", updatedUser);
 
       onUserUpdated(updatedUser);
       await refreshUsers(); // Refresh the user list

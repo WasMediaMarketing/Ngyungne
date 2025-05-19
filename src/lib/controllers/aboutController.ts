@@ -24,7 +24,6 @@ export class AboutController {
       const content = await this.aboutService.createContent(contentData);
       return handleResponse(content, httpMessages.CREATED());
     } catch (error) {
-      console.log("createContentController error", error);
       return handleError();
     }
   }
@@ -51,7 +50,6 @@ export class AboutController {
       );
       return handleResponse(content);
     } catch (error) {
-      console.log("getContentController error", error);
       return handleError();
     }
   }
@@ -73,7 +71,6 @@ export class AboutController {
       const content = await this.aboutService.getContentById(contentId);
       return handleResponse(content);
     } catch (error) {
-      console.log("getContentByIdController error", error);
       return handleError();
     }
   }
@@ -99,7 +96,6 @@ export class AboutController {
       );
       return handleResponse(updatedContent);
     } catch (error) {
-      console.log("updateContentController error", error);
       return handleError();
     }
   }
@@ -121,7 +117,6 @@ export class AboutController {
       const deletedContent = await this.aboutService.deleteContent(contentId);
       return handleResponse(deletedContent);
     } catch (error) {
-      console.log("deleteContentController error", error);
       return handleError();
     }
   }
@@ -135,7 +130,6 @@ export class AboutController {
       const heroSection = await this.aboutService.getHeroSection();
       return handleResponse(heroSection);
     } catch (error) {
-      console.log("getHeroSectionController error", error);
       return handleError();
     }
   }
@@ -153,7 +147,6 @@ export class AboutController {
       );
       return handleResponse(updatedHeroSection);
     } catch (error) {
-      console.log("updateHeroSectionController error", error);
       return handleError();
     }
   }

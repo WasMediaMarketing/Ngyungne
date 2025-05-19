@@ -143,9 +143,6 @@ export const deleteDonations = async (ids: string[]): Promise<boolean> => {
       throw new Error("Authentication required");
     }
 
-    console.log("Deleting donations with IDs:", ids);
-    console.log("Request URL:", `/api/donation?donationIds=${ids.join(",")}`);
-
     const response = await fetch(`/api/donation?donationIds=${ids.join(",")}`, {
       method: "DELETE",
       headers: {
@@ -153,8 +150,6 @@ export const deleteDonations = async (ids: string[]): Promise<boolean> => {
         "Content-Type": "application/json",
       },
     });
-
-    console.log("Delete response status:", response.status);
 
     if (!response.ok) {
       let errorMessage = "Failed to delete donations";

@@ -45,7 +45,6 @@ export class UserController {
 
   async getUserById(req: NextRequest): Promise<NextResponse> {
     try {
-      console.log(req.nextUrl, "and te pathmae", req.nextUrl.pathname);
       const userId = req.nextUrl.pathname.split("/").pop();
 
       if (!userId) {
@@ -76,7 +75,7 @@ export class UserController {
       return handleError();
     }
   }
-  
+
   async deleteUser(req: NextRequest): Promise<NextResponse> {
     try {
       const userId = req.nextUrl.pathname.split("/").pop();

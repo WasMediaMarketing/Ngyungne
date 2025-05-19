@@ -24,7 +24,6 @@ export class SliderController {
       const slider = await this.sliderService.createSlider(sliderData);
       return handleResponse(slider, httpMessages.CREATED());
     } catch (error) {
-      console.log("createSliderController error", error);
       return handleError(undefined, req);
     }
   }
@@ -39,7 +38,6 @@ export class SliderController {
       const sliders = await this.sliderService.getSliders();
       return handleResponse(sliders);
     } catch (error) {
-      console.log("getSlidersController error", error);
       return handleError();
     }
   }
@@ -54,7 +52,6 @@ export class SliderController {
       const sliders = await this.sliderService.getSliders(true);
       return handleResponse(sliders);
     } catch (error) {
-      console.log("getPublishedSlidersController error", error);
       return handleError();
     }
   }
@@ -78,7 +75,6 @@ export class SliderController {
       );
       return handleResponse(slider);
     } catch (error) {
-      console.log("getSliderByIdController error", error);
       return handleError();
     }
   }
@@ -106,7 +102,6 @@ export class SliderController {
       );
       return handleResponse(updatedSlider);
     } catch (error) {
-      console.log("updateSliderController error", error);
       return req instanceof ExtendedNextRequest
         ? handleError(undefined, req)
         : handleError();
@@ -132,7 +127,6 @@ export class SliderController {
       );
       return handleResponse(deletedSlider);
     } catch (error) {
-      console.log("deleteSliderController error", error);
       return handleError();
     }
   }
@@ -162,7 +156,6 @@ export class SliderController {
 
       const objectIds = sliderIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Slider IDs (ObjectId format):", objectIds);
       const isDeleted = await this.sliderService.deleteSliders(objectIds);
       return handleResponse(isDeleted);
     } catch (error) {
@@ -199,7 +192,6 @@ export class SliderController {
 
       return handleResponse(updatedSlider);
     } catch (error) {
-      console.log("updateSliderOrderController error", error);
       return handleError();
     }
   }

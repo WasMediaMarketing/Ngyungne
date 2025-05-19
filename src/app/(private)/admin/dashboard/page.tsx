@@ -157,7 +157,6 @@ const NgyungneDashboard = () => {
 
     setLoading(false);
   }, [router]);
-  console.log("authenticated", authenticated);
 
   if (loading) {
     return <Loader />;

@@ -86,7 +86,6 @@ export default function AdminBlogPage() {
   useEffect(() => {
     fetchBlogPosts();
   }, []);
-  console.log("Blog posts:", blogPosts);
 
   const handleRowSelectionChange = (rowSelection: Record<string, boolean>) => {
     const selectedRows = Object.keys(rowSelection).filter(

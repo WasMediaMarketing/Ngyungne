@@ -61,7 +61,6 @@ export const validateSliderInput = async (
 ): Promise<NextResponse | void> => {
   try {
     const sliderData = await req.clone().json();
-    console.log("slider input", sliderData);
 
     const result = sliderSchema.safeParse(sliderData);
 
@@ -69,7 +68,6 @@ export const validateSliderInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 
@@ -86,7 +84,6 @@ export const validateSliderUpdate = async (
 ): Promise<NextResponse | void> => {
   try {
     const sliderData = await req.clone().json();
-    console.log("slider update", sliderData);
 
     const result = sliderUpdateSchema.safeParse(sliderData);
 
@@ -94,7 +91,6 @@ export const validateSliderUpdate = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 
@@ -111,7 +107,6 @@ export const validateReorderInput = async (
 ): Promise<NextResponse | void> => {
   try {
     const data = await req.clone().json();
-    console.log("reorder input", data);
 
     const reorderSchema = z.object({
       items: z.array(
@@ -128,7 +123,6 @@ export const validateReorderInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

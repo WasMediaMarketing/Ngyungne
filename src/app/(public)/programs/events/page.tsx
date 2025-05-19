@@ -38,7 +38,6 @@ export default function EventsPage() {
 
     fetchEvents();
   }, []);
-  console.log("events", events);
 
   // Load favorites from localStorage
   useEffect(() => {

@@ -62,10 +62,8 @@ export async function getUserById(userId: string): Promise<IUser> {
 export async function createUser(userData: IUserInput): Promise<IUser> {
   try {
     const cleanedData = cleanUserData(userData);
-    console.log("Creating user with data:", cleanedData);
 
     const token = getAuthToken();
-    console.log("Using auth token:", token ? "Token exists" : "No token found");
 
     const response = await fetch("/api/user", {
       method: "POST",
@@ -76,10 +74,7 @@ export async function createUser(userData: IUserInput): Promise<IUser> {
       body: JSON.stringify(cleanedData),
     });
 
-    console.log("Response status:", response.status);
-
     const responseData = await response.json();
-    console.log("Response data:", responseData);
 
     if (!response.ok) {
       throw new Error(responseData.message || "Failed to create user");

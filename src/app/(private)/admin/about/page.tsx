@@ -524,8 +524,6 @@ export default function AboutAdminPage() {
       </div>
     );
   }
-  console.log("heroSection", heroSection);
-  console.log("statistics", statistics);
 
   return (
     <div className="container mx-auto py-8">

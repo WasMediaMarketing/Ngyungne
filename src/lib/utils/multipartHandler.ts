@@ -44,8 +44,6 @@ export async function handleMultipartRequest(
 
   if (fileUrls instanceof NextResponse) return fileUrls; // If an error occurred in file processing, return the response
 
-  // Extract text fields from formData
-  console.log(fileUrls, fileUrls);
   const body: Record<string, unknown> = {};
   formData.forEach((value, key) => {
     if (!uploadFields.some(({ fileField }) => fileField === key)) {
