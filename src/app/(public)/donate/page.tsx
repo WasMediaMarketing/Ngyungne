@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -28,19 +28,10 @@ import {
 } from "lucide-react";
 import { SupportSection } from "@/components/sections/support-section";
 import { createDonation } from "@/utils/donationApi";
+import { getSettings } from "@/utils/settingsApi";
+import type { PaymentInfo } from "@/types/setting.types";
 import Image from "next/image";
 import Spinner from "@/components/spinner";
-
-const paymentMethods = [
-  {
-    id: "bank",
-    name: "Bank Transfer",
-    accountInfo:
-      "Bank: B.T.M.C. Foundation\nA/C Number: 2222410016305780\nSWIFT: NMBBNPKA\nBranch: Boudha Branch, Kathmandu, Nepal",
-  },
-  { id: "esewa", name: "eSewa", accountInfo: "eSewa ID: 9849118562" },
-  { id: "khalti", name: "Khalti", accountInfo: "Khalti ID: 9849118562" },
-];
 
 export default function DonatePage() {
   const [ref, inView] = useInView({
@@ -48,9 +39,10 @@ export default function DonatePage() {
     threshold: 0.1,
   });
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-    paymentMethods[0].id
-  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentInfo[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<string>("");
   const [donationType, setDonationType] = useState("one-time");
   const [amount, setAmount] = useState("");
   const [name, setName] = useState("");
@@ -63,6 +55,34 @@ export default function DonatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    async function fetchPaymentInfo() {
+      try {
+        setIsLoading(true);
+        const settings = await getSettings();
+
+        // Filter active payment methods
+        const activePaymentMethods = settings.paymentInfo.filter(
+          (method) => method.isActive
+        );
+
+        setPaymentMethods(activePaymentMethods);
+
+        // Set default payment method if available
+        if (activePaymentMethods.length > 0) {
+          setSelectedPaymentMethod(activePaymentMethods[0].type);
+        }
+      } catch (error) {
+        console.error("Error fetching payment info:", error);
+        toast.error("Failed to load payment information");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchPaymentInfo();
+  }, []);
 
   const handleAmountSelect = (value: string) => {
     setAmount(value);
@@ -191,6 +211,36 @@ export default function DonatePage() {
       setIsSubmitting(false);
     }
   };
+
+  const getPaymentDetails = (method: PaymentInfo) => {
+    switch (method.type) {
+      case "BANK":
+        return method.bank
+          ? {
+              name: "Bank Transfer",
+              accountInfo: `Bank: ${method.bank.bankName}\nA/C Name: ${method.bank.accountName}\nA/C Number: ${method.bank.accountNumber}\nBranch: ${method.bank.branchName}\nSWIFT: ${method.bank.swiftCode}`,
+            }
+          : null;
+      case "ESEWA":
+      case "KHALTI":
+        return method.digitalWallet
+          ? {
+              name: method.type === "ESEWA" ? "eSewa" : "Khalti",
+              accountInfo: `${
+                method.type === "ESEWA" ? "eSewa" : "Khalti"
+              } ID: ${method.digitalWallet.id}`,
+            }
+          : null;
+      default:
+        return null;
+    }
+  };
+
+  const selectedPaymentDetails = selectedPaymentMethod
+    ? getPaymentDetails(
+        paymentMethods.find((m) => m.type === selectedPaymentMethod)!
+      )
+    : null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -356,31 +406,78 @@ export default function DonatePage() {
                 </div>
                 <div className="mb-4">
                   <Label className="text-maroon-700">Payment Method *</Label>
-                  <RadioGroup
-                    value={selectedPaymentMethod}
-                    onValueChange={setSelectedPaymentMethod}
-                    className="mt-2"
-                  >
-                    {paymentMethods.map((method) => (
-                      <div
-                        key={method.id}
-                        className="flex items-center space-x-2"
-                      >
-                        <RadioGroupItem value={method.id} id={method.id} />
-                        <Label htmlFor={method.id}>{method.name}</Label>
+                  {isLoading ? (
+                    <div className="flex justify-center py-4">
+                      <Spinner text="Loading payment methods..." />
+                    </div>
+                  ) : paymentMethods.length === 0 ? (
+                    <div className="text-center py-4 text-maroon-600">
+                      No payment methods available
+                    </div>
+                  ) : (
+                    <RadioGroup
+                      value={selectedPaymentMethod}
+                      onValueChange={setSelectedPaymentMethod}
+                      className="mt-2"
+                    >
+                      {paymentMethods.map((method) => {
+                        const details = getPaymentDetails(method);
+                        if (!details) return null;
+
+                        return (
+                          <div
+                            key={method.type}
+                            className="flex items-center space-x-2"
+                          >
+                            <RadioGroupItem
+                              value={method.type}
+                              id={method.type}
+                            />
+                            <Label htmlFor={method.type}>{details.name}</Label>
+                          </div>
+                        );
+                      })}
+                    </RadioGroup>
+                  )}
+                </div>
+                {selectedPaymentMethod && selectedPaymentDetails && (
+                  <div className="mb-4 p-4 bg-saffron-100 rounded-md">
+                    <h4 className="font-semibold mb-2">Account Information</h4>
+                    <pre className="whitespace-pre-wrap text-sm">
+                      {selectedPaymentDetails.accountInfo}
+                    </pre>
+                    {paymentMethods.find(
+                      (m) => m.type === selectedPaymentMethod
+                    )?.bank?.qrCode && (
+                      <div className="mt-4 flex justify-center">
+                        <img
+                          src={
+                            paymentMethods.find(
+                              (m) => m.type === selectedPaymentMethod
+                            )?.bank?.qrCode
+                          }
+                          alt="Payment QR Code"
+                          className="max-w-[200px]"
+                        />
                       </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-                <div className="mb-4 p-4 bg-saffron-100 rounded-md">
-                  <h4 className="font-semibold mb-2">Account Information</h4>
-                  <pre className="whitespace-pre-wrap text-sm">
-                    {
-                      paymentMethods.find((m) => m.id === selectedPaymentMethod)
-                        ?.accountInfo
-                    }
-                  </pre>
-                </div>
+                    )}
+                    {paymentMethods.find(
+                      (m) => m.type === selectedPaymentMethod
+                    )?.digitalWallet?.qrCode && (
+                      <div className="mt-4 flex justify-center">
+                        <img
+                          src={
+                            paymentMethods.find(
+                              (m) => m.type === selectedPaymentMethod
+                            )?.digitalWallet?.qrCode
+                          }
+                          alt="Payment QR Code"
+                          className="max-w-[200px]"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="mb-4">
                   <Label htmlFor="screenshot" className="text-maroon-700">
                     Payment Screenshot *

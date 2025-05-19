@@ -25,7 +25,6 @@ export class ScriptureController {
       );
       return handleResponse(scripture, httpMessages.CREATED());
     } catch (error) {
-      console.log("createScriptureController error", error);
       return handleError(undefined, req);
     }
   }
@@ -38,10 +37,8 @@ export class ScriptureController {
   async getScriptures(): Promise<NextResponse> {
     try {
       const scriptures = await this.scriptureService.getScriptures();
-      console.log("result of scripture controller get", scriptures);
       return handleResponse(scriptures);
     } catch (error) {
-      console.log("getScripturesController error", error);
       return handleError();
     }
   }
@@ -54,10 +51,8 @@ export class ScriptureController {
   async getPublishedScriptures(): Promise<NextResponse> {
     try {
       const scriptures = await this.scriptureService.getScriptures(true);
-      console.log("result of scripture service get", scriptures); // Assuming true means published
       return handleResponse(scriptures);
     } catch (error) {
-      console.log("getPublishedScripturesController error", error);
       return handleError();
     }
   }
@@ -82,7 +77,6 @@ export class ScriptureController {
       );
       return handleResponse(scripture);
     } catch (error) {
-      console.log("getScriptureByIdController error", error);
       return handleError();
     }
   }
@@ -110,7 +104,6 @@ export class ScriptureController {
       );
       return handleResponse(updatedScripture);
     } catch (error) {
-      console.log("updateScriptureController error", error);
       return req instanceof ExtendedNextRequest
         ? handleError(undefined, req)
         : handleError();
@@ -136,7 +129,6 @@ export class ScriptureController {
       );
       return handleResponse(deletedScripture);
     } catch (error) {
-      console.log("deleteScriptureController error", error);
       return handleError();
     }
   }
@@ -168,7 +160,6 @@ export class ScriptureController {
 
       const objectIds = scriptureIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Scripture IDs (ObjectId format):", objectIds);
       const isDeleted = await this.scriptureService.deleteScriptures(objectIds);
       return handleResponse(isDeleted);
     } catch (error) {

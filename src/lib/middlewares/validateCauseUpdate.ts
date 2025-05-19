@@ -70,7 +70,6 @@ export const validateCauseUpdate = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("Validation Error:", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
     return;

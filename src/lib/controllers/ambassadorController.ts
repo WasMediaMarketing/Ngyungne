@@ -25,7 +25,6 @@ export class AmbassadorController {
       const ambassadors = await this.ambassadorService.getAmbassadors(true);
       return handleResponse(ambassadors);
     } catch (error) {
-      console.log("getAmbassadorsController error", error);
       return handleError();
     }
   }
@@ -40,7 +39,6 @@ export class AmbassadorController {
       const ambassadors = await this.ambassadorService.getAmbassadors(false);
       return handleResponse(ambassadors);
     } catch (error) {
-      console.log("getAmbassadorsToDisplayController error", error);
       return handleError();
     }
   }
@@ -67,8 +65,6 @@ export class AmbassadorController {
       const ambassador = await this.ambassadorService.createAmbassador(data);
       return handleResponse(ambassador, httpMessages.CREATED());
     } catch (error) {
-      console.log("createAmbassadorController error", error);
-
       // Clean up uploaded files on error
       if (req.uploadedFiles) {
         for (const [field, url] of Object.entries(req.uploadedFiles)) {
@@ -116,7 +112,6 @@ export class AmbassadorController {
 
       return handleResponse(updatedAmbassador);
     } catch (error) {
-      console.log("updateAmbassadorController error", error);
       return handleError(undefined, req);
     }
   }
@@ -155,7 +150,6 @@ export class AmbassadorController {
 
       return handleResponse(updatedAmbassador);
     } catch (error) {
-      console.log("updateAmbassadorVisibilityController error", error);
       return handleError(undefined, req);
     }
   }
@@ -196,7 +190,6 @@ export class AmbassadorController {
 
       return handleResponse({ message: "Ambassador deleted successfully" });
     } catch (error) {
-      console.log("deleteAmbassadorController error", error);
       return handleError();
     }
   }
@@ -286,7 +279,6 @@ export class AmbassadorController {
 
       return handleResponse(ambassador);
     } catch (error) {
-      console.log("getAmbassadorByIdController error", error);
       return handleError();
     }
   }
@@ -300,7 +292,6 @@ export class AmbassadorController {
       const ambassadors = await this.ambassadorService.getAmbassadors(true);
       return { data: ambassadors };
     } catch (error) {
-      console.log("getAmbassadorsForProps error", error);
       return { error: error as Error };
     }
   }
@@ -323,7 +314,6 @@ export class AmbassadorController {
       );
       return { data: ambassador };
     } catch (error) {
-      console.log("getAmbassadorByIdForProps error", error);
       return { error: error };
     }
   }

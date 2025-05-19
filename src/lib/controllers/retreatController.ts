@@ -23,7 +23,6 @@ export class RetreatController {
       const retreat = await this.retreatService.createRetreat(retreatData);
       return handleResponse(retreat, httpMessages.CREATED());
     } catch (error) {
-      console.log("createRetreatController error", error);
       return handleError();
     }
   }
@@ -39,7 +38,6 @@ export class RetreatController {
       const retreats = await this.retreatService.getRetreats();
       return handleResponse(retreats);
     } catch (error) {
-      console.log("getRetreatsController error", error);
       return handleError();
     }
   }
@@ -55,7 +53,6 @@ export class RetreatController {
       const retreats = await this.retreatService.getRetreats(true);
       return handleResponse(retreats);
     } catch (error) {
-      console.log("getPublishedRetreatsController error", error);
       return handleError();
     }
   }
@@ -80,7 +77,6 @@ export class RetreatController {
       );
       return handleResponse(retreat);
     } catch (error) {
-      console.log("getRetreatByIdController error", error);
       return handleError();
     }
   }
@@ -106,7 +102,6 @@ export class RetreatController {
       );
       return handleResponse(updatedRetreat);
     } catch (error) {
-      console.log("updateRetreatController error", error);
       return handleError();
     }
   }
@@ -130,7 +125,6 @@ export class RetreatController {
       );
       return handleResponse(deletedRetreat);
     } catch (error) {
-      console.log("deleteRetreatController error", error);
       return handleError();
     }
   }
@@ -162,7 +156,6 @@ export class RetreatController {
 
       const objectIds = retreatIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Retreat IDs (ObjectId format):", objectIds);
       const isDeleted = await this.retreatService.deleteRetreats(objectIds);
       return handleResponse(isDeleted);
     } catch (error) {

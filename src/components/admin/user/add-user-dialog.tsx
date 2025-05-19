@@ -98,7 +98,6 @@ export function AddUserDialog({
   const isAdmin = selectedRole === "admin";
 
   const onSubmit = async (data: UserFormValues) => {
-    console.log("AddUserDialog - onSubmit called with data:", data);
     setFormError(null);
     setIsLoading(true);
 
@@ -120,10 +119,7 @@ export function AddUserDialog({
         userInput.password = data.password;
       }
 
-      console.log("Calling createUser with:", userInput);
-
       const newUser = await createUser(userInput);
-      console.log("User created successfully:", newUser);
 
       onUserAdded(newUser);
 

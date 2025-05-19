@@ -25,7 +25,6 @@ export class CauseController {
       const cause = await this.causeService.createCause(causeData);
       return handleResponse(cause, httpMessages.CREATED());
     } catch (error) {
-      console.log("createCauseController error", error);
       return handleError(undefined, req);
     }
   }
@@ -41,7 +40,6 @@ export class CauseController {
       const causes = await this.causeService.getCauses();
       return handleResponse(causes);
     } catch (error) {
-      console.log("getCausesController error", error);
       return handleError();
     }
   }
@@ -57,7 +55,6 @@ export class CauseController {
       const causes = await this.causeService.getCauses(true);
       return handleResponse(causes);
     } catch (error) {
-      console.log("getPublishedCausesController error", error);
       return handleError();
     }
   }
@@ -82,7 +79,6 @@ export class CauseController {
       );
       return handleResponse(cause);
     } catch (error) {
-      console.log("getCauseByIdController error", error);
       return handleError();
     }
   }
@@ -98,7 +94,6 @@ export class CauseController {
       const causes = await this.causeService.getCauses();
       return { data: causes };
     } catch (error) {
-      console.log("getCausesForPropsController error", error);
       return { error: error as Error };
     }
   }
@@ -120,7 +115,6 @@ export class CauseController {
       );
       return { data: cause };
     } catch (error) {
-      console.log("getCauseByIdForPropsController error", error);
       return { error: error };
     }
   }
@@ -148,7 +142,6 @@ export class CauseController {
       );
       return handleResponse(updatedCause);
     } catch (error) {
-      console.log("updateCauseController error", error);
       return req instanceof ExtendedNextRequest
         ? handleError(undefined, req)
         : handleError();
@@ -174,7 +167,6 @@ export class CauseController {
       );
       return handleResponse(deletedCause);
     } catch (error) {
-      console.log("deleteCauseController error", error);
       return handleError();
     }
   }
@@ -204,7 +196,6 @@ export class CauseController {
 
       const objectIds = causeIdArray.map((id) => new Types.ObjectId(id));
 
-      console.log("Cause IDs (ObjectId format):", objectIds);
       const isDeleted = await this.causeService.deleteCauses(objectIds);
       return handleResponse(isDeleted);
     } catch (error) {

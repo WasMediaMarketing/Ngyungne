@@ -57,9 +57,6 @@ export class PageController {
       // Replace spaces or %20 with hyphens
       const modifiedSlug = slugPath.replace(/%20| /g, "-");
 
-      console.log("Original Slug Path:", slugPath);
-      console.log("Modified Slug (Spaces or %20 to Hyphens):", modifiedSlug);
-
       const page = await this.pageService.getPageBySlug(modifiedSlug);
 
       if (!page) {

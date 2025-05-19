@@ -90,8 +90,6 @@ import { validateFaqData } from "@/lib/middlewares/validateFaq";
  */
 
 export async function POST(req: NextRequest) {
-  console.log("POST /api/faq - Request received");
-
   // Check authentication
   const authResult = await isAuthenticated(req);
   if (authResult) {

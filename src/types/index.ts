@@ -62,6 +62,23 @@ import {
   IBlogPostUpdate,
 } from "./blogPost.types";
 import { IBlogPostService } from "./blogPostService.interface";
+import {
+  ISlider,
+  ISliderInput,
+  ISliderUpdate,
+  ISliderService,
+} from "./slider.types";
+import {
+  IStatistic,
+  IHistoryItem,
+  IAboutContent,
+  IAboutContentInput,
+  IAboutContentUpdate,
+  IAboutService,
+  IBenefitItem,
+  IHeroSection,
+  IPracticeElement,
+} from "./about.types";
 export type {
   IUser,
   IUserInput,
@@ -128,4 +145,17 @@ export type {
   IBlogPostInput,
   IBlogPostUpdate,
   IBlogPostService,
+  ISlider,
+  ISliderInput,
+  ISliderUpdate,
+  ISliderService,
+  IAboutContent,
+  IAboutContentInput,
+  IAboutContentUpdate,
+  IStatistic,
+  IHistoryItem,
+  IAboutService,
+  IBenefitItem,
+  IHeroSection,
+  IPracticeElement,
 };

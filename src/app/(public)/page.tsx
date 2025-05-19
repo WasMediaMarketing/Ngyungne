@@ -6,7 +6,7 @@ import { CausesSection } from "@/components/sections/causes-section";
 // import { ProgramsSection } from "@/components/sections/programs-section";
 import { TestimonialsSection } from "@/components/sections/testimonials-section";
 import { ImpactSection } from "@/components/sections/impact-section";
-import { BlogSection } from "@/components/blog/blog-section";
+import BlogSection from "@/components/blog/BlogSection";
 import { SupportSection } from "@/components/sections/support-section";
 import { FeaturedEventsSlider } from "@/components/events/FeaturedEventsSlider";
 import { events } from "@/data/events";
@@ -36,7 +36,6 @@ export default function Home() {
       setIsLoading(true);
       try {
         const data = await causeApi.getCauses();
-        console.log("Causes data:", data); // Add this log
         setCauses(data);
       } catch (error) {
         console.error("Failed to fetch causes:", error);
@@ -53,7 +52,6 @@ export default function Home() {
     const fetchEvents = async () => {
       try {
         const data = await eventApi.getEvents();
-        console.log("Events data:", data); // Add this log
         setEvents(data);
       } catch (error) {
         console.error("Error fetching events:", error);

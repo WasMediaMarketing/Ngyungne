@@ -43,12 +43,9 @@ export default async function DynamicPage({
 }) {
   // Extract the slug before using it
   const slug = params?.slug;
-  console.log(`Rendering dynamic page for slug: ${slug}`);
 
   const page = await pageApi.getPageBySlug(slug);
-  console.log(`Page fetched: ${JSON.stringify(page)}`);
   if (!page) {
-    console.log(`Page not found for slug: ${slug}, showing 404`);
     notFound();
   }
 

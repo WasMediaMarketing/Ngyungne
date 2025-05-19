@@ -33,8 +33,7 @@ export function RegisterForm({ teaching }: any) {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log("Form submitted:", formData);
+
     setOpen(false);
   };
 

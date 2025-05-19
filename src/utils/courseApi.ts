@@ -121,9 +121,7 @@ export const courseApi = {
   createCourse: async (formData: FormData): Promise<ICourse | null> => {
     try {
       // Log the FormData for debugging
-      console.log("API - Form data entries:");
       for (const pair of formData.entries()) {
-        console.log(pair[0], typeof pair[1], pair[1]);
       }
 
       const response = await fetch("/api/course", {
@@ -172,9 +170,7 @@ export const courseApi = {
   ): Promise<ICourse | null> => {
     try {
       // Log the FormData for debugging
-      console.log("API - Update Form data entries:");
       for (const pair of formData.entries()) {
-        console.log(pair[0], typeof pair[1], pair[1]);
       }
 
       const response = await fetch(`/api/course/${id}`, {

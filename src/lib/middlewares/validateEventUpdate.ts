@@ -51,7 +51,6 @@ export const validateEventUpdate = async (
 ): Promise<NextResponse | void> => {
   try {
     const eventData = await req.clone().json();
-    console.log("event update", eventData);
 
     const result = eventUpdateSchema.safeParse(eventData);
 
@@ -59,7 +58,6 @@ export const validateEventUpdate = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

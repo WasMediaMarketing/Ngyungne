@@ -35,7 +35,6 @@ export const validateScriptureInput = async (
 ): Promise<NextResponse | void> => {
   try {
     const scriptureData = await req.clone().json();
-    console.log("scripture input", scriptureData);
 
     const result = scriptureSchema.safeParse(scriptureData);
 
@@ -43,7 +42,6 @@ export const validateScriptureInput = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 
@@ -77,7 +75,6 @@ export const validateScriptureUpdate = async (
 ): Promise<NextResponse | void> => {
   try {
     const scriptureData = await req.clone().json();
-    console.log("scripture update", scriptureData);
 
     const result = scriptureUpdateSchema.safeParse(scriptureData);
 
@@ -85,7 +82,6 @@ export const validateScriptureUpdate = async (
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

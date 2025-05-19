@@ -109,7 +109,6 @@ export const blogApi = {
     id: string,
     blogPostData: FormData
   ): Promise<IBlogPost> => {
-    console.log("updateBlogPost", id, blogPostData);
     try {
       const response = await fetch(`/api/blogpost/${id}`, {
         method: "PATCH",

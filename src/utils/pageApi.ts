@@ -126,7 +126,6 @@ export const pageApi = {
   async getPageBySlug(slug: string): Promise<PageUI | null> {
     try {
       const url = `${BASE_URL}/api/pages/slug/${slug}`;
-      console.log(`Fetching from: ${url}`);
 
       const response = await fetch(url, {
         next: { revalidate: 60 },
@@ -246,10 +245,6 @@ export const pageApi = {
   ): Promise<boolean> {
     try {
       const newStatus = currentStatus === "draft" ? "published" : "draft";
-      console.log(
-        `Toggling page ${pageId} status from ${currentStatus} to ${newStatus}`
-      );
-      console.log(`Using auth token: ${getAdminToken().substring(0, 5)}...`);
 
       const response = await fetch(`${API_URL}/${pageId}`, {
         method: "PATCH",

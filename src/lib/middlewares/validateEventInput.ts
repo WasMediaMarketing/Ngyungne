@@ -27,11 +27,9 @@ const eventSchema = z
     title: z.string().min(1, { message: "Title is required" }),
     description: z.string().min(1, { message: "Description is required" }),
     type: z.string().min(1, { message: "Event Type is required" }),
-    date: z
-      .string()
-      .refine((val) => !isNaN(Date.parse(val)), {
-        message: "Invalid date format",
-      }),
+    date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+      message: "Invalid date format",
+    }),
     time: z.string().min(1, { message: "Time is required" }),
     location: z.string().min(1, { message: "Location is required" }),
     teacher: teacherSchema,
@@ -57,13 +55,10 @@ export const validateEventInput = async (
     const eventData = await req.clone().json();
 
     const result = eventSchema.safeParse(eventData);
-    console.log("eventData", eventData);
-
     if (!result.success) {
       const errorMessages = result.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
-      console.log("errorMessage", errorMessages);
       return handleError(httpMessages.BAD_REQUEST(errorMessages));
     }
 

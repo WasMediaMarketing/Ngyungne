@@ -161,9 +161,6 @@ export default function AdminPageList() {
   ) => {
     setIsUpdatingStatus(id);
     try {
-      console.log(
-        `Attempting to toggle status for page ${id} from ${currentStatus}`
-      );
       const success = await pageApi.togglePageStatus(id, currentStatus);
 
       if (success) {
@@ -172,7 +169,6 @@ export default function AdminPageList() {
             if (page.id === id) {
               const newStatus =
                 currentStatus === "draft" ? "published" : "draft";
-              console.log(`Successfully updated page status to ${newStatus}`);
               return {
                 ...page,
                 status: newStatus,

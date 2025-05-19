@@ -87,7 +87,6 @@ export default function AdminScripturePage() {
       setLoading(false);
     }
   };
-  console.log("scriptures", scriptures);
 
   useEffect(() => {
     fetchScriptures();

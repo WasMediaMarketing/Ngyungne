@@ -15,7 +15,6 @@ export class BookEventController {
   async createBookEvent(req: NextRequest): Promise<NextResponse> {
     try {
       const bookEventData = await req.json();
-      console.log("body in controller", bookEventData);
       const bookEvent = await this.bookEventService.createBookEvent(
         bookEventData
       );

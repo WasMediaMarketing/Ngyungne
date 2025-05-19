@@ -118,9 +118,7 @@ export const causeApi = {
   // Get all causes (public endpoint - only visible causes)
   getCauses: async (): Promise<CauseUI[]> => {
     try {
-      console.log("Fetching all causes");
       const response = await axios.get("/api/cause");
-      console.log("API response for all causes:", response.data);
 
       // Extract causes from response with more detailed handling
       let causes;
@@ -147,7 +145,6 @@ export const causeApi = {
       }
 
       const mappedCauses = causes.map(mapCauseToUI);
-      console.log("Mapped causes:", mappedCauses);
       return mappedCauses;
     } catch (error) {
       console.error("Error fetching causes:", error);
@@ -184,9 +181,7 @@ export const causeApi = {
   // Get cause by ID
   getCauseById: async (id: string): Promise<CauseUI | null> => {
     try {
-      console.log(`Fetching cause with ID: ${id}`);
       const response = await axios.get(`/api/cause/${id}`);
-      console.log(`API response for cause ${id}:`, response.data);
 
       if (!response.data) {
         console.error("Empty response data");
@@ -208,7 +203,6 @@ export const causeApi = {
 
       // Map the cause data to UI format
       const mappedCause = mapCauseToUI(causeData);
-      console.log("Mapped cause:", mappedCause);
       return mappedCause;
     } catch (error) {
       console.error(`Error fetching cause ${id}:`, error);

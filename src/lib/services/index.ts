@@ -15,6 +15,9 @@ import { NewsletterService } from "./newsletterService";
 import { AmbassadorService } from "./ambassadorService";
 import { GalleryService } from "./galleryService";
 import { BlogPostService } from "./blogPostService";
+import { SliderService } from "./sliderService";
+import { SettingService } from "./settingService";
+import { AboutService } from "./aboutService";
 export {
   UserService,
   DonationService,
@@ -33,4 +36,7 @@ export {
   AmbassadorService,
   GalleryService,
   BlogPostService,
+  SliderService,
+  SettingService,
+  AboutService,
 };

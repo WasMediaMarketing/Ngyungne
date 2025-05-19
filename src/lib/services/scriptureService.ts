@@ -53,7 +53,6 @@ export class ScriptureService implements IScriptureService {
     await this.initializeDbConnection();
     const scripture = await Scripture.findById(scriptureId);
     if (!scripture) throw new Error("Scripture not found");
-    console.log("result of scripture service get", scripture);
     return scripture;
   }
 

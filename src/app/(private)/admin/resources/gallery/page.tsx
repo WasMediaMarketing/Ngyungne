@@ -103,7 +103,6 @@ export default function AdminGalleryPage() {
       return;
     }
 
-    console.log("Setting item to edit with ID:", id);
     setItemToEdit(id);
     setIsEditItemOpen(true);
     // Close view dialog if open

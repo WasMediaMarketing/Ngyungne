@@ -161,8 +161,6 @@ export function DonationsDataTable() {
         return;
       }
 
-      console.log("Deleting donations with IDs:", selectedDonationIds);
-
       const response = await fetch(
         `/api/donation?donationIds=${selectedDonationIds.join(",")}`,
         {

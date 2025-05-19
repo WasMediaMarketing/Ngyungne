@@ -25,7 +25,6 @@ export class PhilosophyTopicController {
         );
       return handleResponse(philosophyTopic, httpMessages.CREATED());
     } catch (error) {
-      console.log("createPhilosophyTopicController error", error);
       return handleError();
     }
   }
@@ -40,7 +39,6 @@ export class PhilosophyTopicController {
         await this.philosophyTopicService.getPhilosophyTopics();
       return handleResponse(philosophyTopics);
     } catch (error) {
-      console.log("getPhilosophyTopicsController error", error);
       return handleError();
     }
   }
@@ -55,7 +53,6 @@ export class PhilosophyTopicController {
         await this.philosophyTopicService.getPhilosophyTopics(true);
       return handleResponse(philosophyTopics);
     } catch (error) {
-      console.log("getVisiblePhilosophyTopicsController error", error);
       return handleError();
     }
   }
@@ -82,7 +79,6 @@ export class PhilosophyTopicController {
         );
       return handleResponse(philosophyTopic);
     } catch (error) {
-      console.log("getPhilosophyTopicByIdController error", error);
       return handleError();
     }
   }
@@ -113,7 +109,6 @@ export class PhilosophyTopicController {
         );
       return handleResponse(updatedPhilosophyTopic);
     } catch (error) {
-      console.log("updatePhilosophyTopicController error", error);
       return handleError();
     }
   }
@@ -140,7 +135,6 @@ export class PhilosophyTopicController {
         );
       return handleResponse(deletedPhilosophyTopic);
     } catch (error) {
-      console.log("deletePhilosophyTopicController error", error);
       return handleError();
     }
   }
@@ -176,7 +170,6 @@ export class PhilosophyTopicController {
         (id) => new Types.ObjectId(id)
       );
 
-      console.log("Philosophy Topic IDs (ObjectId format):", objectIds);
       const isDeleted =
         await this.philosophyTopicService.deletePhilosophyTopics(objectIds);
       return handleResponse(isDeleted);

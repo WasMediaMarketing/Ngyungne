@@ -1,11 +1,9 @@
 "use client";
 
 import { Label } from "@/components/ui/label";
-
 import type React from "react";
-
 import { motion, useInView } from "framer-motion";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +30,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createDonation } from "@/utils/donationApi";
+import { getSettings } from "@/utils/settingsApi";
+import { PaymentMethodType, PaymentInfo } from "@/types/setting.types";
 import Spinner from "../spinner";
 
 const supportOptions = [
@@ -78,12 +78,6 @@ const supportOptions = [
   },
 ];
 
-const paymentMethods = [
-  { id: "bank", name: "Bank Transfer" },
-  { id: "khalti", name: "Khalti" },
-  { id: "esewa", name: "eSewa" },
-];
-
 export function SupportSection() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true });
@@ -98,6 +92,8 @@ export function SupportSection() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLLabelElement>(null);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentInfo[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm({
     defaultValues: {
@@ -105,10 +101,39 @@ export function SupportSection() {
       email: "",
       phone: "",
       amount: "",
-      paymentMethod: "bank",
+      paymentMethod: "",
       receiveUpdates: true,
     },
   });
+
+  // Fetch payment info from API
+  useEffect(() => {
+    async function fetchPaymentInfo() {
+      try {
+        setIsLoading(true);
+        const settings = await getSettings();
+
+        // Filter active payment methods
+        const activePaymentMethods = settings.paymentInfo.filter(
+          (method) => method.isActive
+        );
+
+        setPaymentMethods(activePaymentMethods);
+
+        // Set default payment method if available
+        if (activePaymentMethods.length > 0) {
+          form.setValue("paymentMethod", activePaymentMethods[0].type);
+        }
+      } catch (error) {
+        console.error("Error fetching payment info:", error);
+        toast.error("Failed to load payment information");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchPaymentInfo();
+  }, [form]);
 
   const handleSupportNow = (option: any) => {
     setSelectedOption(option);
@@ -119,7 +144,7 @@ export function SupportSection() {
       email: "",
       phone: "",
       amount: donationAmount.replace(/[^0-9]/g, "") || "",
-      paymentMethod: "bank",
+      paymentMethod: paymentMethods.length > 0 ? paymentMethods[0].type : "",
       receiveUpdates: true,
     });
   };
@@ -194,6 +219,101 @@ export function SupportSection() {
     setScreenshotPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+  };
+
+  const renderPaymentMethodDetails = (method: PaymentInfo) => {
+    switch (method.type) {
+      case PaymentMethodType.BANK:
+        return method.bank ? (
+          <div className="p-3 bg-gray-50">
+            <p>
+              <strong>Beneficiary Name:</strong> {method.bank.accountName}
+            </p>
+            <p>
+              <strong>Bank Name:</strong> {method.bank.bankName}
+            </p>
+            <p>
+              <strong>SWIFT:</strong> {method.bank.swiftCode}
+            </p>
+            <p>
+              <strong>A/C No.:</strong> {method.bank.accountNumber}
+            </p>
+            <p>
+              <strong>Branch:</strong> {method.bank.branchName}
+            </p>
+            {method.bank.qrCode && (
+              <div className="mt-2 flex justify-center">
+                <img
+                  src={method.bank.qrCode}
+                  alt="Bank QR Code"
+                  className="max-h-32 object-contain"
+                />
+              </div>
+            )}
+          </div>
+        ) : null;
+
+      case PaymentMethodType.ESEWA:
+      case PaymentMethodType.KHALTI:
+        return method.digitalWallet ? (
+          <div className="p-3 bg-gray-50">
+            <p className="text-sm mb-2">
+              {method.type === PaymentMethodType.ESEWA ? "eSewa" : "Khalti"}{" "}
+              Payment:
+            </p>
+            <p className="text-sm mt-2 text-gray-600">
+              {method.type === PaymentMethodType.ESEWA ? "eSewa" : "Khalti"} ID:{" "}
+              {method.digitalWallet.id}
+            </p>
+            {method.digitalWallet.qrCode && (
+              <div className="mt-2 flex justify-center">
+                <img
+                  src={method.digitalWallet.qrCode}
+                  alt={`${method.type} QR Code`}
+                  className="max-h-32 object-contain"
+                />
+              </div>
+            )}
+          </div>
+        ) : null;
+
+      case PaymentMethodType.OTHER:
+        return method.other ? (
+          <div className="p-3 bg-gray-50">
+            <p>
+              <strong>{method.other.name}</strong>
+            </p>
+            <p className="text-sm">{method.other.details}</p>
+            {method.other.qrCode && (
+              <div className="mt-2 flex justify-center">
+                <img
+                  src={method.other.qrCode}
+                  alt="Payment QR Code"
+                  className="max-h-32 object-contain"
+                />
+              </div>
+            )}
+          </div>
+        ) : null;
+
+      default:
+        return null;
+    }
+  };
+
+  const getPaymentMethodLabel = (method: PaymentInfo) => {
+    switch (method.type) {
+      case PaymentMethodType.BANK:
+        return "Bank Transfer";
+      case PaymentMethodType.ESEWA:
+        return "eSewa";
+      case PaymentMethodType.KHALTI:
+        return "Khalti";
+      case PaymentMethodType.OTHER:
+        return method.other?.name || "Other Payment Method";
+      default:
+        return "Payment Method";
     }
   };
 
@@ -345,317 +465,280 @@ export function SupportSection() {
             </DialogDescription>
           </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg font-medium">
-                        Donation Amount *
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                            $
-                          </span>
-                          <Input
-                            placeholder="Enter donation amount"
-                            className="pl-8"
-                            type="number"
-                            min="1"
-                            required
-                            {...field}
-                            value={
-                              donationAmount.replace(/[^0-9]/g, "") ||
-                              field.value
-                            }
-                            onChange={(e) => {
-                              setDonationAmount(e.target.value);
-                              field.onChange(e);
-                            }}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="fullName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your full name"
-                          required
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your email"
-                          type="email"
-                          required
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your phone number"
-                          required
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="paymentMethod"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-lg font-medium">
-                        Payment Method *
-                      </FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="space-y-2"
-                        >
-                          <div className="border rounded-lg overflow-hidden">
-                            <div className="flex items-center space-x-2 p-3 border-b">
-                              <RadioGroupItem value="bank" id="bank" />
-                              <label
-                                htmlFor="bank"
-                                className="flex-1 cursor-pointer font-medium"
-                              >
-                                Bank Transfer
-                              </label>
-                            </div>
-                            {field.value === "bank" && (
-                              <div className="p-3 bg-gray-50">
-                                <p>
-                                  <strong>Beneficiary Name:</strong> B.T.M.C.
-                                  Foundation
-                                </p>
-                                <p>
-                                  <strong>Bank Name:</strong> NMB Bank
-                                </p>
-                                <p>
-                                  <strong>SWIFT:</strong> NMBBNPKA
-                                </p>
-                                <p>
-                                  <strong>A/C No.:</strong> 2222410016305780
-                                </p>
-                                <p>
-                                  <strong>Branch:</strong> Boudha Branch,
-                                  Kathmandu, Nepal
-                                </p>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="border rounded-lg overflow-hidden">
-                            <div className="flex items-center space-x-2 p-3 border-b">
-                              <RadioGroupItem value="khalti" id="khalti" />
-                              <label
-                                htmlFor="khalti"
-                                className="flex-1 cursor-pointer font-medium"
-                              >
-                                Khalti
-                              </label>
-                            </div>
-                            {field.value === "khalti" && (
-                              <div className="p-3 bg-gray-50">
-                                <p className="text-sm mb-2">Khalti Payment:</p>
-
-                                <p className="text-sm mt-2 text-gray-600">
-                                  Khalti ID: 9849118562
-                                </p>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="border rounded-lg overflow-hidden">
-                            <div className="flex items-center space-x-2 p-3 border-b">
-                              <RadioGroupItem value="esewa" id="esewa" />
-                              <label
-                                htmlFor="esewa"
-                                className="flex-1 cursor-pointer font-medium"
-                              >
-                                eSewa
-                              </label>
-                            </div>
-                            {field.value === "esewa" && (
-                              <div className="p-3 bg-gray-50">
-                                <p className="text-sm mb-2">eSewa Payment:</p>
-
-                                <p className="text-sm mt-2 text-gray-600">
-                                  eSewa ID: 9849118562
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="space-y-2">
-                  <FormLabel className="text-lg font-medium">
-                    Payment Screenshot *
-                  </FormLabel>
-                  <div className="mt-1">
-                    <Label
-                      htmlFor="support-screenshot-upload"
-                      ref={dropZoneRef}
-                      className={`cursor-pointer flex flex-col items-center justify-center w-full border-2 ${
-                        isDragging
-                          ? "border-primary"
-                          : "border-dashed border-gray-300"
-                      } rounded-md p-4 hover:bg-gray-50 transition-colors`}
-                      onDragEnter={handleDragEnter}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                    >
-                      <input
-                        id="support-screenshot-upload"
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={handleFileChange}
-                        ref={fileInputRef}
-                        required
-                      />
-
-                      {!screenshotPreview ? (
-                        <div className="text-center">
-                          <Upload className="mx-auto h-8 w-8 text-gray-500 mb-2" />
-                          <p className="text-sm text-gray-700">
-                            {screenshot
-                              ? screenshot.name
-                              : "Upload payment screenshot"}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Click to browse or drag and drop
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="relative w-full">
-                          <div className="absolute top-2 right-2 z-10">
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="icon"
-                              className="h-6 w-6 rounded-full"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                removeScreenshot();
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Spinner text="Loading payment methods..." />
+            </div>
+          ) : paymentMethods.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-lg text-muted-foreground">
+                Payment methods are currently unavailable. Please try again
+                later.
+              </p>
+            </div>
+          ) : (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg font-medium">
+                          Donation Amount *
+                        </FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                              $
+                            </span>
+                            <Input
+                              placeholder="Enter donation amount"
+                              className="pl-8"
+                              type="number"
+                              min="1"
+                              required
+                              {...field}
+                              value={
+                                donationAmount.replace(/[^0-9]/g, "") ||
+                                field.value
+                              }
+                              onChange={(e) => {
+                                setDonationAmount(e.target.value);
+                                field.onChange(e);
                               }}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          <div className="relative w-full aspect-video">
-                            <img
-                              src={screenshotPreview || "/placeholder.svg"}
-                              alt="Payment screenshot"
-                              className="w-full h-full object-contain"
                             />
                           </div>
-                          <p className="text-xs text-center text-gray-500 mt-2">
-                            Click to change image
-                          </p>
-                        </div>
-                      )}
-                    </Label>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your full name"
+                            required
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your email"
+                            type="email"
+                            required
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your phone number"
+                            required
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="paymentMethod"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel className="text-lg font-medium">
+                          Payment Method *
+                        </FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            className="space-y-2"
+                          >
+                            {paymentMethods.map((method, index) => (
+                              <div
+                                key={index}
+                                className="border rounded-lg overflow-hidden"
+                              >
+                                <div className="flex items-center space-x-2 p-3 border-b">
+                                  <RadioGroupItem
+                                    value={method.type}
+                                    id={`payment-${method.type}`}
+                                  />
+                                  <label
+                                    htmlFor={`payment-${method.type}`}
+                                    className="flex-1 cursor-pointer font-medium"
+                                  >
+                                    {getPaymentMethodLabel(method)}
+                                  </label>
+                                </div>
+                                {field.value === method.type &&
+                                  renderPaymentMethodDetails(method)}
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-2">
+                    <FormLabel className="text-lg font-medium">
+                      Payment Screenshot *
+                    </FormLabel>
+                    <div className="mt-1">
+                      <Label
+                        htmlFor="support-screenshot-upload"
+                        ref={dropZoneRef}
+                        className={`cursor-pointer flex flex-col items-center justify-center w-full border-2 ${
+                          isDragging
+                            ? "border-primary"
+                            : "border-dashed border-gray-300"
+                        } rounded-md p-4 hover:bg-gray-50 transition-colors`}
+                        onDragEnter={handleDragEnter}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                      >
+                        <input
+                          id="support-screenshot-upload"
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={handleFileChange}
+                          ref={fileInputRef}
+                          required
+                        />
+
+                        {!screenshotPreview ? (
+                          <div className="text-center">
+                            <Upload className="mx-auto h-8 w-8 text-gray-500 mb-2" />
+                            <p className="text-sm text-gray-700">
+                              {screenshot
+                                ? screenshot.name
+                                : "Upload payment screenshot"}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Click to browse or drag and drop
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="relative w-full">
+                            <div className="absolute top-2 right-2 z-10">
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="h-6 w-6 rounded-full"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  removeScreenshot();
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <div className="relative w-full aspect-video">
+                              <img
+                                src={screenshotPreview || "/placeholder.svg"}
+                                alt="Payment screenshot"
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                            <p className="text-xs text-center text-gray-500 mt-2">
+                              Click to change image
+                            </p>
+                          </div>
+                        )}
+                      </Label>
+                    </div>
                   </div>
+
+                  <FormField
+                    control={form.control}
+                    name="receiveUpdates"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-6">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Receive Updates</FormLabel>
+                          <FormDescription>
+                            Receive occasional updates about our work and how
+                            your support is helping
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="receiveUpdates"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-6">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>Receive Updates</FormLabel>
-                        <FormDescription>
-                          Receive occasional updates about our work and how your
-                          support is helping
-                        </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="flex justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsDialogOpen(false);
-                    setScreenshot(null);
-                    setScreenshotPreview(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-primary hover:bg-primary/90"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <Spinner text="Submitting..." />
-                  ) : (
-                    "Complete Support"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Form>
+                <div className="flex justify-between">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setIsDialogOpen(false);
+                      setScreenshot(null);
+                      setScreenshotPreview(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-primary hover:bg-primary/90"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <Spinner text="Submitting..." />
+                    ) : (
+                      "Complete Support"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
         </DialogContent>
       </Dialog>
     </section>
