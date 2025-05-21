@@ -1,4 +1,3 @@
-import { toast } from "sonner";
 import type { IRetreat, IRetreatInput, IRetreatUpdate } from "@/types";
 
 // Retreat API functions
@@ -16,9 +15,7 @@ export const retreatApi = {
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error fetching public retreats:", error);
-      toast.error("Error", {
-        description: "Failed to fetch retreats",
-      });
+
       return [];
     }
   },
@@ -40,9 +37,7 @@ export const retreatApi = {
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error fetching admin retreats:", error);
-      toast.error("Error", {
-        description: "Failed to fetch retreats",
-      });
+
       return [];
     }
   },
@@ -59,9 +54,7 @@ export const retreatApi = {
       return data;
     } catch (error) {
       console.error(`Error fetching retreat ${id}:`, error);
-      toast.error("Error", {
-        description: "Failed to fetch retreat details",
-      });
+
       return null;
     }
   },
@@ -83,15 +76,10 @@ export const retreatApi = {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Retreat created successfully",
-      });
       return true;
     } catch (error: any) {
       console.error("Error creating retreat:", error);
-      toast.error("Error", {
-        description: error.message || "Failed to create retreat",
-      });
+
       return false;
     }
   },
@@ -116,15 +104,10 @@ export const retreatApi = {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Retreat updated successfully",
-      });
       return true;
     } catch (error: any) {
       console.error(`Error updating retreat ${id}:`, error);
-      toast.error("Error", {
-        description: error.message || "Failed to update retreat",
-      });
+
       return false;
     }
   },
@@ -148,17 +131,10 @@ export const retreatApi = {
         throw new Error(`Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: `Retreat ${
-          isVisible ? "published" : "unpublished"
-        } successfully`,
-      });
       return true;
     } catch (error) {
       console.error(`Error toggling retreat visibility ${id}:`, error);
-      toast.error("Error", {
-        description: `Failed to ${isVisible ? "publish" : "unpublish"} retreat`,
-      });
+
       return false;
     }
   },
@@ -177,15 +153,10 @@ export const retreatApi = {
         throw new Error(`Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Retreat deleted successfully",
-      });
       return true;
     } catch (error) {
       console.error(`Error deleting retreat ${id}:`, error);
-      toast.error("Error", {
-        description: "Failed to delete retreat",
-      });
+
       return false;
     }
   },
@@ -203,16 +174,10 @@ export const retreatApi = {
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
-      toast.success("Success", {
-        description: `${ids.length} retreats deleted successfully`,
-      });
       return true;
     } catch (error) {
       console.error("Error deleting retreats:", error);
-      toast.error("Error", {
-        description: "Failed to delete retreats",
-      });
+
       return false;
     }
   },

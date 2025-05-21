@@ -1,4 +1,3 @@
-import { toast } from "sonner";
 import type { IEvent } from "@/types";
 
 // Event API functions
@@ -16,9 +15,7 @@ export const eventApi = {
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error fetching events:", error);
-      toast.error("Error", {
-        description: "Failed to fetch events",
-      });
+
       return [];
     }
   },
@@ -40,9 +37,7 @@ export const eventApi = {
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error fetching admin events:", error);
-      toast.error("Error", {
-        description: "Failed to fetch events",
-      });
+
       return [];
     }
   },
@@ -59,9 +54,7 @@ export const eventApi = {
       return data;
     } catch (error) {
       console.error(`Error fetching event ${id}:`, error);
-      toast.error("Error", {
-        description: "Failed to fetch event details",
-      });
+
       return null;
     }
   },
@@ -91,15 +84,10 @@ export const eventApi = {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Event created successfully",
-      });
       return true;
     } catch (error: any) {
       console.error("Error creating event:", error);
-      toast.error("Error", {
-        description: error.message || "Failed to create event",
-      });
+
       return false;
     }
   },
@@ -121,15 +109,10 @@ export const eventApi = {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Event updated successfully",
-      });
       return true;
     } catch (error: any) {
       console.error(`Error updating event ${id}:`, error);
-      toast.error("Error", {
-        description: error.message || "Failed to update event",
-      });
+
       return false;
     }
   },
@@ -154,15 +137,10 @@ export const eventApi = {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Event updated successfully",
-      });
       return true;
     } catch (error: any) {
       console.error(`Error updating event ${id}:`, error);
-      toast.error("Error", {
-        description: error.message || "Failed to update event",
-      });
+
       return false;
     }
   },
@@ -187,17 +165,10 @@ export const eventApi = {
         throw new Error(`Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: `Event ${
-          isVisible ? "published" : "unpublished"
-        } successfully`,
-      });
       return true;
     } catch (error) {
       console.error(`Error toggling event visibility ${id}:`, error);
-      toast.error("Error", {
-        description: `Failed to ${isVisible ? "publish" : "unpublish"} event`,
-      });
+
       return false;
     }
   },
@@ -216,15 +187,10 @@ export const eventApi = {
         throw new Error(`Error: ${response.status}`);
       }
 
-      toast.success("Success", {
-        description: "Event deleted successfully",
-      });
       return true;
     } catch (error) {
       console.error(`Error deleting event ${id}:`, error);
-      toast.error("Error", {
-        description: "Failed to delete event",
-      });
+
       return false;
     }
   },
@@ -245,9 +211,7 @@ export const eventApi = {
       return true;
     } catch (error) {
       console.error("Error deleting events:", error);
-      toast.error("Error", {
-        description: "Failed to delete events",
-      });
+
       return false;
     }
   },

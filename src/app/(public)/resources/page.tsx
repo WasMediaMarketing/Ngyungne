@@ -23,6 +23,7 @@ import {
   Clock,
   Headphones,
 } from "lucide-react";
+import BlogSection from "@/components/blog/BlogSection";
 
 const ResourcesPage = () => {
   const featuredResources = [
@@ -32,7 +33,7 @@ const ResourcesPage = () => {
       description:
         "Step-by-step instructions for establishing a daily meditation routine",
       icon: <BookOpen className="h-6 w-6 text-amber-600" />,
-      href: "/resources/practices/daily-meditation",
+      href: "/resources/practices",
     },
     {
       title: "Buddhist Calendar 2025",
@@ -57,29 +58,6 @@ const ResourcesPage = () => {
         "Answers to common questions for those new to Buddhist practice",
       icon: <HelpCircle className="h-6 w-6 text-amber-600" />,
       href: "/resources/faq",
-    },
-  ];
-
-  const blogPosts = [
-    {
-      title: "The Art of Mindful Living",
-      date: "February 25, 2025",
-      excerpt: "Exploring how to bring awareness into everyday activities...",
-      image: "/placeholder.svg?height=200&width=400",
-    },
-    {
-      title: "Understanding Buddhist Ethics in Modern Life",
-      date: "February 10, 2025",
-      excerpt:
-        "How ancient ethical principles can guide us in today's complex world...",
-      image: "/placeholder.svg?height=200&width=400",
-    },
-    {
-      title: "Meditation and Neuroscience",
-      date: "January 30, 2025",
-      excerpt:
-        "Recent findings on how meditation affects brain structure and function...",
-      image: "/placeholder.svg?height=200&width=400",
     },
   ];
 
@@ -232,37 +210,7 @@ const ResourcesPage = () => {
 
       {/* Blog Section */}
       <section className="mb-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Recent Blog Posts</h2>
-          <Button variant="link" asChild>
-            <a href="/resources/blog">View All Posts</a>
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {blogPosts.map((post, index) => (
-            <Card key={index} className="overflow-hidden">
-              <img
-                src={post.image || "/placeholder.svg"}
-                alt={post.title}
-                className="w-full h-48 object-cover"
-              />
-              <CardContent className="pt-6">
-                <div className="text-sm text-gray-500 mb-2">{post.date}</div>
-                <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
-                <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                <Button variant="link" className="p-0" asChild>
-                  <a
-                    href={`/resources/blog/${post.title
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`}
-                  >
-                    Read More
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <BlogSection />
       </section>
     </div>
   );

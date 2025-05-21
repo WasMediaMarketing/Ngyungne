@@ -16,6 +16,7 @@ import { causeApi, CauseUI } from "@/utils/causeApi";
 import { Loader } from "@/components/common/loader";
 import { eventApi } from "@/utils/eventApi";
 import { IEvent } from "@/types/event.types";
+import { CoursesSection } from "@/components/course/courses-section";
 export default function Home() {
   const apiCallDone = useRef(false); // useRef to track whether API has been called
   const [readingProgress, setReadingProgress] = useState(0);
@@ -82,7 +83,7 @@ export default function Home() {
       <HeroSlider />
       <AboutSection />
       {/* <ProgramsSection /> */}
-      <TeachingsSection />
+      <CoursesSection />
       <div className=" mx-auto px-4 sm:px-6 lg:px-8">
         {events && events.length > 0 ? (
           <FeaturedEventsSlider events={events} />

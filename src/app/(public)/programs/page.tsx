@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -15,84 +17,159 @@ import {
   MapPin,
   Clock,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { causeApi } from "@/utils/causeApi";
+import { eventApi } from "@/utils/eventApi";
+import { retreatApi } from "@/utils/retreatApi";
+import type { CauseUI } from "@/utils/causeApi";
+import type { IEvent, IRetreat } from "@/types";
 
-const ProgramsPage = () => {
-  const upcomingEvents = [
-    {
-      title: "Weekend Meditation Retreat",
-      date: "March 15-17, 2025",
-      location: "Mountain Dharma Center",
-      description:
-        "A peaceful weekend retreat focusing on mindfulness and compassion practices",
-      image: "/api/placeholder/400/200",
-    },
-    {
-      title: "Public Talk: The Path to Inner Peace",
-      date: "March 25, 2025",
-      location: "City Community Hall",
-      description: "An evening talk on finding peace in our busy modern lives",
-      image: "/api/placeholder/400/200",
-    },
-    {
-      title: "Nyungne Fasting Practice",
-      date: "April 5-6, 2025",
-      location: "Temple Meditation Hall",
-      description:
-        "Traditional purification and compassion practice with fasting and prayers",
-      image: "/api/placeholder/400/200",
-    },
-  ];
+// Format date to readable string
+const formatDate = (dateString: string | Date) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
-  const retreatTypes = [
-    {
-      title: "Weekend Retreats",
-      description:
-        "Short, intensive practice periods perfect for those with busy schedules",
-      duration: "2-3 days",
-      frequency: "Monthly",
-    },
-    {
-      title: "Silent Retreats",
-      description:
-        "Deep immersion in meditation practice in a supportive, silent environment",
-      duration: "5-7 days",
-      frequency: "Quarterly",
-    },
-    {
-      title: "Summer Intensive",
-      description:
-        "Annual extended retreat combining study and practice in a residential setting",
-      duration: "2-4 weeks",
-      frequency: "Annually (June-August)",
-    },
-  ];
+// Calculate progress percentage
+const calculateProgress = (raised: number, goal: number) => {
+  return Math.floor((raised / goal) * 100);
+};
 
-  const causes = [
-    {
-      title: "Education Fund",
-      description:
-        "Supporting Buddhist education for monastics and lay practitioners",
-      goal: "$25,000",
-      current: "$18,750",
-      image: "/api/placeholder/400/200",
-    },
-    {
-      title: "Temple Renovation",
-      description:
-        "Preserving and maintaining sacred spaces for practice and community",
-      goal: "$50,000",
-      current: "$32,500",
-      image: "/api/placeholder/400/200",
-    },
-    {
-      title: "Humanitarian Relief",
-      description: "Providing aid to communities affected by natural disasters",
-      goal: "$15,000",
-      current: "$9,800",
-      image: "/api/placeholder/400/200",
-    },
-  ];
+export default function ProgramsPage() {
+  // State for data
+  const [causes, setCauses] = useState<CauseUI[]>([]);
+  const [events, setEvents] = useState<IEvent[]>([]);
+  const [retreats, setRetreats] = useState<IRetreat[]>([]);
+
+  // State for loading and errors
+  const [causesLoading, setCausesLoading] = useState(true);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [retreatsLoading, setRetreatLoading] = useState(true);
+
+  const [causesError, setCausesError] = useState<string | null>(null);
+  const [eventsError, setEventsError] = useState<string | null>(null);
+  const [retreatsError, setRetreatsError] = useState<string | null>(null);
+
+  // Fetch causes
+  useEffect(() => {
+    async function fetchCauses() {
+      try {
+        setCausesLoading(true);
+        const data = await causeApi.getCauses();
+        setCauses(data);
+        setCausesError(null);
+      } catch (err) {
+        console.error("Error fetching causes:", err);
+        setCausesError("Failed to load causes. Please try again later.");
+      } finally {
+        setCausesLoading(false);
+      }
+    }
+
+    fetchCauses();
+  }, []);
+
+  // Fetch events
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        setEventsLoading(true);
+        const data = await eventApi.getEvents();
+        setEvents(data);
+        setEventsError(null);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+        setEventsError("Failed to load events. Please try again later.");
+      } finally {
+        setEventsLoading(false);
+      }
+    }
+
+    fetchEvents();
+  }, []);
+
+  // Fetch retreats
+  useEffect(() => {
+    async function fetchRetreats() {
+      try {
+        setRetreatLoading(true);
+        const data = await retreatApi.getPublicRetreats();
+        setRetreats(data);
+        setRetreatsError(null);
+      } catch (err) {
+        console.error("Error fetching retreats:", err);
+        setRetreatsError("Failed to load retreats. Please try again later.");
+      } finally {
+        setRetreatLoading(false);
+      }
+    }
+
+    fetchRetreats();
+  }, []);
+
+  // Process retreat data
+  const retreatTypes = retreats.reduce((acc, retreat) => {
+    const type = retreat.type || "General";
+    if (!acc[type]) {
+      acc[type] = [];
+    }
+    acc[type].push(retreat);
+    return acc;
+  }, {} as Record<string, IRetreat[]>);
+
+  // Get retreat type summaries
+  const retreatTypeSummaries = Object.entries(retreatTypes).map(
+    ([type, retreats]) => {
+      const durations = retreats.map((r) => r.duration);
+      const avgDuration =
+        durations.length > 0
+          ? durations[Math.floor(durations.length / 2)]
+          : "Varies";
+
+      return {
+        title: type,
+        description: `${type} retreats focusing on deep practice and spiritual growth`,
+        duration: avgDuration,
+        frequency: retreats.length > 3 ? "Regular" : "Occasional",
+      };
+    }
+  );
+
+  // Limit to 3 items for each section
+  const upcomingEvents = events
+    .filter((event) => new Date(event.date) > new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 3);
+
+  const featuredCauses = causes.filter((cause) => cause.isVisible).slice(0, 3);
+
+  // Loading indicator component
+  const LoadingIndicator = () => (
+    <div className="flex justify-center items-center py-12">
+      <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+    </div>
+  );
+
+  // Error message component
+  const ErrorMessage = ({ message }: { message: string }) => (
+    <div className="text-center py-8">
+      <p className="text-red-500">{message}</p>
+      <Button
+        variant="outline"
+        className="mt-4"
+        onClick={() => window.location.reload()}
+      >
+        Try Again
+      </Button>
+    </div>
+  );
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -124,9 +201,9 @@ const ProgramsPage = () => {
             </CardContent>
             <CardFooter className="flex justify-center">
               <Button asChild>
-                <a href="/programs/events">
+                <Link href="/programs/events">
                   View Calendar <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                </Link>
               </Button>
             </CardFooter>
           </Card>
@@ -147,9 +224,9 @@ const ProgramsPage = () => {
             </CardContent>
             <CardFooter className="flex justify-center">
               <Button asChild>
-                <a href="/programs/retreats">
+                <Link href="/programs/retreats">
                   Explore Retreats <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                </Link>
               </Button>
             </CardFooter>
           </Card>
@@ -170,9 +247,9 @@ const ProgramsPage = () => {
             </CardContent>
             <CardFooter className="flex justify-center">
               <Button asChild>
-                <a href="/programs/causes">
+                <Link href="/programs/causes">
                   Support Causes <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                </Link>
               </Button>
             </CardFooter>
           </Card>
@@ -182,41 +259,62 @@ const ProgramsPage = () => {
       {/* Upcoming Events */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-6">Upcoming Events</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {upcomingEvents.map((event, index) => (
-            <Card key={index} className="overflow-hidden">
-              <img
-                src={event.image}
-                alt={event.title}
-                className="w-full h-48 object-cover"
-              />
-              <CardHeader>
-                <CardTitle>{event.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-start">
-                    <Calendar className="h-4 w-4 mr-2 mt-1 text-amber-600" />
-                    <span>{event.date}</span>
-                  </div>
-                  <div className="flex items-start">
-                    <MapPin className="h-4 w-4 mr-2 mt-1 text-amber-600" />
-                    <span>{event.location}</span>
-                  </div>
+
+        {eventsLoading ? (
+          <LoadingIndicator />
+        ) : eventsError ? (
+          <ErrorMessage message={eventsError} />
+        ) : upcomingEvents.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {upcomingEvents.map((event) => (
+              <Card key={event.id.toString()} className="overflow-hidden">
+                <div className="w-full h-48 relative">
+                  <Image
+                    src={event.image || "/placeholder.svg?height=200&width=400"}
+                    alt={event.title}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
-                <p className="text-gray-600">{event.description}</p>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">
-                  Learn More
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                <CardHeader>
+                  <CardTitle>{event.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 mb-4">
+                    <div className="flex items-start">
+                      <Calendar className="h-4 w-4 mr-2 mt-1 text-amber-600" />
+                      <span>{formatDate(event.date)}</span>
+                    </div>
+                    <div className="flex items-start">
+                      <MapPin className="h-4 w-4 mr-2 mt-1 text-amber-600" />
+                      <span>{event.location}</span>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 line-clamp-3">
+                    {event.description}
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href={`/programs/events/${event.id}`}>
+                      Learn More
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">
+              No upcoming events at this time. Check back soon!
+            </p>
+          </div>
+        )}
+
         <div className="text-center mt-8">
-          <Button variant="outline" size="lg">
-            View All Events
+          <Button variant="outline" size="lg" asChild>
+            <Link href="/programs/events">View All Events</Link>
           </Button>
         </div>
       </section>
@@ -224,90 +322,118 @@ const ProgramsPage = () => {
       {/* Retreats Section */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-6">Retreat Programs</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {retreatTypes.map((retreat, index) => (
-            <Card key={index}>
-              <CardHeader>
-                <CardTitle>{retreat.title}</CardTitle>
-                <CardDescription>{retreat.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-2 text-amber-600" />
-                    <span>Duration: {retreat.duration}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-2 text-amber-600" />
-                    <span>Frequency: {retreat.frequency}</span>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">
-                  View Schedule
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+
+        {retreatsLoading ? (
+          <LoadingIndicator />
+        ) : retreatsError ? (
+          <ErrorMessage message={retreatsError} />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {retreatTypeSummaries.length > 0 ? (
+              retreatTypeSummaries.slice(0, 3).map((retreat, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle>{retreat.title}</CardTitle>
+                    <CardDescription>{retreat.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-2 text-amber-600" />
+                        <span>Duration: {retreat.duration}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-2 text-amber-600" />
+                        <span>Frequency: {retreat.frequency}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link href="/programs/retreats">View Schedule</Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-8">
+                <p className="text-gray-500">
+                  No retreat programs available at this time. Check back soon!
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Causes Section */}
       <section>
         <h2 className="text-2xl font-bold mb-6">Current Causes</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {causes.map((cause, index) => (
-            <Card key={index} className="overflow-hidden">
-              <img
-                src={cause.image}
-                alt={cause.title}
-                className="w-full h-48 object-cover"
-              />
-              <CardHeader>
-                <CardTitle>{cause.title}</CardTitle>
-                <CardDescription>{cause.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>
-                        Progress: {cause.current} of {cause.goal}
-                      </span>
-                      <span>
-                        {Math.floor(
-                          (parseInt(cause.current.replace(/\D/g, "")) /
-                            parseInt(cause.goal.replace(/\D/g, ""))) *
-                            100
-                        )}
-                        %
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-amber-600 h-2 rounded-full"
-                        style={{
-                          width: `${Math.floor(
-                            (parseInt(cause.current.replace(/\D/g, "")) /
-                              parseInt(cause.goal.replace(/\D/g, ""))) *
-                              100
-                          )}%`,
-                        }}
-                      ></div>
+
+        {causesLoading ? (
+          <LoadingIndicator />
+        ) : causesError ? (
+          <ErrorMessage message={causesError} />
+        ) : featuredCauses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {featuredCauses.map((cause) => (
+              <Card key={cause.id} className="overflow-hidden">
+                <div className="w-full h-48 relative">
+                  <Image
+                    src={cause.image || "/placeholder.svg?height=200&width=400"}
+                    alt={cause.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <CardHeader>
+                  <CardTitle>{cause.title}</CardTitle>
+                  <CardDescription>{cause.subtitle}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>
+                          Progress: ${cause.raised.toLocaleString()} of $
+                          {cause.goal.toLocaleString()}
+                        </span>
+                        <span>
+                          {calculateProgress(cause.raised, cause.goal)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-amber-600 h-2 rounded-full"
+                          style={{
+                            width: `${calculateProgress(
+                              cause.raised,
+                              cause.goal
+                            )}%`,
+                          }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full">Support This Cause</Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" asChild>
+                    <Link href={`/programs/causes/${cause.id}`}>
+                      Support This Cause
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">
+              No active causes at this time. Check back soon!
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );
-};
-
-export default ProgramsPage;
+}

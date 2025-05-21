@@ -1,5 +1,4 @@
 import axios from "axios";
-import { toast } from "sonner";
 
 // Configure axios to handle larger payloads
 axios.defaults.maxContentLength = 50 * 1024 * 1024; // 50MB
@@ -148,7 +147,6 @@ export const causeApi = {
       return mappedCauses;
     } catch (error) {
       console.error("Error fetching causes:", error);
-      toast.error("Error", { description: "Failed to fetch causes" });
       return [];
     }
   },
@@ -172,7 +170,6 @@ export const causeApi = {
 
       return Array.isArray(causes) ? causes.map(mapCauseToUI) : [];
     } catch (error) {
-      toast.error("Error", { description: "Failed to fetch causes" });
       console.error("Error fetching admin causes:", error);
       return [];
     }
@@ -206,7 +203,6 @@ export const causeApi = {
       return mappedCause;
     } catch (error) {
       console.error(`Error fetching cause ${id}:`, error);
-      toast.error("Error", { description: "Failed to fetch cause details" });
       return null;
     }
   },
@@ -228,15 +224,10 @@ export const causeApi = {
         timeout: 60000, // 60 seconds
       });
 
-      toast.success("Success", {
-        description: "Cause created successfully",
-      });
       return true;
     } catch (error: any) {
       console.error("Error creating cause:", error);
-      toast.error("Error", {
-        description: error.message || "Failed to create cause",
-      });
+
       return false;
     }
   },
@@ -258,15 +249,10 @@ export const causeApi = {
         timeout: 60000, // 60 seconds
       });
 
-      toast.success("Success", {
-        description: "Cause updated successfully",
-      });
       return true;
     } catch (error: any) {
       console.error(`Error updating cause ${id}:`, error);
-      toast.error("Error", {
-        description: error.message || "Failed to update cause",
-      });
+
       return false;
     }
   },
@@ -293,16 +279,8 @@ export const causeApi = {
         }
       );
 
-      toast.success("Success", {
-        description: `Cause is now ${
-          isVisible ? "visible" : "hidden"
-        } on the website`,
-      });
       return true;
     } catch (error) {
-      toast.error("Error", {
-        description: "Failed to update cause visibility",
-      });
       console.error("Error updating cause visibility:", error);
       return false;
     }
@@ -322,12 +300,8 @@ export const causeApi = {
         },
       });
 
-      toast.success("Success", {
-        description: "Cause deleted successfully",
-      });
       return true;
     } catch (error) {
-      toast.error("Error", { description: "Failed to delete cause" });
       console.error(`Error deleting cause ${id}:`, error);
       return false;
     }
@@ -347,12 +321,8 @@ export const causeApi = {
         },
       });
 
-      toast.success("Success", {
-        description: "Causes deleted successfully",
-      });
       return true;
     } catch (error) {
-      toast.error("Error", { description: "Failed to delete causes" });
       console.error("Error deleting causes:", error);
       return false;
     }

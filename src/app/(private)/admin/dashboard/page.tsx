@@ -28,8 +28,8 @@ import {
   GraduationCap,
   Activity,
 } from "lucide-react";
-import { isAuthenticated } from "@/utils/auth";
 import { Loader } from "@/components/common/loader";
+import { isAuthenticated } from "@/utils/auth";
 import { getUsers } from "@/utils/userApi";
 import { courseApi } from "@/utils/courseApi";
 import { eventApi } from "@/utils/eventApi";
@@ -398,6 +398,7 @@ const NgyungneDashboard = () => {
       "Nov",
       "Dec",
     ];
+    const currentYear = new Date().getFullYear();
 
     // Initialize data structure for all months
     const newMonthlyData = months.map((month, index) => ({
@@ -408,45 +409,62 @@ const NgyungneDashboard = () => {
       retreats: 0,
     }));
 
-    // Fill in course data by month
+    // Count the number of items created in each month (not participants)
+    // Fill in course data by month - count number of courses
     courses.forEach((course) => {
       if (course.createdAt) {
         const courseDate = new Date(course.createdAt);
-        const monthIndex = courseDate.getMonth();
-        newMonthlyData[monthIndex].courses += 1;
+        // Only count courses from current year
+        if (courseDate.getFullYear() === currentYear) {
+          const monthIndex = courseDate.getMonth();
+          newMonthlyData[monthIndex].courses += 1;
+        }
       }
     });
 
-    // Fill in event data by month
+    // Fill in event data by month - count number of events
     events.forEach((event) => {
       if (event.date || event.startDate) {
         const eventDate = new Date(event.date || event.startDate);
-        const monthIndex = eventDate.getMonth();
-        newMonthlyData[monthIndex].events += 1;
+        // Only count events from current year
+        if (eventDate.getFullYear() === currentYear) {
+          const monthIndex = eventDate.getMonth();
+          newMonthlyData[monthIndex].events += 1;
+        }
       }
     });
 
-    // Fill in cause data by month
+    // Fill in cause data by month - count number of causes
     causes.forEach((cause) => {
       if (cause.startDate) {
         const causeDate = new Date(cause.startDate);
-        const monthIndex = causeDate.getMonth();
-        newMonthlyData[monthIndex].causes += 1;
+        // Only count causes from current year
+        if (causeDate.getFullYear() === currentYear) {
+          const monthIndex = causeDate.getMonth();
+          newMonthlyData[monthIndex].causes += 1;
+        }
       }
     });
 
-    // Fill in retreat data by month
+    // Fill in retreat data by month - count number of retreats
     retreats.forEach((retreat) => {
       if (retreat.date) {
         const retreatDate = new Date(retreat.date);
-        const monthIndex = retreatDate.getMonth();
-        newMonthlyData[monthIndex].retreats += 1;
+        // Only count retreats from current year
+        if (retreatDate.getFullYear() === currentYear) {
+          const monthIndex = retreatDate.getMonth();
+          newMonthlyData[monthIndex].retreats += 1;
+        }
       }
     });
 
     setMonthlyEnrollmentData(newMonthlyData);
 
     // Process enrollment distribution data with real numbers
+    // For the pie chart, we want to show the actual number of participants/students
+    // not just the count of items
+
+    // Get actual counts from the data, defaulting to 0 if not available
     const totalCourseStudents = courses.reduce(
       (total, course) => total + (course.students || 0),
       0
@@ -464,32 +482,70 @@ const NgyungneDashboard = () => {
       0
     );
 
-    // Calculate programs as a separate category if we have that data, otherwise use a small percentage of total
-    const totalProgramParticipants = Math.max(
-      // Try to find program data if it exists
-      courses
-        .filter((course) => course.type === "program")
-        .reduce((total, course) => total + (course.students || 0), 0),
-      // Otherwise use a small percentage of total
-      Math.round(
-        (totalCourseStudents +
-          totalEventAttendees +
-          totalCauseParticipants +
-          totalRetreatParticipants) *
-          0.05
-      )
+    // Debug log to understand retreat data
+    console.log(
+      "Retreats data:",
+      retreats.map((retreat) => ({
+        id: retreat.id || retreat._id,
+        participants: retreat.participants || 0,
+      }))
     );
+    console.log("Total retreat participants:", totalRetreatParticipants);
 
-    // Create distribution data
-    const newDistributionData = [
-      { name: "Courses", value: totalCourseStudents, color: "#f63d55" },
-      { name: "Events", value: totalEventAttendees, color: "#ffb81a" },
-      { name: "Causes", value: totalCauseParticipants, color: "#e64848" },
-      { name: "Retreats", value: totalRetreatParticipants, color: "#dd7200" },
-      { name: "Programs", value: totalProgramParticipants, color: "#b22626" },
-    ];
+    // Calculate programs as a separate category if we have that data
+    const totalProgramParticipants = courses
+      .filter((course) => course.type === "program")
+      .reduce((total, course) => total + (course.students || 0), 0);
 
-    setEnrollmentDistributionData(newDistributionData);
+    // Create distribution data - only include categories with values > 0
+    const distributionData = [];
+
+    if (totalCourseStudents > 0) {
+      distributionData.push({
+        name: "Courses",
+        value: totalCourseStudents,
+        color: "#f63d55",
+      });
+    }
+
+    if (totalEventAttendees > 0) {
+      distributionData.push({
+        name: "Events",
+        value: totalEventAttendees,
+        color: "#ffb81a",
+      });
+    }
+
+    if (totalCauseParticipants > 0) {
+      distributionData.push({
+        name: "Causes",
+        value: totalCauseParticipants,
+        color: "#e64848",
+      });
+    }
+
+    if (totalRetreatParticipants > 0) {
+      distributionData.push({
+        name: "Retreats",
+        value: totalRetreatParticipants,
+        color: "#dd7200",
+      });
+    }
+
+    if (totalProgramParticipants > 0) {
+      distributionData.push({
+        name: "Programs",
+        value: totalProgramParticipants,
+        color: "#b22626",
+      });
+    }
+
+    // If we have no data at all, add a placeholder
+    if (distributionData.length === 0) {
+      distributionData.push({ name: "No Data", value: 1, color: "#cccccc" });
+    }
+
+    setEnrollmentDistributionData(distributionData);
 
     // Process location data based on available location information
     const locationCounts: { [key: string]: number } = {};
@@ -610,6 +666,18 @@ const NgyungneDashboard = () => {
     return null; // Will redirect in useEffect
   }
 
+  // Debug function to log data
+  const logData = () => {
+    console.log("Users:", users);
+    console.log("Courses:", courses);
+    console.log("Events:", events);
+    console.log("Retreats:", retreats);
+    console.log("Causes:", causes);
+    console.log("Monthly Data:", monthlyEnrollmentData);
+    console.log("Distribution Data:", enrollmentDistributionData);
+    console.log("Location Data:", locationData);
+  };
+
   return (
     <div className="w-full p-4 ">
       <div className="mb-6">
@@ -619,6 +687,13 @@ const NgyungneDashboard = () => {
         <p className="text-gray-600">
           Overview of practice activities, user engagement, and upcoming events
         </p>
+        {/* Debug button - remove in production */}
+        <button
+          onClick={logData}
+          className="text-xs text-gray-500 mt-2 hover:text-gray-700"
+        >
+          Debug Data
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -845,9 +920,10 @@ const NgyungneDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Monthly Enrollment Trends */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h3 className="text-lg font-medium mb-4">
-            Monthly User Enrollment Trends
-          </h3>
+          <h3 className="text-lg font-medium mb-4">Monthly Activity Trends</h3>
+          <p className="text-xs text-gray-500 mb-2">
+            Number of items created per month
+          </p>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyEnrollmentData}>
@@ -884,9 +960,125 @@ const NgyungneDashboard = () => {
 
         {/* Enrollment Distribution */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h3 className="text-lg font-medium mb-4">
-            User Enrollment Distribution
-          </h3>
+          <h3 className="text-lg font-medium mb-4">Participant Distribution</h3>
+          <p className="text-xs text-gray-500 mb-2">
+            Total number of people in each category (not number of items)
+          </p>
+          <div className="flex items-center mb-2 space-x-2">
+            <button
+              className="text-xs px-2 py-1 rounded bg-crimson-100 text-crimson-700 hover:bg-crimson-200"
+              onClick={() => {
+                // Create distribution data based on number of items instead of participants
+                const itemCountData = [
+                  { name: "Courses", value: courses.length, color: "#f63d55" },
+                  { name: "Events", value: events.length, color: "#ffb81a" },
+                  { name: "Causes", value: causes.length, color: "#e64848" },
+                  {
+                    name: "Retreats",
+                    value: retreats.length,
+                    color: "#dd7200",
+                  },
+                  {
+                    name: "Programs",
+                    value: courses.filter((c) => c.type === "program").length,
+                    color: "#b22626",
+                  },
+                ].filter((item) => item.value > 0);
+
+                if (itemCountData.length === 0) {
+                  itemCountData.push({
+                    name: "No Data",
+                    value: 1,
+                    color: "#cccccc",
+                  });
+                }
+
+                setEnrollmentDistributionData(itemCountData);
+              }}
+            >
+              Show Item Counts
+            </button>
+            <button
+              className="text-xs px-2 py-1 rounded bg-crimson-100 text-crimson-700 hover:bg-crimson-200"
+              onClick={() => {
+                // Recreate the original participant-based distribution data
+                const participantData = [];
+
+                const totalCourseStudents = courses.reduce(
+                  (total, course) => total + (course.students || 0),
+                  0
+                );
+                const totalEventAttendees = events.reduce(
+                  (total, event) =>
+                    total + (event.attending || event.attendees || 0),
+                  0
+                );
+                const totalCauseParticipants = causes.reduce(
+                  (total, cause) => total + (cause.volunteers || 0),
+                  0
+                );
+                const totalRetreatParticipants = retreats.reduce(
+                  (total, retreat) => total + (retreat.participants || 0),
+                  0
+                );
+                const totalProgramParticipants = courses
+                  .filter((course) => course.type === "program")
+                  .reduce((total, course) => total + (course.students || 0), 0);
+
+                if (totalCourseStudents > 0) {
+                  participantData.push({
+                    name: "Courses",
+                    value: totalCourseStudents,
+                    color: "#f63d55",
+                  });
+                }
+
+                if (totalEventAttendees > 0) {
+                  participantData.push({
+                    name: "Events",
+                    value: totalEventAttendees,
+                    color: "#ffb81a",
+                  });
+                }
+
+                if (totalCauseParticipants > 0) {
+                  participantData.push({
+                    name: "Causes",
+                    value: totalCauseParticipants,
+                    color: "#e64848",
+                  });
+                }
+
+                if (totalRetreatParticipants > 0) {
+                  participantData.push({
+                    name: "Retreats",
+                    value: totalRetreatParticipants,
+                    color: "#dd7200",
+                  });
+                }
+
+                if (totalProgramParticipants > 0) {
+                  participantData.push({
+                    name: "Programs",
+                    value: totalProgramParticipants,
+                    color: "#b22626",
+                  });
+                }
+
+                if (participantData.length === 0) {
+                  participantData.push({
+                    name: "No Data",
+                    value: 1,
+                    color: "#cccccc",
+                  });
+                }
+
+                setEnrollmentDistributionData(participantData);
+              }}
+            >
+              Show Participant Counts
+            </button>
+          </div>
           <div className="h-72 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -906,7 +1098,9 @@ const NgyungneDashboard = () => {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  formatter={(value) => [`${value} participants`, "Count"]}
+                />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -918,7 +1112,10 @@ const NgyungneDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Student Distribution by Location */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h3 className="text-lg font-medium mb-4">Users by Location</h3>
+          <h3 className="text-lg font-medium mb-4">Participants by Location</h3>
+          <p className="text-xs text-gray-500 mb-2">
+            Total number of people at each location (not number of events)
+          </p>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -928,7 +1125,9 @@ const NgyungneDashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value) => [`${value} participants`, "Count"]}
+                />
                 <Legend />
                 <Bar dataKey="students" fill="#f63d55" /> {/* crimson-500 */}
               </BarChart>
