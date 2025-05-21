@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import path from "path";
+import fs from "fs";
 import mime from "mime";
 import { join } from "path";
 import { stat, mkdir, writeFile } from "fs/promises";
 import * as dateFn from "date-fns";
+import { NextResponse } from "next/server";
 import { handleError } from "@/lib/utils/errorHandler";
 import { httpMessages } from "@/lib/utils/HttpMessage";
 
@@ -10,42 +12,48 @@ interface NodeError extends Error {
   code?: string;
 }
 
-// Ensure that handleFileUpload accepts a File object
+export const ROOT_UPLOAD_DIR = path.join(process.cwd(), "uploads"); // uploads in project root
+
+// Ensure root upload directory exists
+export const ensureUploadFolderExists = async () => {
+  try {
+    await fs.promises.access(ROOT_UPLOAD_DIR, fs.constants.F_OK);
+  } catch {
+    await fs.promises.mkdir(ROOT_UPLOAD_DIR, { recursive: true });
+  }
+};
+
+// Call once to ensure base folder exists
+ensureUploadFolderExists();
+
 export async function handleFileUpload(
   file: File
 ): Promise<NextResponse | string> {
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const relativeUploadDir = `/uploads/${dateFn.format(
-      Date.now(),
-      "dd-MM-y"
-    )}`;
-    const uploadDir = join(process.cwd(), "public", relativeUploadDir);
 
-    // Create the upload directory if it doesn't exist
+    // Format date-based subfolder
+    const relativeUploadDir = dateFn.format(Date.now(), "dd-MM-y");
+    const uploadDir = join(ROOT_UPLOAD_DIR, relativeUploadDir); // Root uploads/21-05-2025
+
+    // Ensure date-based folder exists
     try {
       await stat(uploadDir);
     } catch (e: unknown) {
       const error = e as NodeError;
       if (error.code === "ENOENT") {
-        try {
-          await mkdir(uploadDir, { recursive: true });
-        } catch (mkdirError) {
-          console.error("Error creating upload directory:", mkdirError);
-          throw new Error("Failed to create upload directory.");
-        }
+        await mkdir(uploadDir, { recursive: true });
       } else {
         console.error("Error checking directory:", error);
         throw new Error("Something went wrong while accessing storage.");
       }
     }
 
-    // Ensure the file has a valid name and type
+    // Validate file
     if (!file.name || !file.type) {
       return handleError(httpMessages.BAD_REQUEST("Invalid file data"));
     }
 
-    // Generate a unique file name
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     const extension = mime.getExtension(file.type);
 
@@ -57,16 +65,12 @@ export async function handleFileUpload(
       /\.[^/.]+$/,
       ""
     )}-${uniqueSuffix}.${extension}`;
+    const fullPath = join(uploadDir, filename);
 
-    // Write the file to disk
-    try {
-      await writeFile(`${uploadDir}/${filename}`, buffer);
-    } catch (writeError) {
-      console.error("Error writing file:", writeError);
-      return handleError(httpMessages.INTERNAL_SERVER_ERROR);
-    }
+    await writeFile(fullPath, buffer);
 
-    return `${relativeUploadDir}/${filename}`;
+    // Return file path relative to project root
+    return `uploads/${relativeUploadDir}/${filename}`;
   } catch (error) {
     console.error("File upload failed:", error);
     return handleError(httpMessages.INTERNAL_SERVER_ERROR);
