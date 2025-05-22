@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
@@ -14,7 +14,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -42,13 +41,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PaymentMethodType } from "@/types/setting.types";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import Spinner from "@/components/spinner";
@@ -204,7 +196,7 @@ export default function SettingsPage() {
       setSubmitting(true);
 
       // Process keywords if they're a comma-separated string
-      if (typeof data.metaInfo.keywords === "string") {
+      if (data.metaInfo.keywords && !Array.isArray(data.metaInfo.keywords)) {
         data.metaInfo.keywords = (data.metaInfo.keywords as unknown as string)
           .split(",")
           .map((keyword) => keyword.trim())
@@ -818,9 +810,17 @@ export default function SettingsPage() {
                             value={
                               Array.isArray(field.value)
                                 ? field.value.join(", ")
-                                : field.value
+                                : field.value || ""
                             }
-                            onChange={(e) => field.onChange(e.target.value)}
+                            onChange={(e) => {
+                              const inputValue = e.target.value;
+                              // Store as an array internally
+                              const keywordsArray = inputValue
+                                .split(",")
+                                .map((k) => k.trim())
+                                .filter(Boolean);
+                              field.onChange(keywordsArray);
+                            }}
                           />
                         </FormControl>
                         <FormDescription>
