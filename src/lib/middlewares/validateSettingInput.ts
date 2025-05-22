@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import {
   PaymentMethodType,
-  SocialLink,
-  PaymentInfo,
+  type SocialLink,
+  type PaymentInfo,
 } from "@/types/setting.types";
 
 export async function validateSettingInput(
@@ -151,7 +151,14 @@ export async function validateSettingInput(
       if (!description) errors.push("Meta description is required");
 
       if (keywords) {
-        if (!Array.isArray(keywords)) {
+        // Handle keywords that might be a string or an array
+        if (typeof keywords === "string") {
+          // Convert string to array for validation
+          data.metaInfo.keywords = keywords
+            .split(",")
+            .map((k: string) => k.trim())
+            .filter(Boolean);
+        } else if (!Array.isArray(keywords)) {
           errors.push("Meta keywords must be an array");
         }
       }
